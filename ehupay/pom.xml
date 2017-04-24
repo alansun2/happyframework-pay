@@ -1,0 +1,142 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.ehoo100</groupId>
+	<artifactId>ehupay</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>ehupay</name>
+	<packaging>jar</packaging>
+	<description>支付</description>
+<!-- 	<profiles>
+		<profile>
+			开发
+			<id>dev</id>
+			<properties>
+				<profiles.active>dev</profiles.active>
+				<deploy.url>http://localhost:8080/manager/text</deploy.url>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			本地
+			<id>in</id>
+			<properties>
+				<profiles.active>in</profiles.active>
+				<deploy.url>http://localhost:8080/manager/text</deploy.url>
+			</properties>
+		</profile>
+		<profile>
+			测试环境
+			<id>test</id>
+			<properties>
+				<profiles.active>test</profiles.active>
+				<deploy.url>http://114.55.234.83:8083/manager/text</deploy.url>
+			</properties>
+		</profile>
+		<profile>
+			生产环境
+			<id>pro</id>
+			<properties>
+				<profiles.active>pro</profiles.active>
+			</properties>
+		</profile>
+	</profiles> -->
+	<properties>
+		<lombok.version>1.16.14</lombok.version>
+		<slf4j12.version>1.7.9</slf4j12.version>
+	</properties>
+	<dependencies>
+		<!-- httpclient start -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.4.5</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>httpclient3.0.1</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+		<!-- httpclient end -->
+		<!-- jdom -->
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<!-- jdom -->
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.8</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>alipay</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- slf4j start -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j12.version}</version>
+		</dependency>
+		<!-- slf4j end -->
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.7</source> <!-- jdk版本 -->
+					<target>1.7</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+		</plugins>
+<!-- 		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				资源根目录排除各环境的配置，使用单独的资源目录来指定
+				<excludes>
+					<exclude>config/profile/dev/*</exclude>
+					<exclude>config/profile/in/*</exclude>
+					<exclude>config/profile/test/*</exclude>
+					<exclude>config/profile/pro/*</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src/main/resources/config/profile/${profiles.active}</directory>
+			</resource>
+			<resource> <directory>src/main/java/com/ehu/mapper</directory> <includes> 
+				<include>*.xml</include> </includes> </resource>
+		</resources> -->
+		<finalName>ehupay</finalName>
+	</build>
+	<distributionManagement>
+		<repository>
+			<id>ehurelease</id>
+			<name>Demo Release Repository</name>
+			<url>http://120.55.162.216:8081/nexus/content/repositories/ehuReleases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>ehusnapshots</id>
+			<name>Demo Snapshot Repository</name>
+			<url>http://120.55.162.216:8081/nexus/content/repositories/ehusnaphosts/</url>
+		</snapshotRepository>
+	</distributionManagement>
+</project>

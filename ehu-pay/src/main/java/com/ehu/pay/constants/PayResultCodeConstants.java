@@ -79,4 +79,8 @@ public class PayResultCodeConstants {
 	 * 微信支付trade_state:REVOKED
 	 */
 	public static final int TRADE_STATE_REVOKED_30012 = 30012;
+	/**
+	 * 获取财务url失败
+	 */
+	public static final int GET_FINANCIAL_30013 = 30013;
 }

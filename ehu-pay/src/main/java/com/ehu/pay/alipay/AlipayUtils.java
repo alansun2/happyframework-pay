@@ -8,9 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.request.AlipayDataDataserviceBillDownloadurlQueryRequest;
 import com.alipay.api.request.AlipayTradePrecreateRequest;
 import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.request.AlipayTradeRefundRequest;
+import com.alipay.api.response.AlipayDataDataserviceBillDownloadurlQueryResponse;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
@@ -261,6 +263,31 @@ public class AlipayUtils {
 		} catch (AlipayApiException e) {
 			log.error("支付宝扫码查询失败" , e);
 			throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30003, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30003);
+		}
+	}
+	
+	/**
+	 * 日期 只支持 yyyy-MM-dd 与yyyy-MM
+	 * @param time
+	 * @throws PayException
+	 */
+	public void getFinancial(String time) throws PayException{
+		AlipayDataDataserviceBillDownloadurlQueryRequest request = new AlipayDataDataserviceBillDownloadurlQueryRequest();
+		request.setBizContent("{" +
+		"\"bill_type\":\"trade\"," +
+		"\"bill_date\":\""+time+"\"" +
+		"}");
+		AlipayDataDataserviceBillDownloadurlQueryResponse response;
+		try {
+			response = alipayClient.execute(request);
+			if(response.isSuccess()){
+				System.out.println("调用成功");
+			} else {
+				System.out.println("调用失败");
+			}
+		} catch (AlipayApiException e) {
+			log.error("获取财务账单url失败", e);
+			throw new PayException(PayResultCodeConstants.GET_FINANCIAL_30013, PayResultMessageConstants.GET_FINANCIAL_30013);
 		}
 	}
 }

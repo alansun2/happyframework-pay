@@ -78,4 +78,8 @@ public class PayResultMessageConstants {
 	 * 微信支付trade_state:REVOKED
 	 */
 	public static final String TRADE_STATE_REVOKED_30012 = "支付已撤销";
+	/**
+	 * 获取财务url失败
+	 */
+	public static final String GET_FINANCIAL_30013 = "获取财务url失败";
 }

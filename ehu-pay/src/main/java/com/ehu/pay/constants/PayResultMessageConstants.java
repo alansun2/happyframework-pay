@@ -81,5 +81,5 @@ public class PayResultMessageConstants {
 	/**
 	 * 获取财务url失败
 	 */
-	public static final String GET_FINANCIAL_30013 = "获取财务url失败";
+	public static final String GET_FINANCIAL_30013 = "财务账单执行失败";
 }

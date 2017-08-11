@@ -271,7 +271,7 @@ public class AlipayUtils {
 	 * @param time
 	 * @throws PayException
 	 */
-	public static String getFinancial(String time) {
+	public static String getFinancial(String time) throws PayException {
 		AlipayDataDataserviceBillDownloadurlQueryRequest request = new AlipayDataDataserviceBillDownloadurlQueryRequest();
 		request.setBizContent("{" +
 		"\"bill_type\":\"trade\"," +
@@ -288,8 +288,7 @@ public class AlipayUtils {
 			}
 		} catch (AlipayApiException e) {
 			log.error("获取财务账单url失败", e);
-//			throw new PayException(PayResultCodeConstants.GET_FINANCIAL_30013, PayResultMessageConstants.GET_FINANCIAL_30013);
+			throw new PayException(PayResultCodeConstants.GET_FINANCIAL_30013, PayResultMessageConstants.GET_FINANCIAL_30013);
 		}
-		return null;
 	}
 }

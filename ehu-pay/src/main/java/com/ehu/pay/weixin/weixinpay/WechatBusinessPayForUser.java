@@ -21,6 +21,7 @@ public class WechatBusinessPayForUser {
 	
 	private static String REQUESTURL = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
 	
+	@SuppressWarnings("unchecked")
 	public static boolean weChatPayBusinessPayforUser(WechatBusinessPay wechatBusinessPay) throws PayException{
 		EhPayConfig config = EhPayConfig.getInstance();
 		String finalmoney = String.format("%.2f", wechatBusinessPay.getTotalPrice());//保留两位小数

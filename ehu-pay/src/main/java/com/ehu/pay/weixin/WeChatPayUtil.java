@@ -19,6 +19,7 @@ import com.ehu.pay.weixin.entity.WeChatResponseVO;
 import com.ehu.pay.weixin.entity.WeChatpayOrder;
 import com.ehu.pay.weixin.entity.WechatBusinessPay;
 import com.ehu.pay.weixin.util.Signature;
+import com.ehu.pay.weixin.weixinpay.DownloadBill;
 import com.ehu.pay.weixin.weixinpay.GetFinalWeChatpayResult;
 import com.ehu.pay.weixin.weixinpay.GetWeChatQuerySign;
 import com.ehu.pay.weixin.weixinpay.WeChatPayGetPrepay;
@@ -113,5 +114,13 @@ public class WeChatPayUtil {
 			throw new PayException(PayResultCodeConstants.WECHAT_SCAN_ERROR_30004, PayResultMessageConstants.WECHAT_SCAN_ERROR_30004);
 		}
 		return map.get("code_url");
+	}
+	/**
+	 * 下载账单
+	 * @param time
+	 * @throws PayException
+	 */
+	public static void downloadBill(String time, String desPath) throws PayException{
+		DownloadBill.downloadBill(time, desPath);
 	}
 }

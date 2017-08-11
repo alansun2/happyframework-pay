@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 
 /**
  * xml工具
@@ -102,7 +102,6 @@ public class XMLUtil {
 		return (String)doc.getProperty("encoding");
 	}
 
-
 	public static String getXMLString(Map<String , String> map){
 		StringBuffer sb = new StringBuffer();
 		Iterator<Entry<String, String>> it = map.entrySet().iterator();
@@ -117,5 +116,4 @@ public class XMLUtil {
 		}
 		return sb.append("</xml>").toString();
 	}
-	
 }

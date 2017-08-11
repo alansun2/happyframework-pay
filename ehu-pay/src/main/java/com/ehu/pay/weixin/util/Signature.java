@@ -69,6 +69,4 @@ public class Signature {
         //Util.log("Sign Result:" + result);
         return result;
     }
-
-
 }

@@ -1,9 +1,14 @@
 package com.ehu.pay.alipay;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.io.FileUtils;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
@@ -45,7 +50,7 @@ import com.ehu.pay.exception.PayException;
  */
 @Slf4j
 public class AlipayUtils {
-	
+
 	public static EhPayConfig config = EhPayConfig.getInstance();
 	public static AlipayClient alipayClient = new DefaultAlipayClient(config.getAlipay_open_api(), config.getAlipay_app_id(), config.getAlipay_private_key(), "json", config.getAlipay_input_charset(), config.getAlipay_open_public_key());
 	/**
@@ -200,7 +205,7 @@ public class AlipayUtils {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 支付宝退款
 	 * @param alipayRefund
@@ -216,7 +221,7 @@ public class AlipayUtils {
 		}
 		sb.append("\"refund_amount\":\""+alipayRefund.getRefundAmount()+"\"}");
 		request.setBizContent(sb.toString()); //设置业务参数
-		
+
 		try {
 			AlipayTradeRefundResponse response = alipayClient.execute(request);
 			log.info("支付宝号："+response.getTradeNo()+"此次退款金额："+response.getRefundFee()+"退款时间："+response.getGmtRefundPay()+"用户登录id:"+response.getBuyerLogonId());
@@ -236,7 +241,7 @@ public class AlipayUtils {
 			throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30002, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30002);
 		}//通过alipayClient调用API，获得对应的response类
 	}
-	
+
 	/**
 	 * 查询支付状态
 	 * @param outTradeNo
@@ -246,8 +251,8 @@ public class AlipayUtils {
 	public static String queryOrderStatus(String outTradeNo) throws PayException{
 		AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
 		request.setBizContent("{" +
-		"\"out_trade_no\":\""+outTradeNo+"\"" +
-		"}");
+				"\"out_trade_no\":\""+outTradeNo+"\"" +
+				"}");
 		AlipayTradeQueryResponse response = null;
 		try {
 			response = alipayClient.execute(request);
@@ -265,22 +270,33 @@ public class AlipayUtils {
 			throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30003, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30003);
 		}
 	}
-	
+
 	/**
 	 * 日期 只支持 yyyy-MM-dd 与yyyy-MM
+	 * if aliSrcPath is null then just return downloadUrl 
+	 * otherwise return downloadUrl and download the file
 	 * @param time
+	 * @param aliSrcPath downloanUrl
 	 * @throws PayException
 	 */
-	public static String getFinancial(String time) throws PayException {
+	public static String getFinancial(String time, String aliSrcPath) throws PayException {
 		AlipayDataDataserviceBillDownloadurlQueryRequest request = new AlipayDataDataserviceBillDownloadurlQueryRequest();
 		request.setBizContent("{" +
-		"\"bill_type\":\"trade\"," +
-		"\"bill_date\":\""+time+"\"" +
-		"}");
+				"\"bill_type\":\"trade\"," +
+				"\"bill_date\":\""+time+"\"" +
+				"}");
 		AlipayDataDataserviceBillDownloadurlQueryResponse response;
 		try {
 			response = alipayClient.execute(request);
 			if(response.isSuccess()){
+				try {
+					if(!StringUtils.isEmpty(aliSrcPath))
+						FileUtils.copyURLToFile(new URL(response.getBillDownloadUrl()), new File(aliSrcPath), 10000, 10000);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					log.error("获取财务账单url失败", e);
+					return response.getBillDownloadUrl();
+				}
 				return response.getBillDownloadUrl();
 			} else {
 				log.error("获取财务失败", response.getCode() + response.getMsg());

@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -17,7 +19,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 
 import com.ehu.pay.config.EhPayConfig;
@@ -27,8 +28,8 @@ import com.ehu.pay.exception.PayException;
 import com.ehu.pay.weixin.client.TenpayHttpClient;
 
 
+@Slf4j
 public class WeChatUtils {
-	private static Logger log = Logger.getLogger(WeChatUtils.class);
 	
 	public static Map<String,String> getResponseInfo(SortedMap<String, String> map,String requestUrl) {
 		Map<String,String> resultMap = null;
@@ -96,7 +97,7 @@ public class WeChatUtils {
 			CloseableHttpResponse response = httpclient.execute(httppost);
 			try {
 				HttpEntity entity = response.getEntity();
-				log.info(response.getStatusLine());
+				log.info(response.getStatusLine().toString());
 				if (entity != null) {
 					System.out.println("Response content length: " + entity.getContentLength());
 					BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entity.getContent()));

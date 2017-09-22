@@ -5,14 +5,14 @@ import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import com.ehu.pay.config.EhPayConfig;
 import com.ehu.pay.constants.BaseConstants;
 import com.ehu.pay.constants.PayResultCodeConstants;
 import com.ehu.pay.constants.PayResultMessageConstants;
-import com.ehu.pay.constants.StringUtils;
 import com.ehu.pay.exception.PayException;
+import com.ehu.pay.util.StringUtils;
 import com.ehu.pay.weixin.util.MD5Util;
 import com.ehu.pay.weixin.util.WeChatUtils;
 
@@ -24,8 +24,8 @@ import com.ehu.pay.weixin.util.WeChatUtils;
  * 2016-08-10
  * 微信查询订单类
  */
+@Slf4j
 public class GetWeChatQuerySign {
-	private static Logger log = Logger.getLogger(GetWeChatQuerySign.class);
 	static final String requestUrl = "https://api.mch.weixin.qq.com/pay/orderquery";
 	
 	@SuppressWarnings("unchecked")

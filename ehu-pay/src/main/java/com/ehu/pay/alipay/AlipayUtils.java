@@ -26,20 +26,14 @@ import com.ehu.pay.alipay.entity.AlipayRefund;
 import com.ehu.pay.alipay.entity.AlipayRefundOrder;
 import com.ehu.pay.alipay.entity.AlipayTransferMoney;
 import com.ehu.pay.alipay.entity.ScanPayOrder;
-import com.ehu.pay.alipay.sign.MD5;
 import com.ehu.pay.alipay.util.AlipayFunction;
 import com.ehu.pay.alipay.util.AlipayNotify;
-import com.ehu.pay.alipay.util.httpClient.HttpProtocolHandler;
-import com.ehu.pay.alipay.util.httpClient.HttpRequest;
-import com.ehu.pay.alipay.util.httpClient.HttpResponse;
-import com.ehu.pay.alipay.util.httpClient.HttpResultType;
 import com.ehu.pay.config.EhPayConfig;
 import com.ehu.pay.constants.BaseConstants;
 import com.ehu.pay.constants.PayResultCodeConstants;
 import com.ehu.pay.constants.PayResultMessageConstants;
-import com.ehu.pay.constants.StringUtils;
-import com.ehu.pay.constants.XmlUtils;
 import com.ehu.pay.exception.PayException;
+import com.ehu.pay.util.StringUtils;
 
 
 /**
@@ -134,46 +128,46 @@ public class AlipayUtils {
 		return transferUrl;
 	}
 
-	/**
-	 * 根据订单号查询单个订单信息
-	 * @param orderId
-	 * @return
-	 * @throws Exception
-	 */
-	public static String queryAliOrderStutas(String orderId) throws Exception{
-		EhPayConfig config = EhPayConfig.getInstance();
-		Map<String, String> orderInfo = AlipayFunction.getQueryMap(orderId);
-		String prestr = AlipayFunction.createLinkString(orderInfo);
-		//String sign = AlipayFunction.createSign(prestr);
-		String sign = MD5.sign(prestr, config.getAlipay_md5_key(), config.getAlipay_input_charset());
-		orderInfo.put("sign", sign);
-		orderInfo.put("sign_type", "MD5");
-		HttpProtocolHandler httpProtocolHandler = HttpProtocolHandler.getInstance();
-
-		HttpRequest request = new HttpRequest(HttpResultType.BYTES);
-		//设置编码集
-		request.setCharset(config.getAlipay_input_charset());
-
-		request.setParameters(AlipayFunction.generatNameValuePair(orderInfo));
-		request.setUrl(config.getAlipay_gateway_url()+"_input_charset="+config.getAlipay_input_charset());
-		HttpResponse response = httpProtocolHandler.execute(request,"","");
-		if (response == null) {
-			return null;
-		}
-		String strResult = response.getStringResult();
-		Map<String, String> map = XmlUtils.doXMLParse(strResult);
-		if(map.containsKey("is_success")&&map.get("is_success").equals("F")){
-			log.error("支付宝查询有误："+map.get("error"));
-			throw new PayException(PayResultCodeConstants.ERROR_CODE_ALIPAY_10005,map.get("error"));
-		}
-		sign = map.get("sign");
-		map = XmlUtils.doXMLParse(map.get("response"));
-		AlipayFunction.verifMD5(map, sign);
-		if(!map.containsKey("trade_status")){
-			throw new PayException(PayResultCodeConstants.ERROR_CODE_ALIPAY_10005,PayResultMessageConstants.STRING_ALIPAY_10005);
-		}
-		return map.get("trade_status");
-	}
+//	/**
+//	 * 根据订单号查询单个订单信息
+//	 * @param orderId
+//	 * @return
+//	 * @throws Exception
+//	 */
+//	public static String queryAliOrderStutas(String orderId) throws Exception{
+//		EhPayConfig config = EhPayConfig.getInstance();
+//		Map<String, String> orderInfo = AlipayFunction.getQueryMap(orderId);
+//		String prestr = AlipayFunction.createLinkString(orderInfo);
+//		//String sign = AlipayFunction.createSign(prestr);
+//		String sign = MD5.sign(prestr, config.getAlipay_md5_key(), config.getAlipay_input_charset());
+//		orderInfo.put("sign", sign);
+//		orderInfo.put("sign_type", "MD5");
+//		HttpProtocolHandler httpProtocolHandler = HttpProtocolHandler.getInstance();
+//
+//		HttpRequest request = new HttpRequest(HttpResultType.BYTES);
+//		//设置编码集
+//		request.setCharset(config.getAlipay_input_charset());
+//
+//		request.setParameters(AlipayFunction.generatNameValuePair(orderInfo));
+//		request.setUrl(config.getAlipay_gateway_url()+"_input_charset="+config.getAlipay_input_charset());
+//		HttpResponse response = httpProtocolHandler.execute(request,"","");
+//		if (response == null) {
+//			return null;
+//		}
+//		String strResult = response.getStringResult();
+//		Map<String, String> map = XmlUtils.doXMLParse(strResult);
+//		if(map.containsKey("is_success")&&map.get("is_success").equals("F")){
+//			log.error("支付宝查询有误："+map.get("error"));
+//			throw new PayException(PayResultCodeConstants.ERROR_CODE_ALIPAY_10005,map.get("error"));
+//		}
+//		sign = map.get("sign");
+//		map = XmlUtils.doXMLParse(map.get("response"));
+//		AlipayFunction.verifMD5(map, sign);
+//		if(!map.containsKey("trade_status")){
+//			throw new PayException(PayResultCodeConstants.ERROR_CODE_ALIPAY_10005,PayResultMessageConstants.STRING_ALIPAY_10005);
+//		}
+//		return map.get("trade_status");
+//	}
 
 	/**
 	 * 线下支付：扫码支付

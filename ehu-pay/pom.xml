@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ehoo100</groupId>
 	<artifactId>ehu-pay</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>ehu-pay</name>
 	<packaging>jar</packaging>
 	<description>支付</description>
@@ -18,24 +18,14 @@
 		</properties> </profile> </profiles> -->
 	<properties>
 		<lombok.version>1.16.14</lombok.version>
-		<slf4j12.version>1.7.9</slf4j12.version>
 	</properties>
+	
 	<dependencies>
 		<!-- httpclient start -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.5.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-			<version>4.4.5</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>httpclient3.0.1</artifactId>
-			<version>3.0.1</version>
+			<version>4.5.3</version>
 		</dependency>
 		<!-- httpclient end -->
 		<!-- jdom -->
@@ -61,21 +51,21 @@
 			<version>${lombok.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- slf4j start -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>${slf4j12.version}</version>
-		</dependency>
-		<!-- slf4j end -->
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.5</version>
 		</dependency>
-
+		<!-- slf4j start -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.25</version>
+		</dependency>
+		<!-- slf4j start -->
 	</dependencies>
+	
 	<build>
 		<plugins>
 			<plugin>

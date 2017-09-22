@@ -1,7 +1,5 @@
 package com.ehu.pay.alipay.util;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -13,12 +11,6 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.multipart.FilePartSource;
-import org.apache.commons.httpclient.methods.multipart.PartSource;
-import org.apache.commons.httpclient.util.DateUtil;
-
 import com.ehu.pay.alipay.entity.AlipayOrder;
 import com.ehu.pay.alipay.entity.AlipayRefundOrder;
 import com.ehu.pay.alipay.entity.AlipayTransferMoney;
@@ -28,6 +20,7 @@ import com.ehu.pay.config.EhPayConfig;
 import com.ehu.pay.constants.PayResultCodeConstants;
 import com.ehu.pay.constants.PayResultMessageConstants;
 import com.ehu.pay.exception.PayException;
+import com.ehu.pay.util.DateUtil;
 
 
 
@@ -101,24 +94,24 @@ public class AlipayFunction {
         }
 	}
 	
-	/** 
-	 * 生成文件摘要
-	 * @param strFilePath 文件路径
-	 * @param file_digest_type 摘要算法
-	 * @return 文件摘要结果
-	 */
-	public static String getAbstract(String strFilePath, String file_digest_type) throws IOException {
-		PartSource file = new FilePartSource(new File(strFilePath));
-		if(file_digest_type.equals("MD5")){
-			return DigestUtils.md5Hex(file.createInputStream());
-		}
-		else if(file_digest_type.equals("SHA")) {
-			return DigestUtils.sha256Hex(file.createInputStream());
-		}
-		else {
-			return "";
-		}
-	}
+//	/** 
+//	 * 生成文件摘要
+//	 * @param strFilePath 文件路径
+//	 * @param file_digest_type 摘要算法
+//	 * @return 文件摘要结果
+//	 */
+//	public static String getAbstract(String strFilePath, String file_digest_type) throws IOException {
+//		PartSource file = new FilePartSource(new File(strFilePath));
+//		if(file_digest_type.equals("MD5")){
+//			return DigestUtils.md5Hex(file.createInputStream());
+//		}
+//		else if(file_digest_type.equals("SHA")) {
+//			return DigestUtils.sha256Hex(file.createInputStream());
+//		}
+//		else {
+//			return "";
+//		}
+//	}
 
 	/**
 	 * 对字符串生成校验码
@@ -139,20 +132,20 @@ public class AlipayFunction {
 
 		return sign;
 	}
-    /**
-     * MAP类型数组转换成NameValuePair类型
-     * @param properties  MAP类型数组
-     * @return NameValuePair类型数组
-     */
-    public static NameValuePair[] generatNameValuePair(Map<String, String> properties) {
-        NameValuePair[] nameValuePair = new NameValuePair[properties.size()];
-        int i = 0;
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
-            nameValuePair[i++] = new NameValuePair(entry.getKey(), entry.getValue());
-        }
-
-        return nameValuePair;
-    }
+//    /**
+//     * MAP类型数组转换成NameValuePair类型
+//     * @param properties  MAP类型数组
+//     * @return NameValuePair类型数组
+//     */
+//    public static NameValuePair[] generatNameValuePair(Map<String, String> properties) {
+//        NameValuePair[] nameValuePair = new NameValuePair[properties.size()];
+//        int i = 0;
+//        for (Map.Entry<String, String> entry : properties.entrySet()) {
+//            nameValuePair[i++] = new NameValuePair(entry.getKey(), entry.getValue());
+//        }
+//
+//        return nameValuePair;
+//    }
 	/**
 	 * 创建支付宝订单信息
 	 * @param order	订单信息

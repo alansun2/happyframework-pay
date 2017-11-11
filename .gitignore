@@ -1,8 +1,4 @@
 *.class
-.settings
-.classpath
-.project
-target/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -14,3 +10,16 @@ target/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+.project
+.idea
+.settings
+.classpath
+
+*.iml
+
+#gradle
+out/
+*.gradle
+
+target/

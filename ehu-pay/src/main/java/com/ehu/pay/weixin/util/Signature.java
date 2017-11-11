@@ -1,13 +1,13 @@
 package com.ehu.pay.weixin.util;
 
 
+import com.ehu.pay.config.EhPayConfig;
+import com.ehu.pay.util.MD5Util;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
-
-import com.ehu.pay.config.EhPayConfig;
 
 
 /**
@@ -18,6 +18,7 @@ import com.ehu.pay.config.EhPayConfig;
 public class Signature {
     /**
      * 签名算法
+     *
      * @param o 要参与签名的数据对象
      * @return 签名
      * @throws IllegalAccessException
@@ -33,10 +34,10 @@ public class Signature {
             }
         }
         int size = list.size();
-        String [] arrayToSort = list.toArray(new String[size]);
+        String[] arrayToSort = list.toArray(new String[size]);
         Arrays.sort(arrayToSort, String.CASE_INSENSITIVE_ORDER);
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < size; i ++) {
+        for (int i = 0; i < size; i++) {
             sb.append(arrayToSort[i]);
         }
         String result = sb.toString();
@@ -44,22 +45,27 @@ public class Signature {
         //Util.log("Sign Before MD5:" + result);
         result = MD5.MD5Encode(result).toUpperCase();
         //Util.log("Sign Result:" + result);
-*/        return result;
+*/
+        return result;
     }
 
-    public static String getSign(Map<String,String> map){
-    	EhPayConfig config = EhPayConfig.getInstance();
+    /**
+     * @param map
+     * @return
+     */
+    public static String getSign(Map<String, String> map) {
+        EhPayConfig config = EhPayConfig.getInstance();
         ArrayList<String> list = new ArrayList<String>();
-        for(Map.Entry<String,String> entry:map.entrySet()){
-            if(entry.getValue()!=""){
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (entry.getValue() != "") {
                 list.add(entry.getKey() + "=" + entry.getValue() + "&");
             }
         }
         int size = list.size();
-        String [] arrayToSort = list.toArray(new String[size]);
+        String[] arrayToSort = list.toArray(new String[size]);
         Arrays.sort(arrayToSort, String.CASE_INSENSITIVE_ORDER);
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < size; i ++) {
+        for (int i = 0; i < size; i++) {
             sb.append(arrayToSort[i]);
         }
         String result = sb.toString();

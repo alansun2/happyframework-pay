@@ -11,6 +11,10 @@ public class BaseConstants {
 	 */
 	public static final String RETURN_FAIL = "FAIL";
 	/**
+	 * 返回：请重试
+	 */
+	public static final String TRY_AGAIN = "请稍后重试";
+	/**
 	 * 验证guid
 	 */
 	public static final String GUID_FORMAT = "^[0-9]{1,10}$";

@@ -7,7 +7,7 @@ package com.ehu.pay.constants;
  */
 public class PayResultCodeConstants {
 	/**
-	 * 微信支付获取prepayid失败
+	 * 微信支付获取prepayid或code_url失败
 	 */
 	public static final int ERROR_CODE_WECHATPAY_10008 = 10008;
 	/**

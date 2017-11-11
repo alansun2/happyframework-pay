@@ -17,7 +17,7 @@ public class PayResultMessageConstants {
 	/**
 	 * 微信支付：微信支付获取prepayid失败
 	 */
-	public static final String STRING_WECHATPAY_10008 = "微信支付获取prepayid失败";
+	public static final String STRING_WECHATPAY_10008 = "微信支付获取";
 	/**
 	 * 支付宝支付：支付宝查询有误
 	 */

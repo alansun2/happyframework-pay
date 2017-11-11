@@ -100,5 +100,9 @@
 		<property name="wxPay_code">
 			<value>${ehu.ehupay.wxpay_code}</value>
 		</property>
+
+		<property name="wxxcx_appid">
+			<value>${ehu.ehupay.wxxcx_appid}</value>
+		</property>
 	</bean>
 </beans>

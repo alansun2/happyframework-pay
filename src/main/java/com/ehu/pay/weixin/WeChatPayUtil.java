@@ -1,14 +1,11 @@
 package com.ehu.pay.weixin;
 
-import com.ehu.pay.constants.PayResultCodeConstants;
-import com.ehu.pay.constants.PayResultMessageConstants;
 import com.ehu.pay.exception.PayException;
 import com.ehu.pay.weixin.entity.WeChatRefundInfo;
 import com.ehu.pay.weixin.entity.WeChatResponseVO;
 import com.ehu.pay.weixin.entity.WeChatpayOrder;
 import com.ehu.pay.weixin.entity.WechatBusinessPay;
 import com.ehu.pay.weixin.util.Signature;
-import com.ehu.pay.weixin.util.WeChatUtils;
 import com.ehu.pay.weixin.weixinpay.*;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.JDOMException;
@@ -17,8 +14,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * @author AlanSun
@@ -29,11 +24,16 @@ public class WeChatPayUtil {
     /**
      * 微信支付(app支付与jsapi共用)
      *
-     * @param tradeType 1与3 1:app支付；3：jsapi支付
+     * @param tradeType 1与3 1:app支付；3：jsapi支付 4:小程序
      * @throws PayException
      */
     public static WeChatResponseVO createWeiXinPackage(WeChatpayOrder order, int tradeType) throws PayException {
-        return WeChatPayGetPrepay.gerneratorPrepay(order, tradeType);
+        if (1 == tradeType || 3 == tradeType) {
+            return WeChatPayGetPrepay.gerneratorPrepay(order, tradeType);
+        } else if (4 == tradeType) {
+            return WeChatPayGetPrepay.gerneratorPrepayXcx(order);
+        }
+        return null;
     }
 
     /**
@@ -44,15 +44,6 @@ public class WeChatPayUtil {
      */
     public static String getScanPayInfo(WeChatpayOrder order) throws PayException {
         return WeChatPayGetPrepay.gerneratorPrepayScan(order);
-    }
-
-    /**
-     * 微信支付(小程序)
-     *
-     * @throws PayException
-     */
-    public static WeChatResponseVO createWeChatPackageXcx(WeChatpayOrder order) throws PayException {
-        return WeChatPayGetPrepay.gerneratorPrepayXcx(order);
     }
 
     /**

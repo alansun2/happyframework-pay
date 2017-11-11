@@ -50,9 +50,6 @@ public class WeChatPayGetPrepay {
         if (1 == tradeType) {
             packageParams.put("notify_url", config.getWxPay_notify_url());
             packageParams.put("trade_type", config.getWxPay_trade_type_app());
-        } else if (2 == tradeType) {
-            packageParams.put("notify_url", config.getWxPay_scan_notify_url());
-            packageParams.put("trade_type", config.getWxPay_trade_type_native());
         } else if (3 == tradeType) {
             packageParams.put("notify_url", config.getWxPay_notify_url());
             packageParams.put("trade_type", config.getWxPay_trade_type_jsapi());

@@ -405,6 +405,6 @@ public class EhPayConfig {
     }
 
     public void setWxxcx_appid(String wxxcx_appid) {
-        this.wxxcx_appid = wxxcx_appid;
+        INSTANCE.wxxcx_appid = wxxcx_appid;
     }
 }

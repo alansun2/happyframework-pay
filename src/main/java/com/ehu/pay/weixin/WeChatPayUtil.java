@@ -97,6 +97,16 @@ public class WeChatPayUtil {
     }
 
     /**
+     * 小程序微信退款
+     *
+     * @return boolean
+     * @throws PayException
+     */
+    public static boolean weChatRefundXcx(WeChatRefundInfo weChatRefundInfo) throws PayException {
+        return WeChatRefund.weChatRefundOperXcx(weChatRefundInfo);
+    }
+
+    /**
      * 微信企业转账
      *
      * @param wechatBusinessPay

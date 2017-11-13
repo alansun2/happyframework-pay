@@ -1,10 +1,15 @@
 package com.ehu.pay.weixin.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author AlanSun
  * @Date 2016年8月10日
  * 微信退款类
  */
+@Setter
+@Getter
 public class WeChatRefundInfo {
 	/**
 	 * 微信订单号
@@ -19,56 +24,11 @@ public class WeChatRefundInfo {
 	 */
 	private double totalFee;
 	/**
+	 * 退款金额
+	 */
+	private double refundFee;
+	/**
 	 * 密码
 	 */
 	private String password;
-	/**
-	 * @return the transactionId
-	 */
-	public String getTransactionId() {
-		return transactionId;
-	}
-	/**
-	 * @param transactionId the transactionId to set
-	 */
-	public void setTransactionId(String transactionId) {
-		this.transactionId = transactionId;
-	}
-	/**
-	 * @return the outRefundNo
-	 */
-	public String getOutRefundNo() {
-		return outRefundNo;
-	}
-	/**
-	 * @param outRefundNo the outRefundNo to set
-	 */
-	public void setOutRefundNo(String outRefundNo) {
-		this.outRefundNo = outRefundNo;
-	}
-	/**
-	 * @return the totalFee
-	 */
-	public double getTotalFee() {
-		return totalFee;
-	}
-	/**
-	 * @param totalFee the totalFee to set
-	 */
-	public void setTotalFee(double totalFee) {
-		this.totalFee = totalFee;
-	}
-	/**
-	 * @return the password
-	 */
-	public String getPassword() {
-		return password;
-	}
-	/**
-	 * @param password the password to set
-	 */
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	
 }

@@ -144,7 +144,7 @@ public class WeChatPayGetPrepay {
         finalPackage = WeChatUtils.createSign(finalPackage, config);//再次签名获取
 
         WeChatResponseVO weChatResponseVO = new WeChatResponseVO();
-        weChatResponseVO.setTimeStamp(finalPackage.get("timestamp"));
+        weChatResponseVO.setTimeStamp(timeStamp);
         weChatResponseVO.setNonceStr(nonceStr);
         weChatResponseVO.setPackageValue("prepay_id=" + prepayId);
         weChatResponseVO.setSignType("MD5");
@@ -179,7 +179,7 @@ public class WeChatPayGetPrepay {
                 throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008 + key + BaseConstants.RETURN_FAIL + BaseConstants.TRY_AGAIN);
             }
             if (responseMap.containsKey(key)) {
-                return map.put(key, responseMap.get(key));
+                return responseMap.get(key);
             } else {
                 log.error(params + responseMap.toString());
                 throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008 + key + BaseConstants.RETURN_FAIL + BaseConstants.TRY_AGAIN);

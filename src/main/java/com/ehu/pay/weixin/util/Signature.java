@@ -55,7 +55,7 @@ public class Signature {
      */
     public static String getSign(Map<String, String> map) {
         EhPayConfig config = EhPayConfig.getInstance();
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
             if (entry.getValue() != "") {
                 list.add(entry.getKey() + "=" + entry.getValue() + "&");

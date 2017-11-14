@@ -9,6 +9,7 @@ import com.ehu.pay.util.XMLUtil;
 import com.ehu.pay.weixin.client.TenpayHttpClient;
 import com.ehu.pay.weixin.entity.WeChatResponseVO;
 import com.ehu.pay.weixin.entity.WeChatpayOrder;
+import com.ehu.pay.weixin.util.Signature;
 import com.ehu.pay.weixin.util.WeChatUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.JDOMException;
@@ -136,19 +137,19 @@ public class WeChatPayGetPrepay {
 
         String timeStamp = WeChatUtils.getTimeStamp();
         SortedMap<String, String> finalPackage = new TreeMap<>();
-        finalPackage.put("appId", config.getWxPay_appid());
-        finalPackage.put("timeStamp", timeStamp);
+        finalPackage.put("appId", config.getWxxcx_appid());
         finalPackage.put("nonceStr", nonceStr);
         finalPackage.put("package", "prepay_id=" + prepayId);
         finalPackage.put("signType", "MD5");
-        finalPackage = WeChatUtils.createSign(finalPackage, config);//再次签名获取
+        finalPackage.put("timeStamp", timeStamp);
 
         WeChatResponseVO weChatResponseVO = new WeChatResponseVO();
+        weChatResponseVO.setAppId(config.getWxxcx_appid());
         weChatResponseVO.setTimeStamp(timeStamp);
-        weChatResponseVO.setNonceStr(nonceStr);
         weChatResponseVO.setPackageValue("prepay_id=" + prepayId);
+        weChatResponseVO.setNonceStr(nonceStr);
         weChatResponseVO.setSignType("MD5");
-        weChatResponseVO.setSign(finalPackage.get("sign"));
+        weChatResponseVO.setSign(Signature.getSign(finalPackage));
         return weChatResponseVO;
     }
 

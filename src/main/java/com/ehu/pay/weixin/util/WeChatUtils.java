@@ -59,20 +59,20 @@ public class WeChatUtils {
      */
     @SuppressWarnings("rawtypes")
     public static SortedMap createSign(SortedMap map, EhPayConfig config) {
-        StringBuffer sb = new StringBuffer();
-        Set es = map.entrySet();
-        Iterator it = es.iterator();
-        while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
-            String k = (String) entry.getKey();
-            String v = (String) entry.getValue();
-            if (null != v && !"".equals(v) && !"sign".equals(k) && !"key".equals(k)) {
-                sb.append(k + "=" + v + "&");
-            }
-        }
-        sb.append("key=" + config.getWxPay_app_key());
-        String sign = MD5Util.MD5Encode(sb.toString(), "UTF-8").toUpperCase();
-        map.put("sign", sign);
+//        StringBuffer sb = new StringBuffer();
+//        Set es = map.entrySet();
+//        Iterator it = es.iterator();
+//        while (it.hasNext()) {
+//            Map.Entry entry = (Map.Entry) it.next();
+//            String k = (String) entry.getKey();
+//            String v = (String) entry.getValue();
+//            if (null != v && !"".equals(v) && !"sign".equals(k) && !"key".equals(k)) {
+//                sb.append(k + "=" + v + "&");
+//            }
+//        }
+//        sb.append("key=" + config.getWxPay_app_key());
+//        String sign = MD5Util.MD5Encode(sb.toString(), "UTF-8").toUpperCase();
+        map.put("sign", Signature.getSign(map));
         return map;
     }
 
@@ -199,6 +199,7 @@ public class WeChatUtils {
      */
     public static String getFinalMoney(double price) {
         String finalmoney = String.format("%.2f", price);//转为两位小数
-        return finalmoney.replace(".", "");//转为分
+        Integer i = Integer.parseInt(finalmoney.replace(".", ""));
+        return i.toString();//转为分
     }
 }

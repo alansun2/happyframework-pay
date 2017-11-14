@@ -62,13 +62,6 @@ public class WeChatRefund {
         String orderMoney = WeChatUtils.getFinalMoney(weChatRefundInfo.getTotalFee());
         String refundMoney = WeChatUtils.getFinalMoney(weChatRefundInfo.getRefundFee());
 
-        while (orderMoney.startsWith("0")) {
-            orderMoney = orderMoney.substring(1, orderMoney.length());
-        }
-        while (refundMoney.startsWith("0")) {
-            refundMoney = refundMoney.substring(1, refundMoney.length());
-        }
-
         SortedMap<String, String> packageParams = new TreeMap<>();
         packageParams.put("appid", config.getWxxcx_appid());
         packageParams.put("mch_id", config.getWxPay_mch_id());

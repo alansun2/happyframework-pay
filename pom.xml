@@ -43,7 +43,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>alipay</artifactId>
-            <version>1.0</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -65,6 +65,48 @@
         </dependency>
         <!-- slf4j start -->
     </dependencies>
+
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>https://repo1.maven.org/maven2/</url>
+
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>ehuRelease</id>
+            <name>release</name>
+            <url>http://120.55.162.216:8081/nexus/content/repositories/ehuReleases/</url>
+
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>ehusnapshots</id>
+            <name>snapshots</name>
+            <url>http://120.55.162.216:8081/nexus/content/repositories/ehusnaphosts/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+    </repositories>
 
     <build>
         <plugins>

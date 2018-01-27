@@ -39,6 +39,7 @@ public class WeChatRefund {
         packageParams.put("transaction_id", weChatRefundInfo.getTransactionId());
         packageParams.put("out_refund_no", weChatRefundInfo.getOutRefundNo());//商户系统内部的退款单号，商户系统内部唯一，同一退款单号多次请求只退一笔
         packageParams.put("total_fee", orderMoney);
+        packageParams.put("refund_desc", weChatRefundInfo.getReason());
         packageParams.put("refund_fee", refundMoney);
         packageParams.put("transaction_id", weChatRefundInfo.getTransactionId());
         packageParams.put("op_user_id", config.getWxPay_mch_id());
@@ -69,6 +70,7 @@ public class WeChatRefund {
         packageParams.put("transaction_id", weChatRefundInfo.getTransactionId());
         packageParams.put("out_refund_no", weChatRefundInfo.getOutRefundNo());//商户系统内部的退款单号，商户系统内部唯一，同一退款单号多次请求只退一笔
         packageParams.put("total_fee", orderMoney);
+        packageParams.put("refund_desc", weChatRefundInfo.getReason());
         packageParams.put("refund_fee", refundMoney);
         packageParams.put("transaction_id", weChatRefundInfo.getTransactionId());
         packageParams.put("op_user_id", config.getWxPay_mch_id());

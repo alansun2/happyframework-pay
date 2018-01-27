@@ -28,6 +28,10 @@ public class WeChatRefundInfo {
 	 */
 	private double refundFee;
 	/**
+	 * 退款原因
+	 */
+	private String reason;
+	/**
 	 * 密码
 	 */
 	private String password;

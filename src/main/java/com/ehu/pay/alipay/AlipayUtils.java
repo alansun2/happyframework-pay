@@ -199,17 +199,14 @@ public class AlipayUtils {
                 } else {
                     log.error("支付宝扫码退款失败,code:" + response.getCode() + "subCode" + response.getSubCode() + "subMsg" + response.getSubMsg());
                     return false;
-//					throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30002, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30002);
                 }
             } else {
                 log.error("支付宝扫码退款失败code:" + response.getCode());
                 return false;
-//				throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30002, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30002);
             }
         } catch (AlipayApiException e) {
             log.error("支付宝扫码退款失败", e);
             return false;
-//			throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30002, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30002);
         }//通过alipayClient调用API，获得对应的response类
     }
 
@@ -233,18 +230,24 @@ public class AlipayUtils {
                 if (response.getTradeStatus() != null && tradeStatus.equalsIgnoreCase(response.getTradeStatus())) {
                     return Boolean.TRUE;
                 } else {
-                    log.error("支付宝查询订单状态失败", response);
+                    if (response.getTradeStatus() != null && "TRADE_FINISHED".equals(response.getTradeStatus())) {
+                        log.error("check order status error orderId：" + outTradeNo, response);
+                        throw new PayException(PayResultCodeConstants.TRADE_FINISHED, PayResultMessageConstants.TRADE_FINISHED);
+                    }
+                    log.error("check order status error orderId:" + outTradeNo, response);
                     return Boolean.FALSE;
                 }
             } else {
                 if ("ACQ.TRADE_NOT_EXIST".equals(response.getSubCode())) {
+                    log.error("check order status error orderId:" + outTradeNo + response.getCode() + response.getSubMsg());
                     throw new PayException(PayResultCodeConstants.TRADE_NOT_EXIST_30005, PayResultMessageConstants.TRADE_NOT_EXIST_30005);
                 }
-                log.error("支付宝查询订单状态失败" + response.getCode() + response.getSubMsg());
+
+                log.error("check order status error orderId:" + outTradeNo + response.getCode() + response.getSubMsg());
                 throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30003, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30003);
             }
         } catch (AlipayApiException e) {
-            log.error("支付宝查询订单状态失败", e);
+            log.error("check order status error orderId:" + outTradeNo, e);
             throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30003, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30003);
         }
     }

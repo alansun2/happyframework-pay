@@ -83,4 +83,8 @@ public class PayResultCodeConstants {
 	 * 获取财务url失败
 	 */
 	public static final int GET_FINANCIAL_30013 = 30013;
+	/**
+	 * 交易已经结束
+	 */
+	public static final int TRADE_FINISHED = 30014;
 }

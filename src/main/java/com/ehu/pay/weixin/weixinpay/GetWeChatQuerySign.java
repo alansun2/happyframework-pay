@@ -35,7 +35,7 @@ public class GetWeChatQuerySign {
         packageParams.put("out_trade_no", out_trade_no);
         SortedMap<String, String> map = WeChatUtils.createSign(packageParams, config);
         Map<String, String> resultMap = WeChatUtils.getResponseInfo(map, requestUrl);
-        Object flag = judgeOrderState(resultMap, queryFlag);
+        Object flag = judgeOrderState(resultMap, queryFlag, out_trade_no);
         return flag;
     }
 
@@ -47,11 +47,12 @@ public class GetWeChatQuerySign {
      * @return
      * @throws PayException
      */
-    protected static Object judgeOrderState(Map<String, String> resultMap, final String queryFlag) throws PayException {
+    protected static Object judgeOrderState(Map<String, String> resultMap, final String queryFlag, String out_trade_no) throws PayException {
         if (resultMap.containsKey("return_code") && BaseConstants.RETURN_SUCCESS.equals(resultMap.get("return_code"))) {
             if (resultMap.containsKey("result_code") && BaseConstants.RETURN_SUCCESS.equals(resultMap.get("result_code"))) {
                 String resultCode = resultMap.get("result_code");
                 if (BaseConstants.RETURN_SUCCESS.equals(resultCode)) {
+                    //如果queryFlag为空，就返回trade_state
                     if (StringUtils.isEmpty(queryFlag)) {
                         return resultMap.get("trade_state");
                     } else {
@@ -60,17 +61,18 @@ public class GetWeChatQuerySign {
                             if (BaseConstants.TRADE_STATE_SUCCESS.equals(tradeState)) {
                                 return true;
                             } else {
+                                log.error("check order status error orderId:" + out_trade_no + resultMap);
                                 GetWeChatQuerySign.checkTradeState(tradeState);
                             }
                         }
                     }
                 }
             } else {
-                log.error("查询微信服务器错误" + resultMap);
+                log.error("check order status error orderId:" + out_trade_no + resultMap);
                 throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10003, resultMap.get("err_code_des"));
             }
         } else {
-            log.error("查询微信服务器错误");
+            log.error("check order status error orderId:" + out_trade_no);
             throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10003, PayResultMessageConstants.STRING_WECHATPAY_10003);
         }
         return false;

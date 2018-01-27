@@ -82,4 +82,8 @@ public class PayResultMessageConstants {
 	 * 获取财务url失败
 	 */
 	public static final String GET_FINANCIAL_30013 = "财务账单执行失败";
+	/**
+	 * 交易已经结束
+	 */
+	public static final String TRADE_FINISHED = "交易已经结束,请到订单详情查看";
 }

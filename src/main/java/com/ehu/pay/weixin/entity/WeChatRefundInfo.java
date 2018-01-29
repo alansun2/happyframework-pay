@@ -14,7 +14,11 @@ public class WeChatRefundInfo {
 	/**
 	 * 微信订单号
 	 */
-	private String transactionId;
+//	private String transactionId;
+	/**
+	 * 订单id
+	 */
+	private String orderId;
 	/**
 	 * 商家退款号
 	 */

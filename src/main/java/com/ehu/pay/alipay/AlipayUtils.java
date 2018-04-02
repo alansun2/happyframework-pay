@@ -208,12 +208,12 @@ public class AlipayUtils {
 	 */
 	public static boolean aliPayRefund(AlipayRefund alipayRefund) throws PayException{
 		AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();//创建API对应的request类
-		StringBuffer sb =  new StringBuffer();
-		sb.append("{"+"\"out_trade_no\":\""+alipayRefund.getOutTradeNo()+"\",");
+		StringBuilder sb =  new StringBuilder();
+		sb.append("{" + "\"out_trade_no\":\"").append(alipayRefund.getOutTradeNo()).append("\",");
 		if(!StringUtils.isEmpty(alipayRefund.getOutRequestNo())){
-			sb.append("\"out_request_no\":\""+alipayRefund.getOutRequestNo()+"\",");
+			sb.append("\"out_request_no\":\"").append(alipayRefund.getOutRequestNo()).append("\",");
 		}
-		sb.append("\"refund_amount\":\""+alipayRefund.getRefundAmount()+"\"}");
+		sb.append("\"refund_amount\":\"").append(alipayRefund.getRefundAmount()).append("\"}");
 		request.setBizContent(sb.toString()); //设置业务参数
 
 		try {
@@ -224,15 +224,15 @@ public class AlipayUtils {
 					return true;
 				}else{
 					log.error("支付宝扫码退款失败,code:"+response.getCode()+ "subCode"+response.getSubCode() +"subMsg"+ response.getSubMsg());
-					throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30002, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30002);
+					return false;
 				}
 			}else{
 				log.error("支付宝扫码退款失败code:"+response.getCode());
-				throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30002, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30002);
+				return false;
 			}
 		} catch (AlipayApiException e) {
 			log.error("支付宝扫码退款失败", e);
-			throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30002, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30002);
+			return false;
 		}//通过alipayClient调用API，获得对应的response类
 	}
 

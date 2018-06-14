@@ -247,44 +247,26 @@ public class EhPayConfig {
         INSTANCE.alipay_verify_url = alipay_verify_url;
     }
 
-    /**
-     * @return the alipay_service
-     */
     public String getAlipay_service() {
         return INSTANCE.alipay_service;
     }
 
-    /**
-     * @param alipay_service the alipay_service to set
-     */
     public void setAlipay_service(String alipay_service) {
         INSTANCE.alipay_service = alipay_service;
     }
 
-    /**
-     * @return the alipay_account_name
-     */
     public String getAlipay_account_name() {
         return INSTANCE.alipay_account_name;
     }
 
-    /**
-     * @param alipay_account_name the alipay_account_name to set
-     */
     public void setAlipay_account_name(String alipay_account_name) {
         INSTANCE.alipay_account_name = alipay_account_name;
     }
 
-    /**
-     * @return the alipay_app_id
-     */
     public String getAlipay_app_id() {
         return alipay_app_id;
     }
 
-    /**
-     * @param alipay_app_id the alipay_app_id to set
-     */
     public void setAlipay_app_id(String alipay_app_id) {
         INSTANCE.alipay_app_id = alipay_app_id;
     }
@@ -293,16 +275,10 @@ public class EhPayConfig {
         return INSTANCE.wxPay_appid;
     }
 
-    /**
-     * @return the alipay_md5_key
-     */
     public String getAlipay_md5_key() {
         return alipay_md5_key;
     }
 
-    /**
-     * @param alipay_md5_key the alipay_md5_key to set
-     */
     public void setAlipay_md5_key(String alipay_md5_key) {
         INSTANCE.alipay_md5_key = EhPayConfig.readKeyFile(alipay_md5_key);
     }

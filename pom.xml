@@ -7,15 +7,7 @@
     <name>ehu-pay</name>
     <packaging>jar</packaging>
     <description>支付</description>
-    <!-- <profiles> <profile> 开发 <id>dev</id> <properties> <profiles.active>dev</profiles.active>
-        <deploy.url>http://localhost:8080/manager/text</deploy.url> </properties>
-        <activation> <activeByDefault>true</activeByDefault> </activation> </profile>
-        <profile> 本地 <id>in</id> <properties> <profiles.active>in</profiles.active>
-        <deploy.url>http://localhost:8080/manager/text</deploy.url> </properties>
-        </profile> <profile> 测试环境 <id>test</id> <properties> <profiles.active>test</profiles.active>
-        <deploy.url>http://114.55.234.83:8083/manager/text</deploy.url> </properties>
-        </profile> <profile> 生产环境 <id>pro</id> <properties> <profiles.active>pro</profiles.active>
-        </properties> </profile> </profiles> -->
+
     <properties>
         <lombok.version>1.16.14</lombok.version>
     </properties>
@@ -78,12 +70,6 @@
                 </configuration>
             </plugin>
         </plugins>
-        <!-- <resources> <resource> <directory>src/main/resources</directory> 资源根目录排除各环境的配置，使用单独的资源目录来指定
-            <excludes> <exclude>config/profile/dev/*</exclude> <exclude>config/profile/in/*</exclude>
-            <exclude>config/profile/test/*</exclude> <exclude>config/profile/pro/*</exclude>
-            </excludes> </resource> <resource> <directory>src/main/resources/config/profile/${profiles.active}</directory>
-            </resource> <resource> <directory>src/main/java/com/ehu/mapper</directory>
-            <includes> <include>*.xml</include> </includes> </resource> </resources> -->
         <finalName>ehu-pay</finalName>
     </build>
     <distributionManagement>

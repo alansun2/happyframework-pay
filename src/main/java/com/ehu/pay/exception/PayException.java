@@ -27,6 +27,11 @@ public class PayException extends Exception {
 		this.errorcode = errorcode;
 		this.errormsg = msg;
 	}
+
+	public PayException(String msg) {
+		super(msg);
+		this.errormsg = msg;
+	}
 	
 	public PayException(int errorcode, String msg, Throwable cause) {
 		super(msg, cause);

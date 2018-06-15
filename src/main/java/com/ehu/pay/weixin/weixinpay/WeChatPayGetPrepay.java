@@ -56,6 +56,9 @@ public class WeChatPayGetPrepay {
         } else if (3 == tradeType) {
             packageParams.put("notify_url", config.getWxPay_notify_url());
             packageParams.put("trade_type", config.getWxPay_trade_type_jsapi());
+        } else if (5 == tradeType) {
+            packageParams.put("notify_url", config.getWxPay_second_hand_notify_url());
+            packageParams.put("trade_type", config.getWxPay_trade_type_app());
         }
         packageParams = WeChatUtils.createSign(packageParams, config);
         String prepayId = sendPrepay(packageParams, "prepay_id");//得到prepayid

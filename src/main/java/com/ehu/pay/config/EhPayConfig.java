@@ -91,10 +91,16 @@ public class EhPayConfig {
      * 支付宝服务器异步通知页面路径
      */
     private String alipay_notify_url;
+
     /**
      * 扫码支付宝服务器异步通知页面路径
      */
     private String alipay_scan_notify_url;
+
+    /**
+     * 扫码支付宝服务器异步通知页面路径
+     */
+    private String alipay_second_hand_notify_url;
 
     /**
      * 支付宝提供给商户的服务接入网关URL(新)
@@ -141,6 +147,7 @@ public class EhPayConfig {
     private String wxPay_app_key;
     private String wxPay_notify_url;
     private String wxPay_scan_notify_url;
+    private String wxPay_second_hand_notify_url;
     private String wxPay_spbill_create_ip;
     private String wxPay_mch_id;
     private String wxPay_trade_type_app;
@@ -231,6 +238,14 @@ public class EhPayConfig {
         INSTANCE.alipay_scan_notify_url = alipay_scan_notify_url;
     }
 
+    public String getAlipay_second_hand_notify_url() {
+        return alipay_second_hand_notify_url;
+    }
+
+    public void setAlipay_second_hand_notify_url(String alipay_second_hand_notify_url) {
+        INSTANCE.alipay_second_hand_notify_url = alipay_second_hand_notify_url;
+    }
+
     public String getAlipay_gateway_url() {
         return alipay_gateway_url;
     }
@@ -301,6 +316,14 @@ public class EhPayConfig {
 
     public void setWxPay_scan_notify_url(String wxPay_scan_notify_url) {
         INSTANCE.wxPay_scan_notify_url = wxPay_scan_notify_url;
+    }
+
+    public String getWxPay_second_hand_notify_url() {
+        return wxPay_second_hand_notify_url;
+    }
+
+    public void setWxPay_second_hand_notify_url(String wxPay_second_hand_notify_url) {
+        INSTANCE.wxPay_second_hand_notify_url = wxPay_second_hand_notify_url;
     }
 
     public String getWxPay_mch_id() {

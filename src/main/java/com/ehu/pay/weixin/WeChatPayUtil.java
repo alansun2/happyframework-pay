@@ -23,12 +23,13 @@ public class WeChatPayUtil {
 
     /**
      * 微信支付(app支付与jsapi共用)
+     * 不同的appType代表会有不同的回调地址
      *
-     * @param tradeType 1与3 1:app支付；3：jsapi支付 4:小程序
+     * @param tradeType 1与3 1:商品支付；3：jsapi支付 4:小程序商品支付 5：app闲置支付
      * @throws PayException
      */
     public static WeChatResponseVO createWeiXinPackage(WeChatpayOrder order, int tradeType) throws PayException {
-        if (1 == tradeType || 3 == tradeType) {
+        if (1 == tradeType || 3 == tradeType || 5 == tradeType) {
             return WeChatPayGetPrepay.gerneratorPrepay(order, tradeType);
         } else if (4 == tradeType) {
             return WeChatPayGetPrepay.gerneratorPrepayXcx(order);

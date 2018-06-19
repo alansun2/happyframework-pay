@@ -152,7 +152,7 @@ public class AlipayFunction {
 	 * @return 支付宝订单信息字符串
 	 * @throws Exception 
 	 */
-	public static String getOrderInfo(AlipayOrder order) throws Exception {
+	public static String getOrderInfo(AlipayOrder order, String notifyUrl) throws Exception {
 		EhPayConfig config = EhPayConfig.getInstance();
 		StringBuilder sb = new StringBuilder();
 		// 合作者身份ID
@@ -172,7 +172,7 @@ public class AlipayFunction {
 		sb.append(order.getPrice());
 		// 服务器异步通知页面路径，网址需要做URL编码
 		sb.append("\"&notify_url=\"");
-		sb.append(URLEncoder.encode(config.getAlipay_notify_url(), config.getAlipay_input_charset()));
+		sb.append(URLEncoder.encode(notifyUrl, config.getAlipay_input_charset()));
 		// 接口名称， 固定值
 		sb.append("\"&service=\"mobile.securitypay.pay");
 		// 参数编码， 固定值

@@ -46,9 +46,9 @@ public class AlipayUtils {
      */
     @Deprecated
     public static String createPayInfo(AlipayOrder order) throws Exception {
-        String orderInfo = AlipayFunction.getOrderInfo(order);
+        String orderInfo = AlipayFunction.getOrderInfo(order, config.getAlipay_notify_url());
         String sign = AlipayFunction.createSign(orderInfo);
-        return orderInfo + "&sign=\"" + sign + "\"&sign_type=\"" + EhPayConfig.getInstance().getAlipay_sign_type() + "\"";
+        return orderInfo + "&sign=\"" + sign + "\"&sign_type=\"" + config.getAlipay_sign_type() + "\"";
     }
 
     /**
@@ -59,7 +59,10 @@ public class AlipayUtils {
      * @throws Exception e
      */
     public static String createPayInfo(AlipayOrder order, int type) throws Exception {
-        //实例化具体API对应的request类,类名称和接口名称对应,当前调用接口名称：alipay.trade.app.pay
+        String orderInfo = AlipayFunction.getOrderInfo(order, config.getAlipay_second_hand_notify_url());
+        String sign = AlipayFunction.createSign(orderInfo);
+        return orderInfo + "&sign=\"" + sign + "\"&sign_type=\"" + config.getAlipay_sign_type() + "\"";
+/*        //实例化具体API对应的request类,类名称和接口名称对应,当前调用接口名称：alipay.trade.app.pay
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
         //SDK已经封装掉了公共参数，这里只需要传入业务参数。以下方法为sdk的model入参方式(model和biz_content同时存在的情况下取biz_content)。
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
@@ -79,7 +82,7 @@ public class AlipayUtils {
         } catch (AlipayApiException e) {
             log.error("构建支付信息失败：", e);
             throw new PayException("构建支付信息失败,请重试");
-        }
+        }*/
     }
 
     /**

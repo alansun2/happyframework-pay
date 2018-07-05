@@ -167,10 +167,7 @@ public class WeChatPayGetPrepay {
             Map<String, String> responseMap = null;
             try {
                 responseMap = XMLUtil.doXMLParse(resContent);
-            } catch (JDOMException e) {
-                log.error(PayResultMessageConstants.STRING_WECHATPAY_10008 + key + BaseConstants.RETURN_FAIL, e);
-                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008 + key + BaseConstants.RETURN_FAIL + BaseConstants.TRY_AGAIN);
-            } catch (IOException e) {
+            } catch (JDOMException | IOException e) {
                 log.error(PayResultMessageConstants.STRING_WECHATPAY_10008 + key + BaseConstants.RETURN_FAIL, e);
                 throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008 + key + BaseConstants.RETURN_FAIL + BaseConstants.TRY_AGAIN);
             }

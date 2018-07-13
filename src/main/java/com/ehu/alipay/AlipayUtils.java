@@ -160,9 +160,8 @@ public class AlipayUtils {
      * @throws PayException e
      */
     public static String scanPay(ScanPayOrder scanPayOrder) throws PayException {
-        EhPayConfig config = EhPayConfig.getInstance();
         AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();//创建API对应的request类
-        request.setNotifyUrl(config.getAlipay_scan_notify_url());
+        request.setNotifyUrl(scanPayOrder.getNotifyUrl());
         request.setBizContent("{" +
                 "\"out_trade_no\":\"" + scanPayOrder.getOutTradeNo() + "\"," +
                 "\"total_amount\":" + scanPayOrder.getTotalAmount() + "," +

@@ -1,14 +1,5 @@
 package com.ehu.alipay.util;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.ehu.alipay.entity.AlipayOrder;
 import com.ehu.alipay.entity.AlipayRefundOrder;
 import com.ehu.alipay.entity.AlipayTransferMoney;
@@ -20,6 +11,10 @@ import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
 import com.ehu.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.*;
 
 
 /**
@@ -216,7 +211,7 @@ public class AlipayFunction {
         // 参数编码， 固定值
         map.put("_input_charset", config.getAlipay_input_charset());
         // 服务器异步通知页面路径，网址需要做URL编码
-        map.put("notify_url", config.getAlipay_notify_url());
+        map.put("notify_url", refundOrder.getNotifyUrl());
         // 退款时间
         map.put("refund_date", refundOrder.getRefundDate());
         // 退款批次号
@@ -245,7 +240,7 @@ public class AlipayFunction {
         sParaTemp.put("service", "batch_trans_notify");
         sParaTemp.put("partner", config.getAlipay_partner());
         sParaTemp.put("_input_charset", config.getAlipay_input_charset());
-        sParaTemp.put("notify_url", config.getAlipay_notify_url());
+        sParaTemp.put("notify_url", alipayTransferMoney.getNotifyUrl());
         sParaTemp.put("email", config.getAlipay_seller());
         sParaTemp.put("account_name", config.getAlipay_account_name());
         sParaTemp.put("pay_date", DateUtil.formatDate(date, "yyyyMMdd"));

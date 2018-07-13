@@ -26,13 +26,14 @@ public class WeChatpayOrder {
      * openid 微信小程序必传
      */
     private String openid;
-
     /**
      * 回调地址
      */
     private String notifyUrl;
     /**
      * [APP,NATIVE,JSAPI]
+     * NATIVE:扫码
+     * JSAPI:小程序，网页
      */
     private String tradeType;
 

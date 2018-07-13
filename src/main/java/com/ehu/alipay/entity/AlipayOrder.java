@@ -24,4 +24,11 @@ public class AlipayOrder {
      * 回调地址
      */
     private String notifyUrl;
+
+    public void setBody(String body) {
+        if (body.length() > 49) {
+            body = body.substring(0, 49);
+        }
+        this.body = body;
+    }
 }

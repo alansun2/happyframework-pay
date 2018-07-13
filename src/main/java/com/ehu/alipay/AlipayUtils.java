@@ -49,7 +49,6 @@ public class AlipayUtils {
      * @return 支付宝订单支付信息（无线）
      * @throws Exception e
      */
-    @Deprecated
     public static String createPayInfo(AlipayOrder order) throws Exception {
         String orderInfo = AlipayFunction.getOrderInfo(order);
         String sign = AlipayFunction.createSign(orderInfo);

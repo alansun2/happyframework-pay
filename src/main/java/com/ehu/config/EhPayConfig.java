@@ -53,32 +53,26 @@ public class EhPayConfig {
      * 合作身份者ID，以2088开头由16位纯数字组成的字符串
      */
     private String alipay_partner;
-
     /**
      * 收款时的支付宝账号，需要与partner对应的支付宝账号为同一个，也就是说收款支付宝账号必须是签约时的支付宝账号
      */
     private String alipay_seller;
-
     /**
      * 商户的私钥
      */
     private String alipay_private_key;
-
     /**
      * 支付宝的公钥，无需修改该值
      */
     private String alipay_public_key;
-
     /**
      * 字符编码格式 目前支持 GBK 或 UTF-8
      */
     private String alipay_input_charset;
-
     /**
      * 签名方式 不需修改
      */
     private String alipay_sign_type;
-
     /**
      * 设置未付款交易的超时时间 默认30分钟，一旦超时，该笔交易就会自动被关闭。 <br>
      * 取值范围：1m～15d。<br>
@@ -86,27 +80,10 @@ public class EhPayConfig {
      * 该参数数值不接受小数点，如1.5h，可转换为90m。<br>
      */
     private String alipay_time_out;
-
-    /**
-     * 支付宝服务器异步通知页面路径
-     */
-    private String alipay_notify_url;
-
-    /**
-     * 扫码支付宝服务器异步通知页面路径
-     */
-    private String alipay_scan_notify_url;
-
-    /**
-     * 扫码支付宝服务器异步通知页面路径
-     */
-    private String alipay_second_hand_notify_url;
-
     /**
      * 支付宝提供给商户的服务接入网关URL(新)
      */
     private String alipay_gateway_url;
-
     /**
      * 支付宝消息验证地址
      */
@@ -145,14 +122,8 @@ public class EhPayConfig {
      */
     private String wxPay_appid;
     private String wxPay_app_key;
-    private String wxPay_notify_url;
-    private String wxPay_scan_notify_url;
-    private String wxPay_second_hand_notify_url;
     private String wxPay_spbill_create_ip;
     private String wxPay_mch_id;
-    private String wxPay_trade_type_app;
-    private String wxPay_trade_type_native;
-    private String wxPay_trade_type_jsapi;
     private String wxPay_ca;
     private String wxPay_code;
     private String wxxcx_appid;
@@ -222,30 +193,6 @@ public class EhPayConfig {
         INSTANCE.alipay_time_out = alipay_time_out;
     }
 
-    public String getAlipay_notify_url() {
-        return alipay_notify_url;
-    }
-
-    public void setAlipay_notify_url(String alipay_notify_url) {
-        INSTANCE.alipay_notify_url = alipay_notify_url;
-    }
-
-    public String getAlipay_scan_notify_url() {
-        return alipay_scan_notify_url;
-    }
-
-    public void setAlipay_scan_notify_url(String alipay_scan_notify_url) {
-        INSTANCE.alipay_scan_notify_url = alipay_scan_notify_url;
-    }
-
-    public String getAlipay_second_hand_notify_url() {
-        return alipay_second_hand_notify_url;
-    }
-
-    public void setAlipay_second_hand_notify_url(String alipay_second_hand_notify_url) {
-        INSTANCE.alipay_second_hand_notify_url = alipay_second_hand_notify_url;
-    }
-
     public String getAlipay_gateway_url() {
         return alipay_gateway_url;
     }
@@ -302,30 +249,6 @@ public class EhPayConfig {
         INSTANCE.wxPay_appid = wxPay_appid;
     }
 
-    public String getWxPay_notify_url() {
-        return INSTANCE.wxPay_notify_url;
-    }
-
-    public void setWxPay_notify_url(String wxPay_notify_url) {
-        INSTANCE.wxPay_notify_url = wxPay_notify_url;
-    }
-
-    public String getWxPay_scan_notify_url() {
-        return wxPay_scan_notify_url;
-    }
-
-    public void setWxPay_scan_notify_url(String wxPay_scan_notify_url) {
-        INSTANCE.wxPay_scan_notify_url = wxPay_scan_notify_url;
-    }
-
-    public String getWxPay_second_hand_notify_url() {
-        return wxPay_second_hand_notify_url;
-    }
-
-    public void setWxPay_second_hand_notify_url(String wxPay_second_hand_notify_url) {
-        INSTANCE.wxPay_second_hand_notify_url = wxPay_second_hand_notify_url;
-    }
-
     public String getWxPay_mch_id() {
         return INSTANCE.wxPay_mch_id;
     }
@@ -345,31 +268,6 @@ public class EhPayConfig {
     public void setWxPay_spbill_create_ip(String wxPay_spbill_create_ip) {
         INSTANCE.wxPay_spbill_create_ip = wxPay_spbill_create_ip;
     }
-
-    public String getWxPay_trade_type_app() {
-        return INSTANCE.wxPay_trade_type_app;
-    }
-
-    public String getWxPay_trade_type_jsapi() {
-        return INSTANCE.wxPay_trade_type_jsapi;
-    }
-
-    public void setWxPay_trade_type_jsapi(String wxPay_trade_type_jsapi) {
-        INSTANCE.wxPay_trade_type_jsapi = wxPay_trade_type_jsapi;
-    }
-
-    public String getWxPay_trade_type_native() {
-        return wxPay_trade_type_native;
-    }
-
-    public void setWxPay_trade_type_native(String wxPay_trade_type_native) {
-        INSTANCE.wxPay_trade_type_native = wxPay_trade_type_native;
-    }
-
-    public void setWxPay_trade_type_app(String wxPay_trade_type_app) {
-        INSTANCE.wxPay_trade_type_app = wxPay_trade_type_app;
-    }
-
 
     public void setWxPay_app_key(String wxPay_app_key) {
         INSTANCE.wxPay_app_key = EhPayConfig.readKeyFile(wxPay_app_key);

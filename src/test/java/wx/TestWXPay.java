@@ -15,7 +15,7 @@ public class TestWXPay {
 
     public TestWXPay() throws Exception {
         config = WXPayConfigImpl.getInstance();
-        wxpay = new WXPay(config);
+//        wxpay = new WXPay(config);
         total_fee = "1";
         // out_trade_no = "201701017496748980290321";
         out_trade_no = "201613091059590000003433-asd002";
@@ -162,9 +162,9 @@ public class TestWXPay {
         data.put("nonce_str", WXPayUtil.generateNonceStr());
         String sign = WXPayUtil.generateSignature(data, config.getKey());
         data.put("sign", sign);
-        WXPay wxPay = new WXPay(config);
-        String result = wxPay.requestWithoutCert("https://api.mch.weixin.qq.com/sandbox/pay/getsignkey", data, 10000, 10000);
-        System.out.println(result);
+//        WXPay wxPay = new WXPay(config);
+//        String result = wxPay.requestWithoutCert("https://api.mch.weixin.qq.com/sandbox/pay/getsignkey", data, 10000, 10000);
+//        System.out.println(result);
     }
 
 

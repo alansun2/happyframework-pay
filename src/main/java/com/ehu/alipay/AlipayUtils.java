@@ -25,6 +25,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
@@ -49,7 +50,7 @@ public class AlipayUtils {
      * @return 支付宝订单支付信息（无线）
      * @throws Exception e
      */
-    public static String createPayInfo(AlipayOrder order) throws Exception {
+    public static String createPayInfo(AlipayOrder order) throws UnsupportedEncodingException {
         String orderInfo = AlipayFunction.getOrderInfo(order);
         String sign = AlipayFunction.createSign(orderInfo);
         return orderInfo + "&sign=\"" + sign + "\"&sign_type=\"" + config.getAlipay_sign_type() + "\"";

@@ -115,16 +115,11 @@ public class AlipayFunction {
      * @return
      * @throws Exception
      */
-    public static String createSign(String str) throws Exception {
+    public static String createSign(String str) throws UnsupportedEncodingException {
         EhPayConfig config = EhPayConfig.getInstance();
         String sign = RSA.sign(str, config.getAlipay_private_key(), config.getAlipay_input_charset());
         // 仅需对sign 做URL编码
-        try {
-            sign = URLEncoder.encode(sign, config.getAlipay_input_charset());
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            throw new Exception("创建校验码失败", e);
-        }
+        sign = URLEncoder.encode(sign, config.getAlipay_input_charset());
 
         return sign;
     }
@@ -150,7 +145,7 @@ public class AlipayFunction {
      * @return 支付宝订单信息字符串
      * @throws Exception
      */
-    public static String getOrderInfo(AlipayOrder order) throws Exception {
+    public static String getOrderInfo(AlipayOrder order) throws UnsupportedEncodingException {
         EhPayConfig config = EhPayConfig.getInstance();
         StringBuilder sb = new StringBuilder();
         // 合作者身份ID

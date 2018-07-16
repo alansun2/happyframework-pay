@@ -1,7 +1,7 @@
 package com.ehu.constants;
 
 
-public class BaseConstants {
+public class PayBaseConstants {
 	public static final String RETURN_SUCCESS_LOWER = "success";
 	/**
 	 * 返回：SUCCESS

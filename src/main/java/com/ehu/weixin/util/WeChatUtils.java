@@ -1,6 +1,6 @@
 package com.ehu.weixin.util;
 
-import com.ehu.constants.BaseConstants;
+import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
@@ -142,9 +142,9 @@ public class WeChatUtils {
             log.info(entry.getKey() + ":::" + entry.getValue());
         }
         if (map.containsKey("return_code") && "SUCCESS".equals(map.get("return_code"))) {
-            if (BaseConstants.RETURN_SUCCESS.equals(map.get("result_code"))) {
+            if (PayBaseConstants.RETURN_SUCCESS.equals(map.get("result_code"))) {
                 flag = true;
-            } else if (BaseConstants.RETURN_FAIL.equals(map.get("result_code"))) {
+            } else if (PayBaseConstants.RETURN_FAIL.equals(map.get("result_code"))) {
                 log.info(map.get("err_code") + ":::" + map.get("err_code_des"));
             } else {
                 throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10004, PayResultMessageConstants.STRING_WECHATPAY_10004);

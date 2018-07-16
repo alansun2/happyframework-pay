@@ -1,7 +1,7 @@
 package com.ehu.weixin.weixinpay;
 
 import com.ehu.config.EhPayConfig;
-import com.ehu.constants.BaseConstants;
+import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
@@ -159,26 +159,26 @@ public class WeChatPayGetPrepay {
             try {
                 responseMap = XMLUtil.doXMLParse(resContent);
             } catch (JDOMException | IOException e) {
-                log.error(PayResultMessageConstants.STRING_WECHATPAY_10008 + key + BaseConstants.RETURN_FAIL, e);
-                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008 + key + BaseConstants.RETURN_FAIL + BaseConstants.TRY_AGAIN);
+                log.error(PayResultMessageConstants.STRING_WECHATPAY_10008 + key + PayBaseConstants.RETURN_FAIL, e);
+                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008 + key + PayBaseConstants.RETURN_FAIL + PayBaseConstants.TRY_AGAIN);
             }
-            if (BaseConstants.RETURN_FAIL.equals(responseMap.get("return_code"))) {
+            if (PayBaseConstants.RETURN_FAIL.equals(responseMap.get("return_code"))) {
                 log.error(params + responseMap.toString());
-                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008 + key + BaseConstants.RETURN_FAIL + BaseConstants.TRY_AGAIN);
+                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008 + key + PayBaseConstants.RETURN_FAIL + PayBaseConstants.TRY_AGAIN);
             }
-            if (BaseConstants.REFUND_FAIL.equalsIgnoreCase(responseMap.get("result_code"))) {
+            if (PayBaseConstants.REFUND_FAIL.equalsIgnoreCase(responseMap.get("result_code"))) {
                 log.error(params + responseMap.toString());
-                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008 + key + BaseConstants.RETURN_FAIL + BaseConstants.TRY_AGAIN);
+                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008 + key + PayBaseConstants.RETURN_FAIL + PayBaseConstants.TRY_AGAIN);
             }
             if (responseMap.containsKey(key)) {
                 return responseMap.get(key);
             } else {
                 log.error(params + responseMap.toString());
-                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008 + key + BaseConstants.RETURN_FAIL + BaseConstants.TRY_AGAIN);
+                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008 + key + PayBaseConstants.RETURN_FAIL + PayBaseConstants.TRY_AGAIN);
             }
         } else {
             log.error("httpClient.callHttpPost(requestUrl, params) 返回false" + params);
-            throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008 + key + BaseConstants.RETURN_FAIL);
+            throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008 + key + PayBaseConstants.RETURN_FAIL);
         }
     }
 }

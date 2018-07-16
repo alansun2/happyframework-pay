@@ -13,7 +13,6 @@ import java.io.Serializable;
  */
 @Setter
 @Getter
-@ToString
 public class WeChatResponseVO implements Serializable {
 
     private static final long serialVersionUID = 1L;

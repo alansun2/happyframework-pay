@@ -15,7 +15,7 @@ import com.ehu.alipay.entity.*;
 import com.ehu.alipay.util.AlipayFunction;
 import com.ehu.alipay.util.AlipayNotify;
 import com.ehu.config.EhPayConfig;
-import com.ehu.constants.BaseConstants;
+import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
@@ -172,7 +172,7 @@ public class AlipayUtils {
         AlipayTradePrecreateResponse response;
         try {
             response = alipayClient.execute(request);
-            if (BaseConstants.ALIPAY_RETURN_CODE_10000.equals(response.getCode())) {
+            if (PayBaseConstants.ALIPAY_RETURN_CODE_10000.equals(response.getCode())) {
                 return response.getQrCode();
             }
         } catch (Exception e) {
@@ -203,7 +203,7 @@ public class AlipayUtils {
             AlipayTradeRefundResponse response = alipayClient.execute(request);
             log.info("支付宝号：" + response.getTradeNo() + "此次退款金额：" + response.getRefundFee() + "退款时间：" + response.getGmtRefundPay() + "用户登录id:" + response.getBuyerLogonId());
             if (response.isSuccess()) {
-                if (BaseConstants.ALIPAY_RETURN_CODE_10000.equals(response.getCode())) {
+                if (PayBaseConstants.ALIPAY_RETURN_CODE_10000.equals(response.getCode())) {
                     return true;
                 } else {
                     log.error("支付宝扫码退款失败,code:" + response.getCode() + "subCode" + response.getSubCode() + "subMsg" + response.getSubMsg());

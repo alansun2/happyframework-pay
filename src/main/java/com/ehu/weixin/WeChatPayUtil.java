@@ -31,7 +31,7 @@ public class WeChatPayUtil {
     public static WeChatResponseVO createWeiXinPackage(WeChatpayOrder order, int tradeType) throws PayException {
         if (1 == tradeType) {
             return WeChatPayGetPrepay.gerneratorPrepay(order);
-        } else if (4 == tradeType) {
+        } else if (2 == tradeType) {
             return WeChatPayGetPrepay.gerneratorPrepayXcx(order);
         }
         return null;

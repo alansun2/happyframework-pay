@@ -23,11 +23,13 @@ import com.ehu.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -48,7 +50,6 @@ public class AlipayUtils {
      *
      * @param order 订单信息
      * @return 支付宝订单支付信息（无线）
-     * @throws Exception e
      */
     public static String createPayInfo(AlipayOrder order) throws UnsupportedEncodingException {
         String orderInfo = AlipayFunction.getOrderInfo(order);
@@ -272,7 +273,6 @@ public class AlipayUtils {
                     if (!StringUtils.isEmpty(aliSrcPath))
                         FileUtils.copyURLToFile(new URL(response.getBillDownloadUrl()), new File(aliSrcPath), 10000, 10000);
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
                     log.error("获取财务账单url失败", e);
                     return response.getBillDownloadUrl();
                 }
@@ -285,5 +285,29 @@ public class AlipayUtils {
             log.error("获取财务账单url失败", e);
             throw new PayException(PayResultCodeConstants.GET_FINANCIAL_30013, PayResultMessageConstants.GET_FINANCIAL_30013);
         }
+    }
+
+    /**
+     * 处理支付宝返回参数
+     *
+     * @param request HttpServletRequest
+     * @return paramsMap
+     */
+    public static Map<String, String> getAlipayCallBackMap(HttpServletRequest request) {
+        //获取支付宝POST过来反馈信息
+        Map<String, String> params = new HashMap<>();
+        Map<String, String[]> requestParams = request.getParameterMap();
+        for (String name : requestParams.keySet()) {
+            String[] values = requestParams.get(name);
+            String valueStr = "";
+            for (int i = 0; i < values.length; i++) {
+                valueStr = (i == values.length - 1) ? valueStr + values[i]
+                        : valueStr + values[i] + ",";
+            }
+            //乱码解决，这段代码在出现乱码时使用。如果mysign和sign不相等也可以使用这段代码转化
+            //valueStr = new String(valueStr.getBytes("ISO-8859-1"), "gbk");
+            params.put(name, valueStr);
+        }
+        return params;
     }
 }

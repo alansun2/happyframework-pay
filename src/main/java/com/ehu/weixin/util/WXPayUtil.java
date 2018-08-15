@@ -30,7 +30,7 @@ public class WXPayUtil {
      */
     public static Map<String, String> xmlToMap(String strXML) {
         try {
-            Map<String, String> data = new HashMap<String, String>();
+            Map<String, String> data = new HashMap<>();
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setExpandEntityReferences(false);
             documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
@@ -46,11 +46,7 @@ public class WXPayUtil {
                     data.put(element.getNodeName(), element.getTextContent());
                 }
             }
-            try {
-                stream.close();
-            } catch (Exception ex) {
-                // do nothing
-            }
+            stream.close();
             return data;
         } catch (Exception ex) {
             log.warn("Invalid XML, can not convert to map. Error message: {}. XML content: {}", ex.getMessage(), strXML);

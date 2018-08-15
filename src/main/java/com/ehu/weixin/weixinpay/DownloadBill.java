@@ -5,8 +5,8 @@ import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
 import com.ehu.config.EhPayConfig;
 import com.ehu.util.FileUtils;
+import com.ehu.util.XmlUtils;
 import com.ehu.weixin.util.WeChatUtils;
-import com.ehu.util.XMLUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -43,7 +43,7 @@ public class DownloadBill {
         packageParams.put("bill_type", "ALL");
         packageParams.put("tar_type", "GZIP");
         packageParams = WeChatUtils.createSign(packageParams, config);//获取签名
-        sendRequest(XMLUtil.getXMLString(packageParams), desPath);
+        sendRequest(XmlUtils.mapToXml(packageParams), desPath);
     }
 
     private static void sendRequest(String param, String path) throws PayException {

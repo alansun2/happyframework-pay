@@ -5,16 +5,14 @@ import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
-import com.ehu.util.XMLUtil;
+import com.ehu.util.XmlUtils;
 import com.ehu.weixin.client.TenpayHttpClient;
 import com.ehu.weixin.entity.WeChatResponseVO;
 import com.ehu.weixin.entity.WeChatpayOrder;
 import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.util.WeChatUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.jdom2.JDOMException;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -149,16 +147,16 @@ public class WeChatPayGetPrepay {
 
     @SuppressWarnings("unchecked")
     public static String sendPrepay(SortedMap<String, String> map, String key) throws PayException {
-        String params = XMLUtil.getXMLString(map);
+        String params = XmlUtils.mapToXml(map);
         TenpayHttpClient httpClient = new TenpayHttpClient();
         httpClient.setReqContent(requestUrl);
         if (httpClient.callHttpPost(requestUrl, params)) {
             String resContent = httpClient.getResContent();
             log.info(resContent);
-            Map<String, String> responseMap = null;
+            Map<String, String> responseMap;
             try {
-                responseMap = XMLUtil.doXMLParse(resContent);
-            } catch (JDOMException | IOException e) {
+                responseMap = XmlUtils.xmlToMap(resContent);
+            } catch (Exception e) {
                 log.error(PayResultMessageConstants.STRING_WECHATPAY_10008 + key + PayBaseConstants.RETURN_FAIL, e);
                 throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008 + key + PayBaseConstants.RETURN_FAIL + PayBaseConstants.TRY_AGAIN);
             }

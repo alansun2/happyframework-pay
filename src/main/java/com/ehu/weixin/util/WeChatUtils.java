@@ -1,13 +1,13 @@
 package com.ehu.weixin.util;
 
+import com.ehu.config.EhPayConfig;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
-import com.ehu.config.EhPayConfig;
 import com.ehu.util.MD5Util;
 import com.ehu.util.SSlUtil;
-import com.ehu.util.XMLUtil;
+import com.ehu.util.XmlUtils;
 import com.ehu.weixin.client.TenpayHttpClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
@@ -18,34 +18,28 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.jdom2.JDOMException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.SortedMap;
 
 
 @Slf4j
 public class WeChatUtils {
 
-    public static Map<String, String> getResponseInfo(SortedMap<String, String> map, String requestUrl) {
+    public static Map<String, String> getResponseInfo(SortedMap<String, String> map, String requestUrl) throws PayException {
         Map<String, String> resultMap = null;
-        String params = getXmlString(map);//map转String
+        String params = XmlUtils.mapToXml(map);//map转String
         TenpayHttpClient httpClient = new TenpayHttpClient();
         httpClient.setReqContent(requestUrl);
-        String resContent = "";
+        String resContent;
         if (httpClient.callHttpPost(requestUrl, params)) {
             resContent = httpClient.getResContent();
-            try {
-                resultMap = XMLUtil.doXMLParse(resContent);
-            } catch (JDOMException e) {
-                log.error("xml解析错误"); //(log, resContent, "xml解析有误");   //"xml解析有误");
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            resultMap = WXPayUtil.xmlToMap(resContent);
         }
         return resultMap;
     }
@@ -58,7 +52,7 @@ public class WeChatUtils {
      * @return
      */
     @SuppressWarnings("rawtypes")
-    public static SortedMap createSign(SortedMap map, EhPayConfig config) {
+    public static SortedMap<String, String> createSign(SortedMap<String, String> map, EhPayConfig config) {
 //        StringBuffer sb = new StringBuffer();
 //        Set es = map.entrySet();
 //        Iterator it = es.iterator();
@@ -84,10 +78,10 @@ public class WeChatUtils {
      * @param keyStorepass
      * @return
      */
-    public static Map<String, String> wechatPostWithSSL(SortedMap<String, String> map, String requestUrl, String keyStorePath, String keyStorepass) {
+    public static Map<String, String> wechatPostWithSSL(SortedMap<String, String> map, String requestUrl, String keyStorePath, String keyStorepass) throws PayException {
         CloseableHttpClient httpclient = null;
         Map<String, String> resultMap = null;
-        String xmlString = getXmlString(map);
+        String xmlString = XmlUtils.mapToXml(map);
         try {
             SSLConnectionSocketFactory sslsf = SSlUtil.getSSL(keyStorePath, keyStorepass);
             httpclient = HttpClients.custom()
@@ -97,29 +91,27 @@ public class WeChatUtils {
             StringEntity myEntity = new StringEntity(xmlString, "UTF-8");
             httppost.addHeader("Content-Type", "text/xml");
             httppost.setEntity(myEntity);
-            CloseableHttpResponse response = httpclient.execute(httppost);
-            try {
+            try (CloseableHttpResponse response = httpclient.execute(httppost)) {
                 HttpEntity entity = response.getEntity();
                 log.info(response.getStatusLine().toString());
                 if (entity != null) {
                     log.info("Response content length: " + entity.getContentLength());
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entity.getContent()));
                     String text;
-                    StringBuffer sb = new StringBuffer();
+                    StringBuilder sb = new StringBuilder();
                     while ((text = bufferedReader.readLine()) != null) {
                         sb.append(text);
                     }
-                    resultMap = XMLUtil.doXMLParse(sb.toString());
+                    resultMap = WXPayUtil.xmlToMap(sb.toString());
                 }
                 EntityUtils.consume(entity);
-            } finally {
-                response.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                httpclient.close();
+                if (httpclient != null)
+                    httpclient.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -136,9 +128,7 @@ public class WeChatUtils {
             log.error("WeChatUtils - checkWechatResponse 微信返回有误");
             return false;
         }
-        Iterator<Entry<String, String>> it = map.entrySet().iterator();
-        while (it.hasNext()) {
-            Entry<String, String> entry = it.next();
+        for (Entry<String, String> entry : map.entrySet()) {
             log.info(entry.getKey() + ":::" + entry.getValue());
         }
         if (map.containsKey("return_code") && "SUCCESS".equals(map.get("return_code"))) {
@@ -153,24 +143,6 @@ public class WeChatUtils {
             log.info("return_message为：：：" + map.get("return_msg"));
         }
         return flag;
-    }
-
-    protected static String getXmlString(SortedMap<String, String> map) {
-        StringBuffer sb = new StringBuffer();
-        Set es = map.entrySet();
-        Iterator it = es.iterator();
-        sb.append("<xml>");
-        while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
-            String k = (String) entry.getKey();
-            String v = (String) entry.getValue();
-            if (null != v && !"".equals(v) && !"appkey".equals(k)) {
-                sb.append("<" + k + ">" + v + "</" + k + ">");
-            }
-        }
-        String params = sb.append("</xml>").toString();
-        log.info(params);
-        return params;
     }
 
     /**

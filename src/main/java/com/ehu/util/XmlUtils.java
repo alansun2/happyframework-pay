@@ -1,108 +1,123 @@
 package com.ehu.util;
 
+import com.ehu.exception.PayException;
+import com.ehu.weixin.util.HttpClientUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 
-
-
+@Slf4j
 public class XmlUtils {
-	/**
-	 * 瑙ｆ瀽xml,杩斿洖绗竴绾у厓绱犻敭鍊煎銆傚鏋滅锟�?绾у厓绱犳湁瀛愯妭鐐癸紝鍒欐鑺傜偣鐨勶拷?锟芥槸瀛愯妭鐐圭殑xml鏁版嵁锟�?
-	 * @param strxml
-	 * @return
-	 * @throws JDOMException
-	 * @throws IOException
-	 */
-	public static Map<String,String> doXMLParse(String strxml) throws JDOMException, IOException {
 
-		if(null == strxml || "".equals(strxml)) {
-			return null;
-		}
+    /**
+     * XML格式字符串转换为Map
+     *
+     * @param strXML XML字符串
+     * @return XML数据转换后的Map
+     * @throws Exception
+     */
+    public static Map<String, String> xmlToMap(String strXML) throws IOException, SAXException, ParserConfigurationException {
+        try {
+            Map<String, String> data = new HashMap<>();
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setExpandEntityReferences(false);
+            documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            InputStream stream = new ByteArrayInputStream(strXML.getBytes("UTF-8"));
+            org.w3c.dom.Document doc = documentBuilder.parse(stream);
+            doc.getDocumentElement().normalize();
+            NodeList nodeList = doc.getDocumentElement().getChildNodes();
+            for (int idx = 0; idx < nodeList.getLength(); ++idx) {
+                Node node = nodeList.item(idx);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    org.w3c.dom.Element element = (org.w3c.dom.Element) node;
+                    data.put(element.getNodeName(), element.getTextContent());
+                }
+            }
+            stream.close();
+            return data;
+        } catch (Exception ex) {
+            log.warn("Invalid XML, can not convert to map. Error message: {}. XML content: {}", ex.getMessage(), strXML);
+            throw ex;
+        }
+    }
 
-		Map<String,String> m = new HashMap<String,String>();
+    /**
+     * 将Map转换为XML格式的字符串
+     *
+     * @param data Map类型数据
+     * @return XML格式的字符串
+     */
+    public static String mapToXml(Map<String, String> data) throws PayException {
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder;
+        String output;
+        try {
+            documentBuilder = documentBuilderFactory.newDocumentBuilder();
 
-		InputStream in = new ByteArrayInputStream(strxml.getBytes("UTF-8"));
-		SAXBuilder builder = new SAXBuilder();
-		Document doc = builder.build(in);
-		Element root = doc.getRootElement();
-		List list = root.getChildren();
-		Iterator it = list.iterator();
-		while(it.hasNext()) {
-			Element e = (Element) it.next();
-			String k = e.getName();
-			String v = "";
-			List children = e.getChildren();
-			if(children.isEmpty()) {
-				v = e.getTextNormalize();
-			} else {
-				v = XmlUtils.getChildrenText(children);
-			}
+            org.w3c.dom.Document document = documentBuilder.newDocument();
+            org.w3c.dom.Element root = document.createElement("xml");
+            document.appendChild(root);
+            for (String key : data.keySet()) {
+                String value = data.get(key);
+                if (value == null) {
+                    value = "";
+                }
+                value = value.trim();
+                org.w3c.dom.Element filed = document.createElement(key);
+                filed.appendChild(document.createTextNode(value));
+                root.appendChild(filed);
+            }
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            DOMSource source = new DOMSource(document);
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            StringWriter writer = new StringWriter();
+            StreamResult result = new StreamResult(writer);
+            transformer.transform(source, result);
+            output = writer.getBuffer().toString(); //.replaceAll("\n|\r", "");
+            writer.close();
+        } catch (Exception e) {
+            throw new PayException("xml解析失败");
+        }
+        return output;
+    }
 
-			m.put(k, v);
-		}
-		//鍏抽棴
-		in.close();
-		return m;
-	}
-
-	/**
-	 * 鑾峰彇瀛愮粨鐐圭殑xml
-	 * @param children
-	 * @return String
-	 */
-	public static String getChildrenText(List children) {
-		StringBuffer sb = new StringBuffer();
-		if(!children.isEmpty()) {
-			Iterator it = children.iterator();
-			while(it.hasNext()) {
-				Element e = (Element) it.next();
-				String name = e.getName();
-				String value = e.getTextNormalize();
-				List list = e.getChildren();
-				sb.append("<" + name + ">");
-				if(!list.isEmpty()) {
-					sb.append(XmlUtils.getChildrenText(list));
-				}
-				sb.append(value);
-				sb.append("</" + name + ">");
-			}
-		}
-
-		return sb.toString();
-	}
-	public static String createXml(String xml){
-		String[] xmls = xml.split(",");
-		Element root = new Element("xml");  
-		Document document = new Document(root);  
-		Element return_code = new Element("return_code");
-		return_code.setText(xmls[0]);
-		root.addContent(return_code);  
-		Element return_msg = new Element("return_msg");  
-		return_msg.setText(xmls[1]);
-		root.addContent(return_msg);  
-		XMLOutputter XMLOut = new XMLOutputter(); 
-		 String resultXml = "";
-        try {  
-            Format f = Format.getPrettyFormat();  
-            f.setEncoding("UTF-8");//default=UTF-8  
-            XMLOut.setFormat(f);  
-            resultXml = XMLOut.outputString(document); 
-        } catch (Exception e) {  
-            e.printStackTrace();  
-        } 
-		return resultXml;
-	}
-
+    /**
+     * 获取xml编码字符�?
+     *
+     * @param strxml
+     * @return
+     * @throws IOException
+     * @throws JDOMException
+     */
+    public static String getXMLEncoding(String strxml) throws JDOMException, IOException {
+        InputStream in = HttpClientUtil.String2Inputstream(strxml);
+        SAXBuilder builder = new SAXBuilder();
+        Document doc = builder.build(in);
+        in.close();
+        return (String) doc.getProperty("encoding");
+    }
 }

@@ -57,7 +57,7 @@ public class Signature {
         EhPayConfig config = EhPayConfig.getInstance();
         ArrayList<String> list = new ArrayList<>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            if (entry.getValue() != "") {
+            if (!entry.getValue().equals("")) {
                 list.add(entry.getKey() + "=" + entry.getValue() + "&");
             }
         }

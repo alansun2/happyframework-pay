@@ -3,6 +3,7 @@ package com.ehu.weixin.weixinpay;
 import com.ehu.exception.PayException;
 import com.ehu.config.EhPayConfig;
 import com.ehu.weixin.entity.WeChatRefundInfo;
+import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.util.WeChatUtils;
 
 import java.util.Map;
@@ -41,8 +42,7 @@ public class WeChatRefund {
         packageParams.put("total_fee", orderMoney);
         packageParams.put("refund_fee", refundMoney);
         packageParams.put("op_user_id", config.getWxPay_mch_id());
-
-        packageParams = WeChatUtils.createSign(packageParams, config);
+        packageParams.put("sign", Signature.getSign(packageParams));
         Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, requestUrl, config.getWxPay_ca(), config.getWxPay_code());
 
         return WeChatUtils.checkWechatResponse(map);
@@ -70,8 +70,7 @@ public class WeChatRefund {
         packageParams.put("total_fee", orderMoney);
         packageParams.put("refund_fee", refundMoney);
         packageParams.put("op_user_id", config.getWxPay_mch_id());
-
-        packageParams = WeChatUtils.createSign(packageParams, config);
+        packageParams.put("sign", Signature.getSign(packageParams));
         Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, requestUrl, config.getWxPay_ca(), config.getWxPay_code());
 
         return WeChatUtils.checkWechatResponse(map);

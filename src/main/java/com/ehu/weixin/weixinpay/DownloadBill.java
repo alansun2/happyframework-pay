@@ -1,15 +1,15 @@
 package com.ehu.weixin.weixinpay;
 
+import com.ehu.config.EhPayConfig;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
-import com.ehu.config.EhPayConfig;
 import com.ehu.util.FileUtils;
 import com.ehu.util.XmlUtils;
+import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.util.WeChatUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -17,7 +17,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -42,52 +41,27 @@ public class DownloadBill {
         packageParams.put("bill_date", time);
         packageParams.put("bill_type", "ALL");
         packageParams.put("tar_type", "GZIP");
-        packageParams = WeChatUtils.createSign(packageParams, config);//获取签名
+        packageParams.put("sign", Signature.getSign(packageParams));
         sendRequest(XmlUtils.mapToXml(packageParams), desPath);
     }
 
     private static void sendRequest(String param, String path) throws PayException {
         // 创建默认的httpClient实例.
-        CloseableHttpClient httpclient = HttpClients.createDefault();
         // 创建httppost
         HttpPost httppost = new HttpPost(downloadbillurl);
         StringEntity uefEntity;
-        try {
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
             uefEntity = new StringEntity(param, "UTF-8");
             httppost.setEntity(uefEntity);
-            CloseableHttpResponse response = httpclient.execute(httppost);
-            try {
+            try (CloseableHttpResponse response = httpclient.execute(httppost)) {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
-//					String content = HttpClientUtil.InputStreamTOString(entity.getContent(), "UTf-8");
-//					if(content.startsWith("<xml>")){
-//						@SuppressWarnings("unchecked")
-//						Map<String, String> map = XMLUtil.doXMLParse(content);
-//						log.error("微信获取账单失败" + map.get("return_msg"));
-//						throw new PayException(PayResultCodeConstants.GET_FINANCIAL_30013, PayResultMessageConstants.GET_FINANCIAL_30013);
-//					}
                     FileUtils.streamHandler(entity.getContent(), path);
                 }
-            } finally {
-                response.close();
             }
-        } catch (ClientProtocolException e) {
-            log.error("获取微信账单失败", e);
-            throw new PayException(PayResultCodeConstants.GET_FINANCIAL_30013, PayResultMessageConstants.GET_FINANCIAL_30013);
-        } catch (UnsupportedEncodingException e) {
-            log.error("获取微信账单失败", e);
-            throw new PayException(PayResultCodeConstants.GET_FINANCIAL_30013, PayResultMessageConstants.GET_FINANCIAL_30013);
         } catch (IOException e) {
             log.error("获取微信账单失败", e);
             throw new PayException(PayResultCodeConstants.GET_FINANCIAL_30013, PayResultMessageConstants.GET_FINANCIAL_30013);
-        } finally {
-            // 关闭连接,释放资源
-            try {
-                httpclient.close();
-            } catch (IOException e) {
-                log.error("获取微信账单失败", e);
-                throw new PayException(PayResultCodeConstants.GET_FINANCIAL_30013, PayResultMessageConstants.GET_FINANCIAL_30013);
-            }
         }
     }
 }

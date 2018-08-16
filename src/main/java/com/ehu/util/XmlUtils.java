@@ -8,12 +8,10 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -35,9 +33,9 @@ public class XmlUtils {
      *
      * @param strXML XML字符串
      * @return XML数据转换后的Map
-     * @throws Exception
+     * @throws PayException e
      */
-    public static Map<String, String> xmlToMap(String strXML) throws IOException, SAXException, ParserConfigurationException {
+    public static Map<String, String> xmlToMap(String strXML) throws PayException {
         try {
             Map<String, String> data = new HashMap<>();
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -59,7 +57,7 @@ public class XmlUtils {
             return data;
         } catch (Exception ex) {
             log.warn("Invalid XML, can not convert to map. Error message: {}. XML content: {}", ex.getMessage(), strXML);
-            throw ex;
+            throw new PayException("xml to map error");
         }
     }
 
@@ -106,7 +104,7 @@ public class XmlUtils {
     }
 
     /**
-     * 获取xml编码字符�?
+     * 获取xml编码字符
      *
      * @param strxml
      * @return

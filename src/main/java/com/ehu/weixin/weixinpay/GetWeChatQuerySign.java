@@ -6,6 +6,7 @@ import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
 import com.ehu.config.EhPayConfig;
 import com.ehu.util.StringUtils;
+import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.util.WeChatUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,10 +34,9 @@ public class GetWeChatQuerySign {
         packageParams.put("mch_id", config.getWxPay_mch_id());
         packageParams.put("nonce_str", nonce_str);
         packageParams.put("out_trade_no", out_trade_no);
-        SortedMap<String, String> map = WeChatUtils.createSign(packageParams, config);
-        Map<String, String> resultMap = WeChatUtils.getResponseInfo(map, requestUrl);
-        Object flag = judgeOrderState(resultMap, queryFlag);
-        return flag;
+        packageParams.put("sign", Signature.getSign(packageParams));
+        Map<String, String> resultMap = WeChatUtils.getResponseInfo(packageParams, requestUrl);
+        return judgeOrderState(resultMap, queryFlag);
     }
 
     /**
@@ -47,7 +47,7 @@ public class GetWeChatQuerySign {
      * @return
      * @throws PayException
      */
-    protected static Object judgeOrderState(Map<String, String> resultMap, final String queryFlag) throws PayException {
+    private static Object judgeOrderState(Map<String, String> resultMap, final String queryFlag) throws PayException {
         if (resultMap.containsKey("return_code") && PayBaseConstants.RETURN_SUCCESS.equals(resultMap.get("return_code"))) {
             if (resultMap.containsKey("result_code") && PayBaseConstants.RETURN_SUCCESS.equals(resultMap.get("result_code"))) {
                 String resultCode = resultMap.get("result_code");
@@ -76,7 +76,7 @@ public class GetWeChatQuerySign {
         return false;
     }
 
-    protected static void checkTradeState(String tradeState) throws PayException {
+    private static void checkTradeState(String tradeState) throws PayException {
         if (PayBaseConstants.TRADE_STATE_SUCCESS.equals(tradeState)) {
             throw new PayException(PayResultCodeConstants.TRADE_STATE_SUCCESS_30007, PayResultMessageConstants.TRADE_STATE_SUCCESS_30007);
         } else if (PayBaseConstants.TRADE_STATE_NOTPAY.equals(tradeState)) {

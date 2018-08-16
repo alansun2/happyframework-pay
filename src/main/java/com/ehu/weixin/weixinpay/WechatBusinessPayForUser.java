@@ -4,6 +4,7 @@ import com.ehu.config.EhPayConfig;
 import com.ehu.exception.PayException;
 import com.ehu.util.StringUtils;
 import com.ehu.weixin.entity.WechatBusinessPay;
+import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.util.WeChatUtils;
 
 import java.util.Map;
@@ -39,7 +40,7 @@ public class WechatBusinessPayForUser {
         packageParams.put("amount", WeChatUtils.getFinalMoney(wechatBusinessPay.getAmount()));
         packageParams.put("spbill_create_ip", config.getWxPay_spbill_create_ip());
         packageParams.put("desc", wechatBusinessPay.getDesc());
-        packageParams = WeChatUtils.createSign(packageParams, config);//获取签名
+        packageParams.put("sign", Signature.getSign(packageParams));
         Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, REQUESTURL, config.getWxPay_ca(), config.getWxPay_code());//发送得到微信服务器
         return WeChatUtils.checkWechatResponse(map);
     }

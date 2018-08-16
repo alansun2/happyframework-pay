@@ -49,7 +49,7 @@ public class WeChatPayGetPrepay {
         packageParams.put("out_trade_no", order.getOrderId());
         packageParams.put("notify_url", order.getNotifyUrl());
         packageParams.put("trade_type", order.getTradeType());
-        packageParams = WeChatUtils.createSign(packageParams, config);
+        packageParams.put("sign", Signature.getSign(packageParams));
         String prepayId = sendPrepay(packageParams, "prepay_id");//得到prepayid
         packageParams.put("nonce_str", nonceStr);
 
@@ -61,7 +61,7 @@ public class WeChatPayGetPrepay {
         finalPackage.put("package", "Sign=WXPay");
         finalPackage.put("partnerid", config.getWxPay_mch_id());
         finalPackage.put("prepayid", prepayId);
-        finalPackage = WeChatUtils.createSign(finalPackage, config);
+        finalPackage.put("sign", Signature.getSign(finalPackage));
 
         WeChatResponseVO weChatResponseVO = new WeChatResponseVO();
         weChatResponseVO.setAppId(config.getWxPay_appid());
@@ -96,7 +96,7 @@ public class WeChatPayGetPrepay {
         packageParams.put("out_trade_no", order.getOrderId());
         packageParams.put("notify_url", order.getNotifyUrl());
         packageParams.put("trade_type", order.getTradeType());
-        packageParams = WeChatUtils.createSign(packageParams, config);
+        packageParams.put("sign", Signature.getSign(packageParams));
         return sendPrepay(packageParams, "code_url");//得到prepayid
     }
 
@@ -124,7 +124,7 @@ public class WeChatPayGetPrepay {
         packageParams.put("notify_url", order.getNotifyUrl());
         packageParams.put("trade_type", order.getTradeType());
         packageParams.put("openid", order.getOpenid());
-        packageParams = WeChatUtils.createSign(packageParams, config);
+        packageParams.put("sign", Signature.getSign(packageParams));
         String prepayId = sendPrepay(packageParams, "prepay_id");//得到prepayid
 
         String timeStamp = WeChatUtils.getTimeStamp();

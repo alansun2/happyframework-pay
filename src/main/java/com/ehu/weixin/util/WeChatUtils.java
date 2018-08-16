@@ -1,7 +1,5 @@
 package com.ehu.weixin.util;
 
-import com.ehu.config.EhPayConfig;
-import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
@@ -23,7 +21,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.SortedMap;
 
@@ -39,35 +36,18 @@ public class WeChatUtils {
         String resContent;
         if (httpClient.callHttpPost(requestUrl, params)) {
             resContent = httpClient.getResContent();
-            resultMap = WXPayUtil.xmlToMap(resContent);
+            resultMap = XmlUtils.xmlToMap(resContent);
         }
         return resultMap;
     }
 
-    /**
-     * 微信签名并返回带签名的map
-     *
-     * @param map
-     * @param config
-     * @return
-     */
-    @SuppressWarnings("rawtypes")
-    public static SortedMap<String, String> createSign(SortedMap<String, String> map, EhPayConfig config) {
-//        StringBuffer sb = new StringBuffer();
-//        Set es = map.entrySet();
-//        Iterator it = es.iterator();
-//        while (it.hasNext()) {
-//            Map.Entry entry = (Map.Entry) it.next();
-//            String k = (String) entry.getKey();
-//            String v = (String) entry.getValue();
-//            if (null != v && !"".equals(v) && !"sign".equals(k) && !"key".equals(k)) {
-//                sb.append(k + "=" + v + "&");
-//            }
-//        }
-//        sb.append("key=" + config.getWxPay_app_key());
-//        String sign = MD5Util.MD5Encode(sb.toString(), "UTF-8").toUpperCase();
-        map.put("sign", Signature.getSign(map));
-        return map;
+    private static SSLConnectionSocketFactory sslsf;
+
+    private static SSLConnectionSocketFactory getSslsf(String keyStorePath, String keyStorepass) throws Exception {
+        if (null == sslsf) {
+            sslsf = SSlUtil.getSSL(keyStorePath, keyStorepass);
+        }
+        return sslsf;
     }
 
     /**
@@ -83,7 +63,7 @@ public class WeChatUtils {
         Map<String, String> resultMap = null;
         String xmlString = XmlUtils.mapToXml(map);
         try {
-            SSLConnectionSocketFactory sslsf = SSlUtil.getSSL(keyStorePath, keyStorepass);
+            SSLConnectionSocketFactory sslsf = getSslsf(keyStorePath, keyStorepass);
             httpclient = HttpClients.custom()
                     .setSSLSocketFactory(sslsf)
                     .build();
@@ -102,7 +82,7 @@ public class WeChatUtils {
                     while ((text = bufferedReader.readLine()) != null) {
                         sb.append(text);
                     }
-                    resultMap = WXPayUtil.xmlToMap(sb.toString());
+                    resultMap = XmlUtils.xmlToMap(sb.toString());
                 }
                 EntityUtils.consume(entity);
             }
@@ -124,22 +104,21 @@ public class WeChatUtils {
 
     public static boolean checkWechatResponse(Map<String, String> map) throws PayException {
         boolean flag = false;
-        if (map.isEmpty()) {
+        if (null == map || map.isEmpty()) {
             log.error("WeChatUtils - checkWechatResponse 微信返回有误");
             return false;
         }
-        for (Entry<String, String> entry : map.entrySet()) {
-            log.info(entry.getKey() + ":::" + entry.getValue());
-        }
+        map.forEach((k, v) -> log.info(k + ":::" + k));
+
         if (map.containsKey("return_code") && "SUCCESS".equals(map.get("return_code"))) {
-            if (PayBaseConstants.RETURN_SUCCESS.equals(map.get("result_code"))) {
+            if ("SUCCESS".equals(map.get("result_code"))) {
                 flag = true;
-            } else if (PayBaseConstants.RETURN_FAIL.equals(map.get("result_code"))) {
+            } else if ("FAIL".equals(map.get("result_code"))) {
                 log.info(map.get("err_code") + ":::" + map.get("err_code_des"));
             } else {
                 throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10004, PayResultMessageConstants.STRING_WECHATPAY_10004);
             }
-        } else if (map.containsKey("return_code") && "FAIL".equals(map.get("return_code"))) {
+        } else if (!map.containsKey("return_code") || "FAIL".equals(map.get("return_code"))) {
             log.info("return_message为：：：" + map.get("return_msg"));
         }
         return flag;

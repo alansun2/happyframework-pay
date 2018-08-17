@@ -11,17 +11,8 @@ public class StringUtils {
 	 * @param str
 	 * @return
 	 */
-	public static boolean isEmpty(Object str) {
-		return (str == null || "".equals(str) || "".equals(str.toString().trim()));
-	}
-	
-	/**
-	 * 把对象转换成字符串
-	 * @param obj
-	 * @return
-	 */
-	public static String toString(Object obj) {
-		return (obj == null ? null : obj.toString());
+	public static boolean isBlank(String str) {
+		return (str == null || "".equals(str) || "".equals(str.trim()));
 	}
 
 	/**

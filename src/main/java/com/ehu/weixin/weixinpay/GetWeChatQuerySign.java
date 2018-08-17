@@ -52,7 +52,7 @@ public class GetWeChatQuerySign {
             if (resultMap.containsKey("result_code") && PayBaseConstants.RETURN_SUCCESS.equals(resultMap.get("result_code"))) {
                 String resultCode = resultMap.get("result_code");
                 if (PayBaseConstants.RETURN_SUCCESS.equals(resultCode)) {
-                    if (StringUtils.isEmpty(queryFlag)) {
+                    if (StringUtils.isBlank(queryFlag)) {
                         return resultMap.get("trade_state");
                     } else {
                         String tradeState = resultMap.get("trade_state");

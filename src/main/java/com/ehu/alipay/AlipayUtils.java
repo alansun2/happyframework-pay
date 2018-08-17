@@ -194,7 +194,7 @@ public class AlipayUtils {
         AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();//创建API对应的request类
         StringBuilder sb = new StringBuilder();
         sb.append("{" + "\"out_trade_no\":\"").append(alipayRefund.getOutTradeNo()).append("\",");
-        if (!StringUtils.isEmpty(alipayRefund.getOutRequestNo())) {
+        if (!StringUtils.isBlank(alipayRefund.getOutRequestNo())) {
             sb.append("\"out_request_no\":\"").append(alipayRefund.getOutRequestNo()).append("\",");
         }
         sb.append("\"refund_amount\":\"").append(alipayRefund.getRefundAmount()).append("\"}");
@@ -270,7 +270,7 @@ public class AlipayUtils {
             response = alipayClient.execute(request);
             if (response.isSuccess()) {
                 try {
-                    if (!StringUtils.isEmpty(aliSrcPath))
+                    if (!StringUtils.isBlank(aliSrcPath))
                         FileUtils.copyURLToFile(new URL(response.getBillDownloadUrl()), new File(aliSrcPath), 10000, 10000);
                 } catch (IOException e) {
                     log.error("获取财务账单url失败", e);

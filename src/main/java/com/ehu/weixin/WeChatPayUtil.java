@@ -66,7 +66,7 @@ public class WeChatPayUtil {
      */
     public static boolean checkIsSignValidFromResponseString(Map<String, String> map) throws JDOMException, IOException, IllegalAccessException {
         String signResponse = map.get("sign");
-        if (StringUtils.isEmpty(signResponse)) {
+        if (StringUtils.isBlank(signResponse)) {
             log.error("API返回的数据签名数据不存在，有可能被第三方篡改!!!");
             return false;
         }

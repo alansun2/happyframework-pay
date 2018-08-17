@@ -34,7 +34,7 @@ public class WechatBusinessPayForUser {
         /*NO_CHECK：不校验真实姓名
         FORCE_CHECK：强校验真实姓名（未实名认证的用户会校验失败，无法转账）*/
         packageParams.put("check_name", wechatBusinessPay.getCheckName());
-        if (!StringUtils.isEmpty(wechatBusinessPay.getCheckName())) {
+        if (!StringUtils.isBlank(wechatBusinessPay.getCheckName())) {
             packageParams.put("re_user_name", wechatBusinessPay.getReUserName());
         }
         packageParams.put("amount", WeChatUtils.getFinalMoney(wechatBusinessPay.getAmount()));

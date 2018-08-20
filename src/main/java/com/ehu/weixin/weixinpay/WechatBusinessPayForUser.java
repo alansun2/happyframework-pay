@@ -2,7 +2,6 @@ package com.ehu.weixin.weixinpay;
 
 import com.ehu.config.EhPayConfig;
 import com.ehu.exception.PayException;
-import com.ehu.util.StringUtils;
 import com.ehu.weixin.entity.WechatBusinessPay;
 import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.util.WeChatUtils;
@@ -34,7 +33,7 @@ public class WechatBusinessPayForUser {
         /*NO_CHECK：不校验真实姓名
         FORCE_CHECK：强校验真实姓名（未实名认证的用户会校验失败，无法转账）*/
         packageParams.put("check_name", wechatBusinessPay.getCheckName());
-        if (!StringUtils.isBlank(wechatBusinessPay.getCheckName())) {
+        if (!wechatBusinessPay.getCheckName().equals("NO_CHECK")) {
             packageParams.put("re_user_name", wechatBusinessPay.getReUserName());
         }
         packageParams.put("amount", WeChatUtils.getFinalMoney(wechatBusinessPay.getAmount()));

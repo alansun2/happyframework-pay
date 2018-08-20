@@ -30,7 +30,7 @@ public class WechatBusinessPayForUser {
         packageParams.put("mchid", config.getWxPay_mch_id());
         packageParams.put("nonce_str", WeChatUtils.getNonceStr());
         packageParams.put("partner_trade_no", wechatBusinessPay.getOrderId());
-        packageParams.put("openid", wechatBusinessPay.getOrderId());
+        packageParams.put("openid", wechatBusinessPay.getOpenId());
         /*NO_CHECK：不校验真实姓名
         FORCE_CHECK：强校验真实姓名（未实名认证的用户会校验失败，无法转账）*/
         packageParams.put("check_name", wechatBusinessPay.getCheckName());

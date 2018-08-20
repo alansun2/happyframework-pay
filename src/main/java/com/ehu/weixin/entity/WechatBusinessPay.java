@@ -38,5 +38,5 @@ public class WechatBusinessPay {
      * FORCE_CHECK：强校验真实姓名（未实名认证的用户会校验失败，无法转账）
      * ,必填
      */
-    private String checkName;
+    private String checkName = "NO_CHECK";
 }

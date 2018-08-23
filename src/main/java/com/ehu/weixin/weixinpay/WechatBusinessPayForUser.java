@@ -25,7 +25,7 @@ public class WechatBusinessPayForUser {
         EhPayConfig config = EhPayConfig.getInstance();
 
         SortedMap<String, String> packageParams = new TreeMap<String, String>();
-        packageParams.put("mch_appid", config.getWxPay_appid());
+        packageParams.put("mch_appid", config.getWxPay_mch_appid());
         packageParams.put("mchid", config.getWxPay_mch_id());
         packageParams.put("nonce_str", WeChatUtils.getNonceStr());
         packageParams.put("partner_trade_no", wechatBusinessPay.getOrderId());

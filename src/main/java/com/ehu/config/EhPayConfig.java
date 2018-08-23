@@ -121,6 +121,7 @@ public class EhPayConfig {
      * 微信唯一标示
      */
     private String wxPay_appid;
+    private String wxPay_mch_appid;
     private String wxPay_app_key;
     private String wxPay_spbill_create_ip;
     private String wxPay_mch_id;
@@ -267,6 +268,14 @@ public class EhPayConfig {
 
     public void setWxPay_spbill_create_ip(String wxPay_spbill_create_ip) {
         INSTANCE.wxPay_spbill_create_ip = wxPay_spbill_create_ip;
+    }
+
+    public String getWxPay_mch_appid() {
+        return INSTANCE.wxPay_mch_appid;
+    }
+
+    public void setWxPay_mch_appid(String wxPay_mch_appid) {
+        INSTANCE.wxPay_mch_appid = wxPay_mch_appid;
     }
 
     public void setWxPay_app_key(String wxPay_app_key) {

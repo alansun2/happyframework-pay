@@ -64,6 +64,9 @@
 		<property name="wxPay_appid">
 			<value>${ehu.ehupay.wxpay_appid}</value>
 		</property>
+		<property name="wxPay_mch_appid">
+			<value>${ehu.ehupay.wxpay_mch_appid}</value>
+		</property>
 		<property name="wxPay_app_key">
 			<value>${ehu.ehupay.wxpay_key}</value>
 		</property>

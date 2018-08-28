@@ -1,36 +1,37 @@
 package com.ehu.alipay;
 
+import com.alibaba.fastjson.JSON;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
+import com.alipay.api.AlipayResponse;
 import com.alipay.api.DefaultAlipayClient;
-import com.alipay.api.request.AlipayDataDataserviceBillDownloadurlQueryRequest;
-import com.alipay.api.request.AlipayTradePrecreateRequest;
-import com.alipay.api.request.AlipayTradeQueryRequest;
-import com.alipay.api.request.AlipayTradeRefundRequest;
-import com.alipay.api.response.AlipayDataDataserviceBillDownloadurlQueryResponse;
-import com.alipay.api.response.AlipayTradePrecreateResponse;
-import com.alipay.api.response.AlipayTradeQueryResponse;
-import com.alipay.api.response.AlipayTradeRefundResponse;
+import com.alipay.api.request.*;
+import com.alipay.api.response.*;
 import com.ehu.alipay.entity.*;
 import com.ehu.alipay.util.AlipayFunction;
 import com.ehu.alipay.util.AlipayNotify;
+import com.ehu.bean.LowerUnderscoreFilter;
+import com.ehu.bean.PayResponse;
 import com.ehu.config.EhPayConfig;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
 import com.ehu.util.StringUtils;
+import com.github.rholder.retry.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -51,9 +52,15 @@ public class AlipayUtils {
      * @param order 订单信息
      * @return 支付宝订单支付信息（无线）
      */
-    public static String createPayInfo(AlipayOrder order) throws UnsupportedEncodingException {
-        String orderInfo = AlipayFunction.getOrderInfo(order);
-        String sign = AlipayFunction.createSign(orderInfo);
+    public static String createPayInfo(AlipayOrder order) throws PayException {
+        String sign;
+        String orderInfo;
+        try {
+            orderInfo = AlipayFunction.getOrderInfo(order);
+            sign = AlipayFunction.createSign(orderInfo);
+        } catch (Exception e) {
+            throw new PayException("生成支付失败");
+        }
         return orderInfo + "&sign=\"" + sign + "\"&sign_type=\"" + config.getAlipay_sign_type() + "\"";
     }
 
@@ -110,11 +117,6 @@ public class AlipayUtils {
             sign = params.get("sign");
         }
         boolean isSign = AlipayNotify.getSignVeryfy(params, sign);
-
-        //写日志记录（若要调试，请取消下面两行注释）
-        //String sWord = "responseTxt=" + responseTxt + "\n isSign=" + isSign + "\n 返回回来的参数：" + AlipayCore.createLinkString(params);
-        //AlipayCore.logResult(sWord);
-
         return isSign && "true".equals(responseTxt);
     }
 
@@ -138,6 +140,8 @@ public class AlipayUtils {
 
     /**
      * 获取批量转账url
+     * （1）单日转出累计额度为100万元。
+     * （2）转账给个人支付宝账户，单笔最高5万元；转账给企业支付宝账户，单笔最高10万元。
      *
      * @param alipayTransferMoney alipayTransferMoney
      * @return String
@@ -152,6 +156,43 @@ public class AlipayUtils {
         orderInfo.put("detail_data", URLEncoder.encode(orderInfo.get("detail_data"), config.getAlipay_input_charset()));
         String linkstr = AlipayFunction.createLinkString(orderInfo);
         return config.getAlipay_gateway_url() + linkstr + "&sign=" + sign + "&sign_type=" + config.getAlipay_sign_type();
+    }
+
+    /**
+     * 支付宝 单笔转账到支付宝
+     *
+     * @param params {@link TransferSingleParams}
+     * @return
+     */
+    public static PayResponse<Boolean> transferSingle(TransferSingleParams params) {
+        AlipayFundTransToaccountTransferRequest request = new AlipayFundTransToaccountTransferRequest();
+        String paramStr = JSON.toJSONString(params, new LowerUnderscoreFilter());
+        request.setBizContent(paramStr);
+
+        Callable<AlipayFundTransToaccountTransferResponse> callable = () -> alipayClient.execute(request);
+        Retryer<AlipayFundTransToaccountTransferResponse> retryer = RetryerBuilder.<AlipayFundTransToaccountTransferResponse>newBuilder()
+                .retryIfException()
+                .retryIfResult(response ->
+                        response == null
+                                || !response.isSuccess()
+                                || "SYSTEM_ERROR".equals(response.getSubCode())
+                                || "40004".equals(response.getCode())
+                                || "20000".equals(response.getCode()))
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(3))
+                .build();
+
+        PayResponse<Boolean> response = new PayResponse<>();
+        AlipayFundTransToaccountTransferResponse call = null;
+        try {
+            call = retryer.call(callable);
+        } catch (ExecutionException | RetryException e) {
+            response.setResult(false);
+            log.error("alipay transfer error", e);
+        }
+
+        responseHandler(response, call);
+        return response;
     }
 
     /**
@@ -287,6 +328,8 @@ public class AlipayUtils {
         }
     }
 
+    //------------------------------------------------------------------------------------------------------------------
+
     /**
      * 处理支付宝返回参数
      *
@@ -309,5 +352,30 @@ public class AlipayUtils {
             params.put(name, valueStr);
         }
         return params;
+    }
+
+    /**
+     * 处理支付宝返回结果
+     *
+     * @param response response
+     * @param call     支付宝返回结果
+     */
+    private static void responseHandler(PayResponse<Boolean> response, AlipayResponse call) {
+        if (null == call) {
+            response.setResult(false);
+            response.setResultMessage("response null error");
+        } else if (call.isSuccess()) {
+            if (!PayBaseConstants.ALIPAY_RETURN_CODE_10000.equals(call.getSubCode())) {
+                response.setResult(false);
+                response.setResultCode(call.getSubCode());
+                response.setResultMessage(call.getSubMsg());
+                log.error(JSON.toJSONString(call));
+            }
+        } else {
+            response.setResult(false);
+            response.setResultCode(call.getCode());
+            response.setResultMessage(call.getMsg());
+            log.error(JSON.toJSONString(call));
+        }
     }
 }

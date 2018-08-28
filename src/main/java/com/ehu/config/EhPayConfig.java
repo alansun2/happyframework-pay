@@ -127,6 +127,7 @@ public class EhPayConfig {
     private String wxPay_mch_id;
     private String wxPay_ca;
     private String wxPay_code;
+    private String wxPay_public_key;
     private String wxxcx_appid;
     // ↑↑↑↑↑↑↑↑↑↑微信结束↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
@@ -280,6 +281,14 @@ public class EhPayConfig {
 
     public void setWxPay_app_key(String wxPay_app_key) {
         INSTANCE.wxPay_app_key = EhPayConfig.readKeyFile(wxPay_app_key);
+    }
+
+    public String getWxPay_public_key() {
+        return INSTANCE.wxPay_public_key;
+    }
+
+    public void setWxPay_public_key(String wxPay_public_key) {
+        INSTANCE.wxPay_public_key = EhPayConfig.readKeyFile(wxPay_public_key);
     }
 
     public String getWxPay_ca() {

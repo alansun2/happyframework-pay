@@ -21,7 +21,7 @@ import java.util.TreeMap;
  * 微信查询订单类
  */
 @Slf4j
-public class GetWeChatQuerySign {
+public class QueryOrder {
     static final String requestUrl = "https://api.mch.weixin.qq.com/pay/orderquery";
 
     @SuppressWarnings("unchecked")
@@ -60,7 +60,7 @@ public class GetWeChatQuerySign {
                             if (PayBaseConstants.TRADE_STATE_SUCCESS.equals(tradeState)) {
                                 return true;
                             } else {
-                                GetWeChatQuerySign.checkTradeState(tradeState);
+                                QueryOrder.checkTradeState(tradeState);
                             }
                         }
                     }

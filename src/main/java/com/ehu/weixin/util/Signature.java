@@ -4,6 +4,7 @@ package com.ehu.weixin.util;
 import com.ehu.config.EhPayConfig;
 import com.ehu.util.MD5Util;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -36,7 +37,11 @@ public class Signature {
         }
         String result = sb.toString();
         result += "key=" + config.getWxPay_app_key();
-        result = MD5Util.MD5Encode(result, "UTF-8").toUpperCase();
+        try {
+            result = MD5Util.MD5(result).toUpperCase();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("md5 error");
+        }
         return result;
     }
 }

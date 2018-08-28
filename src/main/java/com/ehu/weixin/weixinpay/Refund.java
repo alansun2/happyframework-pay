@@ -16,7 +16,7 @@ import java.util.TreeMap;
  *
  * @author AlanSun
  */
-public class WeChatRefund {
+public class Refund {
 
     static final String requestUrl = "https://api.mch.weixin.qq.com/secapi/pay/refund";
 

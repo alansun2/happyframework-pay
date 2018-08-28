@@ -24,7 +24,7 @@ import java.util.TreeMap;
  * 获取prepayid
  */
 @Slf4j
-public class WeChatPayGetPrepay {
+public class GetPrepayInfo {
     private static final String requestUrl = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 
     /**

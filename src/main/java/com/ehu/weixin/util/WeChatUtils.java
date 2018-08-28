@@ -20,6 +20,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Random;
 import java.util.SortedMap;
@@ -129,9 +130,13 @@ public class WeChatUtils {
      *
      * @return
      */
-    public static String getNonceStr() {
+    public static String getNonceStr() throws PayException {
         Random random = new Random();
-        return MD5Util.MD5Encode(String.valueOf(random.nextInt(10000)), "GBK");
+        try {
+            return MD5Util.MD5(String.valueOf(random.nextInt(10000)));
+        } catch (NoSuchAlgorithmException e) {
+            throw new PayException("md5 error");
+        }
     }
 
     /**

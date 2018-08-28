@@ -1,11 +1,9 @@
 package com.ehu.weixin;
 
+import com.ehu.bean.PayResponse;
 import com.ehu.exception.PayException;
 import com.ehu.util.StringUtils;
-import com.ehu.weixin.entity.WeChatRefundInfo;
-import com.ehu.weixin.entity.WeChatResponseVO;
-import com.ehu.weixin.entity.WeChatpayOrder;
-import com.ehu.weixin.entity.WechatBusinessPay;
+import com.ehu.weixin.entity.*;
 import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.weixinpay.*;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +27,9 @@ public class WeChatPayUtil {
      */
     public static WeChatResponseVO createWeiXinPackage(WeChatpayOrder order, int tradeType) throws PayException {
         if (1 == tradeType) {
-            return WeChatPayGetPrepay.gerneratorPrepay(order);
+            return GetPrepayInfo.gerneratorPrepay(order);
         } else if (2 == tradeType) {
-            return WeChatPayGetPrepay.gerneratorPrepayXcx(order);
+            return GetPrepayInfo.gerneratorPrepayXcx(order);
         }
         return null;
     }
@@ -39,11 +37,11 @@ public class WeChatPayUtil {
     /**
      * 获取扫码支付二维码
      *
-     * @param order
+     * @param order WeChatpayOrder
      * @throws PayException e
      */
     public static String getScanPayInfo(WeChatpayOrder order) throws PayException {
-        return WeChatPayGetPrepay.gerneratorPrepayScan(order);
+        return GetPrepayInfo.gerneratorPrepayScan(order);
     }
 
     /**
@@ -52,7 +50,7 @@ public class WeChatPayUtil {
      * @throws PayException e
      */
     public static Object queryWeChatOrder(String transaction_id, String queryFlag) throws PayException {
-        return GetWeChatQuerySign.getQuertResult(transaction_id, queryFlag);
+        return QueryOrder.getQuertResult(transaction_id, queryFlag);
     }
 
     /**
@@ -91,7 +89,7 @@ public class WeChatPayUtil {
      * @throws PayException e
      */
     public static boolean weChatRefund(WeChatRefundInfo weChatRefundInfo) throws PayException {
-        return WeChatRefund.weChatRefundOper(weChatRefundInfo);
+        return Refund.weChatRefundOper(weChatRefundInfo);
     }
 
     /**
@@ -101,18 +99,23 @@ public class WeChatPayUtil {
      * @throws PayException e
      */
     public static boolean weChatRefundXcx(WeChatRefundInfo weChatRefundInfo) throws PayException {
-        return WeChatRefund.weChatRefundOperXcx(weChatRefundInfo);
+        return Refund.weChatRefundOperXcx(weChatRefundInfo);
     }
 
     /**
      * 微信企业转账
+     * ◆ 不支持给非实名用户打款
+     * ◆ 给同一个实名用户付款，单笔单日限额2W/2W
+     * ◆ 一个商户同一日付款总额限额100W
+     * <p>
+     * 注意：以上规则中的限额2w、100w由于计算规则与风控策略的关系，不是完全精确值，金额仅做参考，请不要依赖此金额做系统处理，应以接口实际返回和查询结果为准，请知晓。
      *
      * @param wechatBusinessPay
      * @return boolean
      * @throws PayException e
      */
     public static boolean weChatBusinessPayForUser(WechatBusinessPay wechatBusinessPay) throws PayException {
-        return WechatBusinessPayForUser.weChatPayBusinessPayforUser(wechatBusinessPay);
+        return TransferMoney.weChatPayBusinessPayforUser(wechatBusinessPay);
     }
 
     /**
@@ -124,5 +127,21 @@ public class WeChatPayUtil {
      */
     public static void downloadBill(String time, String desPath) throws PayException {
         DownloadBill.downloadBill(time, desPath);
+    }
+
+    /**
+     * 1.企业付款至银行卡只支持新资金流类型账户
+     * 2.目前企业付款到银行卡支持17家银行，更多银行逐步开放中
+     * 3.付款到账实效为1-3日，最快次日到账
+     * 4.每笔按付款金额收取手续费，按金额0.1%收取，最低1元，最高25元,
+     * 如果商户开通了运营账户，手续费和付款的金额都从运营账户出。如果没有开通，则都从基本户出。
+     * 5.每个商户号每天可以出款100万，单商户给同一银行卡付款每天限额5万
+     * 6.发票：在账户中心-发票信息页面申请开票的商户会按月收到发票（已申请的无需重复申请）。
+     *
+     * @param params {@link TransferToBankCardParams}
+     * @return {@link PayResponse}
+     */
+    public static PayResponse<Boolean> transferToBankCard(TransferToBankCardParams params) throws PayException {
+        return TransferMoney.transferToBankCard(params);
     }
 }

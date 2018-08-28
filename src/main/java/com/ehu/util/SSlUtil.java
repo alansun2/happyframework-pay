@@ -96,13 +96,12 @@ public class SSlUtil {
      * @param map      参数列表
      * @param encoding 编码
      * @return
-     * @throws ParseException
      * @throws IOException
      * @throws KeyManagementException
      * @throws NoSuchAlgorithmException
      * @throws ClientProtocolException
      */
-    public static String send(String url, Map<String, String> map, String encoding) throws ClientProtocolException, IOException {
+    public static String send(String url, Map<String, String> map, String encoding) throws IOException {
         String body = "";
 
         //tomcat是我自己的密钥库的密码，你可以替换成自己的

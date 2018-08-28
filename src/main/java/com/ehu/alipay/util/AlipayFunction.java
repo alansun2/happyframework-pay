@@ -3,17 +3,14 @@ package com.ehu.alipay.util;
 import com.ehu.alipay.entity.AlipayOrder;
 import com.ehu.alipay.entity.AlipayRefundOrder;
 import com.ehu.alipay.entity.AlipayTransferMoney;
-import com.ehu.alipay.sign.MD5;
-import com.ehu.alipay.sign.RSA;
 import com.ehu.config.EhPayConfig;
-import com.ehu.constants.PayResultCodeConstants;
-import com.ehu.constants.PayResultMessageConstants;
-import com.ehu.exception.PayException;
-import com.ehu.util.DateUtil;
+import com.ehu.util.RSAUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -60,7 +57,7 @@ public class AlipayFunction {
     public static String createLinkString(Map<String, String> params) {
 
         params = paraFilter(params);
-        List<String> keys = new ArrayList<String>(params.keySet());
+        List<String> keys = new ArrayList<>(params.keySet());
         Collections.sort(keys);
 
         String prestr = "";
@@ -79,35 +76,6 @@ public class AlipayFunction {
         return prestr;
     }
 
-    public static void verifMD5(Map<String, String> map, String sign) throws PayException {
-        EhPayConfig config = EhPayConfig.getInstance();
-        String prestr = AlipayFunction.createLinkString(map);
-        String sign2 = MD5.sign(prestr, config.getAlipay_md5_key(), config.getAlipay_input_charset());
-        if (!sign.equals(sign2)) {
-            log.info("签名错误：支付宝返回信息可能被篡改" + map.toString() + sign + sign2);
-            throw new PayException(PayResultCodeConstants.ERROR_CODE_ALIPAY_10006, PayResultMessageConstants.STRING_ALIPAY_10006);
-        }
-    }
-
-//	/** 
-//	 * 生成文件摘要
-//	 * @param strFilePath 文件路径
-//	 * @param file_digest_type 摘要算法
-//	 * @return 文件摘要结果
-//	 */
-//	public static String getAbstract(String strFilePath, String file_digest_type) throws IOException {
-//		PartSource file = new FilePartSource(new File(strFilePath));
-//		if(file_digest_type.equals("MD5")){
-//			return DigestUtils.md5Hex(file.createInputStream());
-//		}
-//		else if(file_digest_type.equals("SHA")) {
-//			return DigestUtils.sha256Hex(file.createInputStream());
-//		}
-//		else {
-//			return "";
-//		}
-//	}
-
     /**
      * 对字符串生成校验码
      *
@@ -115,28 +83,14 @@ public class AlipayFunction {
      * @return
      * @throws Exception
      */
-    public static String createSign(String str) throws UnsupportedEncodingException {
+    public static String createSign(String str) throws Exception {
         EhPayConfig config = EhPayConfig.getInstance();
-        String sign = RSA.sign(str, config.getAlipay_private_key(), config.getAlipay_input_charset());
+        String sign = RSAUtils.sign(str.getBytes(config.getAlipay_input_charset()), config.getAlipay_private_key(), RSAUtils.SIGNATURE_ALGORITHM_SHA1);
         // 仅需对sign 做URL编码
         sign = URLEncoder.encode(sign, config.getAlipay_input_charset());
 
         return sign;
     }
-//    /**
-//     * MAP类型数组转换成NameValuePair类型
-//     * @param properties  MAP类型数组
-//     * @return NameValuePair类型数组
-//     */
-//    public static NameValuePair[] generatNameValuePair(Map<String, String> properties) {
-//        NameValuePair[] nameValuePair = new NameValuePair[properties.size()];
-//        int i = 0;
-//        for (Map.Entry<String, String> entry : properties.entrySet()) {
-//            nameValuePair[i++] = new NameValuePair(entry.getKey(), entry.getValue());
-//        }
-//
-//        return nameValuePair;
-//    }
 
     /**
      * 创建支付宝订单信息
@@ -229,17 +183,17 @@ public class AlipayFunction {
      */
     public static Map<String, String> getTransferMoneyMap(AlipayTransferMoney alipayTransferMoney) {
         EhPayConfig config = EhPayConfig.getInstance();
-        Date date = new Date();
+        LocalDateTime now = LocalDateTime.now();
         //把请求参数打包成数组
-        Map<String, String> sParaTemp = new HashMap<String, String>();
+        Map<String, String> sParaTemp = new HashMap<>();
         sParaTemp.put("service", "batch_trans_notify");
         sParaTemp.put("partner", config.getAlipay_partner());
         sParaTemp.put("_input_charset", config.getAlipay_input_charset());
         sParaTemp.put("notify_url", alipayTransferMoney.getNotifyUrl());
         sParaTemp.put("email", config.getAlipay_seller());
         sParaTemp.put("account_name", config.getAlipay_account_name());
-        sParaTemp.put("pay_date", DateUtil.formatDate(date, "yyyyMMdd"));
-        sParaTemp.put("batch_no", DateUtil.formatDate(date, "yyyyMMddHHmmss"));
+        sParaTemp.put("pay_date", now.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+        sParaTemp.put("batch_no", now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
         sParaTemp.put("batch_fee", alipayTransferMoney.getBatchFee());
         //批量付款笔数（最少1笔，最多1000笔）
         sParaTemp.put("batch_num", alipayTransferMoney.getBatchNum() + "");
@@ -252,17 +206,4 @@ public class AlipayFunction {
         sParaTemp.put("detail_data", alipayTransferMoney.getDetailData());
         return sParaTemp;
     }
-
-    public static Map<String, String> getQueryMap(String out_trade_no) {
-        EhPayConfig config = EhPayConfig.getInstance();
-        //把请求参数打包成数组
-        Map<String, String> sParaTemp = new HashMap<String, String>();
-        sParaTemp.put("service", "single_trade_query");
-        sParaTemp.put("partner", config.getAlipay_partner());
-        sParaTemp.put("_input_charset", config.getAlipay_input_charset());
-        //sParaTemp.put("trade_no", "2016080921001004110290638130");
-        sParaTemp.put("out_trade_no", out_trade_no);
-        return sParaTemp;
-    }
-
 }

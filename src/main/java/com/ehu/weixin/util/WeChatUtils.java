@@ -1,7 +1,6 @@
 package com.ehu.weixin.util;
 
-import com.ehu.constants.PayResultCodeConstants;
-import com.ehu.constants.PayResultMessageConstants;
+import com.ehu.bean.PayResponse;
 import com.ehu.exception.PayException;
 import com.ehu.util.MD5Util;
 import com.ehu.util.SSlUtil;
@@ -54,7 +53,7 @@ public class WeChatUtils {
     /**
      * 使用证书发送请求到微信服务器
      *
-     * @param map
+     * @param map          参数
      * @param requestUrl
      * @param keyStorepass
      * @return
@@ -103,32 +102,65 @@ public class WeChatUtils {
             return resultMap;
     }
 
-    public static boolean checkWechatResponse(Map<String, String> map) throws PayException {
+    /**
+     * 处理微信返回
+     *
+     * @param wxResponse 微信返回MAP
+     * @return boolean
+     */
+    public static boolean wechatResponseHandler(Map<String, String> wxResponse) {
         boolean flag = false;
-        if (null == map || map.isEmpty()) {
-            log.error("WeChatUtils - checkWechatResponse 微信返回有误");
+        if (null == wxResponse || wxResponse.isEmpty()) {
+            log.error("微信返回有误");
             return false;
         }
-        map.forEach((k, v) -> log.info(k + ":::" + k));
 
-        if (map.containsKey("return_code") && "SUCCESS".equals(map.get("return_code"))) {
-            if ("SUCCESS".equals(map.get("result_code"))) {
+        wxResponse.forEach((k, v) -> log.info(k + ":::" + k));
+
+        if (wxResponse.containsKey("return_code") && "SUCCESS".equals(wxResponse.get("return_code"))) {
+            if (wxResponse.containsKey("result_code") && "SUCCESS".equals(wxResponse.get("result_code"))) {
                 flag = true;
-            } else if ("FAIL".equals(map.get("result_code"))) {
-                log.info(map.get("err_code") + ":::" + map.get("err_code_des"));
-            } else {
-                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10004, PayResultMessageConstants.STRING_WECHATPAY_10004);
             }
-        } else if (!map.containsKey("return_code") || "FAIL".equals(map.get("return_code"))) {
-            log.info("return_message为：：：" + map.get("return_msg"));
         }
         return flag;
     }
 
     /**
-     * 获取
+     * 处理微信返回
      *
-     * @return
+     * @param wxResponseMap 微信返回MAP
+     */
+    public static void wechatResponseHandler(Map<String, String> wxResponseMap, PayResponse<Boolean> response) {
+        if (null == wxResponseMap || wxResponseMap.isEmpty()) {
+            response.setResultMessage("微信返回有误");
+            response.setResult(false);
+            return;
+        }
+
+        wxResponseMap.forEach((k, v) -> log.info(k + ":::" + k));
+
+        if (wxResponseMap.containsKey("return_code") && "SUCCESS".equals(wxResponseMap.get("return_code"))) {
+            if ("SUCCESS".equals(wxResponseMap.get("result_code"))) {
+                response.setResult(true);
+            } else if ("FAIL".equals(wxResponseMap.get("result_code"))) {
+                response.setResult(false);
+                response.setResultMessage(wxResponseMap.get("err_code_des"));
+                response.setResultCode(wxResponseMap.get("err_code"));
+            } else {
+                response.setResultMessage("微信返回有误");
+                response.setResult(false);
+            }
+        } else {
+            response.setResult(false);
+            response.setResultMessage(wxResponseMap.get("return_msg"));
+            response.setResultCode(wxResponseMap.get("return_code"));
+        }
+    }
+
+    /**
+     * 获取随机数
+     *
+     * @return 随机数
      */
     public static String getNonceStr() throws PayException {
         Random random = new Random();
@@ -142,7 +174,7 @@ public class WeChatUtils {
     /**
      * 获取时间戳
      *
-     * @return
+     * @return 时间戳 单位： 秒
      */
     public static String getTimeStamp() {
         return String.valueOf(System.currentTimeMillis() / 1000);
@@ -151,7 +183,7 @@ public class WeChatUtils {
     /**
      * 把金额转为分单位
      *
-     * @param price
+     * @param price 单位： 元
      */
     public static String getFinalMoney(double price) {
         String finalmoney = String.format("%.2f", price);//转为两位小数

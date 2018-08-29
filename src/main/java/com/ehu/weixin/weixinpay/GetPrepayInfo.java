@@ -145,8 +145,15 @@ public class GetPrepayInfo {
         return weChatResponseVO;
     }
 
-    @SuppressWarnings("unchecked")
-    public static String sendPrepay(SortedMap<String, String> map, String key) throws PayException {
+    /**
+     * 获取prepayId
+     *
+     * @param map map
+     * @param key key
+     * @return prepayId
+     * @throws PayException e
+     */
+    private static String sendPrepay(SortedMap<String, String> map, String key) throws PayException {
         String params = XmlUtils.mapToXml(map);
         TenpayHttpClient httpClient = new TenpayHttpClient();
         httpClient.setReqContent(requestUrl);

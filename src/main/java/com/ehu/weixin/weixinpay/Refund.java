@@ -45,7 +45,7 @@ public class Refund {
         packageParams.put("sign", Signature.getSign(packageParams));
         Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, requestUrl, config.getWxPay_ca(), config.getWxPay_code());
 
-        return WeChatUtils.checkWechatResponse(map);
+        return WeChatUtils.wechatResponseHandler(map);
     }
 
     /**
@@ -73,6 +73,6 @@ public class Refund {
         packageParams.put("sign", Signature.getSign(packageParams));
         Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, requestUrl, config.getWxPay_ca(), config.getWxPay_code());
 
-        return WeChatUtils.checkWechatResponse(map);
+        return WeChatUtils.wechatResponseHandler(map);
     }
 }

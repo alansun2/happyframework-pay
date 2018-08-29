@@ -6,12 +6,12 @@ import com.ehu.bean.LowerUnderscoreFilter;
 import com.ehu.bean.PayResponse;
 import com.ehu.config.EhPayConfig;
 import com.ehu.exception.PayException;
+import com.ehu.util.RSAUtils;
 import com.ehu.weixin.entity.TransferToBankCardParams;
 import com.ehu.weixin.entity.WechatBusinessPay;
 import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.util.WeChatUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -31,11 +31,17 @@ public class TransferMoney {
      */
     private static final String URL_TOBANK = "https://api.mch.weixin.qq.com/mmpaysptrans/pay_bank";
 
-    @SuppressWarnings("unchecked")
+    /**
+     * 微信转账到零钱
+     *
+     * @param wechatBusinessPay {@link WechatBusinessPay}
+     * @return true or false
+     * @throws PayException e
+     */
     public static boolean weChatPayBusinessPayforUser(WechatBusinessPay wechatBusinessPay) throws PayException {
         EhPayConfig config = EhPayConfig.getInstance();
 
-        SortedMap<String, String> packageParams = new TreeMap<String, String>();
+        SortedMap<String, String> packageParams = new TreeMap<>();
         packageParams.put("mch_appid", config.getWxPay_mch_appid());
         packageParams.put("mchid", config.getWxPay_mch_id());
         packageParams.put("nonce_str", WeChatUtils.getNonceStr());
@@ -52,7 +58,7 @@ public class TransferMoney {
         packageParams.put("desc", wechatBusinessPay.getDesc());
         packageParams.put("sign", Signature.getSign(packageParams));
         Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, REQUESTURL, config.getWxPay_ca(), config.getWxPay_code());//发送得到微信服务器
-        return WeChatUtils.checkWechatResponse(map);
+        return WeChatUtils.wechatResponseHandler(map);
     }
 
     /**
@@ -63,16 +69,24 @@ public class TransferMoney {
      */
     public static PayResponse<Boolean> transferToBankCard(TransferToBankCardParams params) throws PayException {
         EhPayConfig config = EhPayConfig.getInstance();
+        PayResponse<Boolean> response = new PayResponse<>();
         params.setAmount(Integer.parseInt(WeChatUtils.getFinalMoney(params.getAmount())));
-        String encBankNo = params.getEncBankNo();
-//        RSAPublicKeyImpl rsaPublicKey = new RSAPublicKeyImpl();
+        try {
+            params.setEncBankNo(RSAUtils.encryptByPublicKeyToString(params.getEncBankNo().getBytes(), config.getWxPay_public_key()));
+            params.setEncTrueName(RSAUtils.encryptByPublicKeyToString(params.getEncTrueName().getBytes(), config.getWxPay_public_key()));
+        } catch (Exception e) {
+            response.setResult(false);
+            response.setResultMessage("RSA error");
+        }
         String s = JSON.toJSONString(params, new LowerUnderscoreFilter());
-        HashMap<String, String> packageParams = JSON.parseObject(s, new TypeReference<HashMap<String, String>>() {
+        SortedMap<String, String> packageParams = JSON.parseObject(s, new TypeReference<TreeMap<String, String>>() {
 
         });
         packageParams.put("mch_id", config.getWxPay_mch_id());
         packageParams.put("nonce_str", WeChatUtils.getNonceStr());
         packageParams.put("sign", Signature.getSign(packageParams));
-        return null;
+        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, URL_TOBANK, config.getWxPay_ca(), config.getWxPay_code());//发送得到微信服务器
+        WeChatUtils.wechatResponseHandler(map, response);
+        return response;
     }
 }

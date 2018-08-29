@@ -248,6 +248,18 @@ public class RSAUtils {
     }
 
     /**
+     * 公钥加密 to String
+     *
+     * @param data      待加密数据
+     * @param publicKey 公钥
+     * @return 已加密数据
+     * @throws Exception e
+     */
+    public static String encryptByPublicKeyToString(byte[] data, String publicKey) throws Exception {
+        return Base64.getEncoder().encodeToString(encryptByPublicKey(data, publicKey));
+    }
+
+    /**
      * <p>
      * 私钥加密
      * </p>

@@ -2,11 +2,9 @@ package com.ehu.util;
 
 import com.ehu.bean.HttpParams;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.Registry;
@@ -15,12 +13,11 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -36,7 +33,11 @@ public class HttpClientUtil {
     //请求器的配置
     private static RequestConfig requestConfig;
 
+    private static HttpClient httpClient;
+
     private static SSLConnectionSocketFactory sslsf;
+
+    private static ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
     private static SSLConnectionSocketFactory getSslsf(String keyStorePath, String keyStorepass) throws Exception {
         if (null == sslsf) {
@@ -94,8 +95,12 @@ public class HttpClientUtil {
         if (!poolConnManagerMap.containsKey(keyStorepass) || null == requestConfig) {
             init(keyStorePath, keyStorepass, useCert);
         }
+
+        if (null != httpClient) {
+            return (CloseableHttpClient) httpClient;
+        }
         PoolingHttpClientConnectionManager connectionManager = poolConnManagerMap.get(keyStorepass);
-        CloseableHttpClient httpClient = HttpClients.custom()
+        httpClient = HttpClients.custom()
                 // 设置连接池管理
                 .setConnectionManager(connectionManager)
                 // 设置请求配置
@@ -103,12 +108,10 @@ public class HttpClientUtil {
                 // 设置重试次数
                 .setRetryHandler(new DefaultHttpRequestRetryHandler(0, false))
                 .build();
-
         if (connectionManager != null && connectionManager.getTotalStats() != null) {
             log.info("now client pool {}", connectionManager.getTotalStats().toString());
         }
-
-        return httpClient;
+        return (CloseableHttpClient) httpClient;
     }
 
     /**
@@ -126,22 +129,8 @@ public class HttpClientUtil {
             post.setEntity(se);
         }
         // Send the post request and get the response
-        CloseableHttpResponse response = getConnection(keyStorePath, keyStorepass, useCert).execute(post);
-        String responseStr = null;
-        try {
 
-            HttpEntity entity = response.getEntity();
-            StatusLine statusLine = response.getStatusLine();
-            log.info(statusLine.toString());
-            if (HttpStatus.SC_OK == statusLine.getStatusCode()) {
-                responseStr = EntityUtils.toString(entity, "UTF-8");
-            }
-            EntityUtils.consume(entity);
-        } finally {
-            if (null != response)
-                response.close();
-        }
-        return responseStr;
+        return getConnection(keyStorePath, keyStorepass, useCert).execute(post, responseHandler);
     }
 
     /**
@@ -157,44 +146,29 @@ public class HttpClientUtil {
         if (httpParams.getHeaders() == null) {
             httpGet.setHeaders(httpParams.getHeaders());
         }
-        CloseableHttpResponse response = getConnection(keyStorePath, keyStorepass, useCert).execute(httpGet);
-        String responseStr = null;
-        try {
-            // 执行请求
-            // 判断返回状态是否为200
-            HttpEntity entity = response.getEntity();
-            StatusLine statusLine = response.getStatusLine();
-            log.info(statusLine.toString());
-            if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
-                responseStr = EntityUtils.toString(entity, "UTF-8");
-            }
-            EntityUtils.consume(entity);
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-        }
-        return responseStr;
+        return getConnection(keyStorePath, keyStorepass, useCert).execute(httpGet, responseHandler);
     }
 
     public static void main(String[] str) throws IOException, NoSuchAlgorithmException, KeyManagementException {
-        HttpParams params = new HttpParams();
+/*        HttpParams params = new HttpParams();
         params.setUrl("https://www.baidu.com");
         BasicHeader[] headers = new BasicHeader[1];
         BasicHeader header = new BasicHeader("User-Agent", "Mozilla/5.0");
         headers[0] = header;
         params.setHeaders(headers);
         String closeableHttpResponse = doPost(null, null, false, params);
-//        params.setHeaders(headers);
-//        CloseableHttpResponse closeableHttpResponse = doPost(params);
-//        int i = 0;
-//        try {
-//            String s = doGet(null, null, false, "https://www.baidu.com");
-//            System.out.println(s);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-//        String s = EntityUtils.toString(closeableHttpResponse.getEntity());
+        params.setHeaders(headers);
+        CloseableHttpResponse closeableHttpResponse = doPost(params);
+        int i = 0;*/
+        HttpParams httpParams = new HttpParams();
+        httpParams.setUrl("https://www.baidu.com");
+        try {
+            for (int i = 0; i < 10; i++) {
+                String s = doGet(null, null, false, httpParams);
+                System.out.println(s);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

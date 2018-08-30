@@ -28,9 +28,9 @@ public class AlipayFunction {
      * @param sArray 签名参数组
      * @return 去掉空值与签名参数后的新签名参数组
      */
-    public static Map<String, String> paraFilter(Map<String, String> sArray) {
+    static Map<String, String> paraFilter(Map<String, String> sArray) {
 
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
 
         if (sArray == null || sArray.size() <= 0) {
             return result;
@@ -56,32 +56,31 @@ public class AlipayFunction {
      */
     public static String createLinkString(Map<String, String> params) {
 
-        params = paraFilter(params);
         List<String> keys = new ArrayList<>(params.keySet());
         Collections.sort(keys);
 
-        String prestr = "";
+        StringBuilder preStr = new StringBuilder();
 
         for (int i = 0; i < keys.size(); i++) {
             String key = keys.get(i);
             String value = params.get(key);
 
             if (i == keys.size() - 1) {//拼接时，不包括最后一个&字符
-                prestr = prestr + key + "=" + value;
+                preStr.append(key).append("=").append(value);
             } else {
-                prestr = prestr + key + "=" + value + "&";
+                preStr.append(key).append("=").append(value).append("&");
             }
         }
 
-        return prestr;
+        return preStr.toString();
     }
 
     /**
      * 对字符串生成校验码
      *
-     * @param str
-     * @return
-     * @throws Exception
+     * @param str 待签名串
+     * @return 签名
+     * @throws Exception e
      */
     public static String createSign(String str) throws Exception {
         EhPayConfig config = EhPayConfig.getInstance();
@@ -97,48 +96,31 @@ public class AlipayFunction {
      *
      * @param order 订单信息
      * @return 支付宝订单信息字符串
-     * @throws Exception
+     * @throws UnsupportedEncodingException e
      */
     public static String getOrderInfo(AlipayOrder order) throws UnsupportedEncodingException {
         EhPayConfig config = EhPayConfig.getInstance();
-        StringBuilder sb = new StringBuilder();
-        // 合作者身份ID
-        sb.append("partner=\"");
-        sb.append(config.getAlipay_partner());
-        // 商户网站唯一订单号
-        sb.append("\"&out_trade_no=\"");
-        sb.append(order.getOrderId());
-        // 商品名称
-        sb.append("\"&subject=\"");
-        sb.append(order.getSubject());
-        // 商品详情
-        sb.append("\"&body=\"");
-        sb.append(order.getBody());
-        // 商品金额
-        sb.append("\"&total_fee=\"");
-        sb.append(order.getPrice());
-        // 服务器异步通知页面路径，网址需要做URL编码
-        sb.append("\"&notify_url=\"");
-        sb.append(URLEncoder.encode(order.getNotifyUrl(), config.getAlipay_input_charset()));
-        // 接口名称， 固定值
-        sb.append("\"&service=\"mobile.securitypay.pay");
-        // 参数编码， 固定值
-        sb.append("\"&_input_charset=\"");
-        sb.append(config.getAlipay_input_charset());
-        // 		支付宝处理完请求后，当前页面跳转到商户指定页面的路径，可空
-        //		sb.append("\"&return_url=\"");
-        //		sb.append(URLEncoder.encode("http://m.alipay.com"));
-        // 支付类型， 固定值
-        sb.append("\"&payment_type=\"1");
-        // 卖家支付宝账号
-        sb.append("\"&seller_id=\"");
-        sb.append(config.getAlipay_seller());
-        // 如果show_url值为空，可不传
-        // sb.append("\"&show_url=\"");
-        sb.append("\"&it_b_pay=\"");
-        sb.append(config.getAlipay_time_out());
-        sb.append("\"");
-        return sb.toString();
+        return "partner=\"" +
+                config.getAlipay_partner() +
+                "\"&out_trade_no=\"" +
+                order.getOrderId() +
+                "\"&subject=\"" +
+                order.getSubject() +
+                "\"&body=\"" +
+                order.getBody() +
+                "\"&total_fee=\"" +
+                order.getPrice() +
+                "\"&notify_url=\"" +
+                URLEncoder.encode(order.getNotifyUrl(), config.getAlipay_input_charset()) +
+                "\"&service=\"mobile.securitypay.pay" +
+                "\"&_input_charset=\"" +
+                config.getAlipay_input_charset() +
+                "\"&payment_type=\"1" +
+                "\"&seller_id=\"" +
+                config.getAlipay_seller() +
+                "\"&it_b_pay=\"" +
+                config.getAlipay_time_out() +
+                "\"";
     }
 
 
@@ -147,12 +129,12 @@ public class AlipayFunction {
      *
      * @param refundOrder 订单信息
      * @return 支付宝退款订单信息Map
-     * @throws Exception
+     * @throws Exception e
      */
     public static Map<String, String> getRefundInfoMap(AlipayRefundOrder refundOrder) throws Exception {
 
         EhPayConfig config = EhPayConfig.getInstance();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         // 接口名称， 固定值
         map.put("service", "refund_fastpay_by_platform_pwd");
         // 合作者身份ID
@@ -178,8 +160,8 @@ public class AlipayFunction {
     /**
      * 创建支付宝批量转账信息
      *
-     * @param alipayTransferMoney
-     * @return
+     * @param alipayTransferMoney {@link AlipayTransferMoney}
+     * @return map
      */
     public static Map<String, String> getTransferMoneyMap(AlipayTransferMoney alipayTransferMoney) {
         EhPayConfig config = EhPayConfig.getInstance();
@@ -205,5 +187,27 @@ public class AlipayFunction {
 
         sParaTemp.put("detail_data", alipayTransferMoney.getDetailData());
         return sParaTemp;
+    }
+
+    /**
+     * 获取授权参数
+     *
+     * @return map
+     */
+    public static Map<String, String> getAuthMap() {
+        EhPayConfig config = EhPayConfig.getInstance();
+        Map<String, String> map = new HashMap<>();
+        map.put("apiname", "com.alipay.account.auth");
+        map.put("method", "alipay.open.auth.sdk.code.get");
+        map.put("app_id", config.getAlipay_app_id());
+        map.put("app_name", "mc");
+        map.put("biz_type", "openservice");
+        map.put("pid", config.getAlipay_app_id());
+        map.put("product_id", "APP_FAST_LOGIN");
+        map.put("scope", "kuaijie");
+        map.put("target_id", UUID.randomUUID().toString().replace("-", ""));
+        map.put("auth_type", "AUTHACCOUNT");
+        map.put("sign_type", "RSA");
+        return map;
     }
 }

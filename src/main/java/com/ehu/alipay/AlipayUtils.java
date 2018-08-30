@@ -378,4 +378,21 @@ public class AlipayUtils {
             log.error(JSON.toJSONString(call));
         }
     }
+
+    /**
+     * 支付宝登录时获取返回串
+     * 用户支付宝登录
+     *
+     * @return infoStr
+     */
+    public String getInfoStrToAuth() throws PayException {
+        Map<String, String> authMap = AlipayFunction.getAuthMap();
+        String linkString = AlipayFunction.createLinkString(authMap);
+        try {
+            authMap.put("sign", AlipayFunction.createSign(linkString));
+            return AlipayFunction.createLinkString(authMap);
+        } catch (Exception e) {
+            throw new PayException("签名失败");
+        }
+    }
 }

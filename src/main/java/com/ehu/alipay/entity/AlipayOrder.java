@@ -29,6 +29,6 @@ public class AlipayOrder {
         if (body.length() > 49) {
             body = body.substring(0, 49);
         }
-        this.body = body;
+        this.body = body.trim();
     }
 }

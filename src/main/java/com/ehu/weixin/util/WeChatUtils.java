@@ -115,7 +115,7 @@ public class WeChatUtils {
             return false;
         }
 
-        wxResponse.forEach((k, v) -> log.info(k + ":::" + k));
+        wxResponse.forEach((k, v) -> log.info(k + ":::" + v));
 
         if (wxResponse.containsKey("return_code") && "SUCCESS".equals(wxResponse.get("return_code"))) {
             if (wxResponse.containsKey("result_code") && "SUCCESS".equals(wxResponse.get("result_code"))) {
@@ -137,7 +137,7 @@ public class WeChatUtils {
             return;
         }
 
-        wxResponseMap.forEach((k, v) -> log.info(k + ":::" + k));
+        wxResponseMap.forEach((k, v) -> log.info(k + ":::" + v));
 
         if (wxResponseMap.containsKey("return_code") && "SUCCESS".equals(wxResponseMap.get("return_code"))) {
             if ("SUCCESS".equals(wxResponseMap.get("result_code"))) {

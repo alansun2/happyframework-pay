@@ -43,8 +43,8 @@ public class TransferMoney {
         EhPayConfig config = EhPayConfig.getInstance();
 
         SortedMap<String, String> packageParams = new TreeMap<>();
-        packageParams.put("mch_appid", StringUtils.getDefaultIfNull(wechatBusinessPay.getMchAppid(), config.getWxPay_mch_appid()));
-        packageParams.put("mchid", StringUtils.getDefaultIfNull(wechatBusinessPay.getMchid(), config.getWxPay_mch_id()));
+        packageParams.put("mch_appid", StringUtils.getDefaultIfNullPay(wechatBusinessPay.getMchAppid(), config.getWxPay_mch_appid()));
+        packageParams.put("mchid", StringUtils.getDefaultIfNullPay(wechatBusinessPay.getMchid(), config.getWxPay_mch_id()));
         packageParams.put("nonce_str", WeChatUtils.getNonceStr());
         packageParams.put("partner_trade_no", wechatBusinessPay.getOrderId());
         packageParams.put("openid", wechatBusinessPay.getOpenId());
@@ -57,8 +57,8 @@ public class TransferMoney {
         packageParams.put("amount", WeChatUtils.getFinalMoney(wechatBusinessPay.getAmount()));
         packageParams.put("spbill_create_ip", config.getWxPay_spbill_create_ip());
         packageParams.put("desc", wechatBusinessPay.getDesc());
-        packageParams.put("sign", Signature.getSign(packageParams, StringUtils.getDefaultIfNull(wechatBusinessPay.getPrivateKey(), config.getWxPay_app_key())));
-        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, REQUESTURL, StringUtils.getDefaultIfNull(wechatBusinessPay.getCaPath(), config.getWxPay_ca()), StringUtils.getDefaultIfNull(wechatBusinessPay.getCode(), config.getWxPay_code()));//发送得到微信服务器
+        packageParams.put("sign", Signature.getSign(packageParams, StringUtils.getDefaultIfNullPay(wechatBusinessPay.getPrivateKey(), config.getWxPay_app_key())));
+        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, REQUESTURL, StringUtils.getDefaultIfNullPay(wechatBusinessPay.getCaPath(), config.getWxPay_ca()), StringUtils.getDefaultIfNullPay(wechatBusinessPay.getCode(), config.getWxPay_code()));//发送得到微信服务器
         return WeChatUtils.wechatResponseHandler(map);
     }
 
@@ -72,7 +72,7 @@ public class TransferMoney {
         EhPayConfig config = EhPayConfig.getInstance();
         PayResponse<Boolean> response = new PayResponse<>();
         params.setAmount(Integer.parseInt(WeChatUtils.getFinalMoney(params.getAmount())));
-        String wxPublicKey = StringUtils.getDefaultIfNull(params.getWxPublicKey(), config.getWxPay_public_key());
+        String wxPublicKey = StringUtils.getDefaultIfNullPay(params.getWxPublicKey(), config.getWxPay_public_key());
         try {
             params.setEncBankNo(RSAUtils.encryptByPublicKeyToString(params.getEncBankNo().getBytes(), wxPublicKey));
             params.setEncTrueName(RSAUtils.encryptByPublicKeyToString(params.getEncTrueName().getBytes(), wxPublicKey));
@@ -84,10 +84,10 @@ public class TransferMoney {
         SortedMap<String, String> packageParams = JSON.parseObject(s, new TypeReference<TreeMap<String, String>>() {
 
         });
-        packageParams.put("mch_id", StringUtils.getDefaultIfNull(params.getMchid(), config.getWxPay_mch_id()));
+        packageParams.put("mch_id", StringUtils.getDefaultIfNullPay(params.getMchid(), config.getWxPay_mch_id()));
         packageParams.put("nonce_str", WeChatUtils.getNonceStr());
-        packageParams.put("sign", Signature.getSign(packageParams, StringUtils.getDefaultIfNull(params.getPrivateKey(), config.getWxPay_app_key())));
-        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, URL_TOBANK, StringUtils.getDefaultIfNull(params.getCaPath(), config.getWxPay_ca()), StringUtils.getDefaultIfNull(params.getCode(), config.getWxPay_code()));//发送得到微信服务器
+        packageParams.put("sign", Signature.getSign(packageParams, StringUtils.getDefaultIfNullPay(params.getPrivateKey(), config.getWxPay_app_key())));
+        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, URL_TOBANK, StringUtils.getDefaultIfNullPay(params.getCaPath(), config.getWxPay_ca()), StringUtils.getDefaultIfNullPay(params.getCode(), config.getWxPay_code()));//发送得到微信服务器
         WeChatUtils.wechatResponseHandler(map, response);
         return response;
     }

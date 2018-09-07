@@ -104,7 +104,7 @@ public class StringUtils {
      * @param defaultVal 默认值
      * @return str
      */
-    public static String getDefaultIfNullPay(String str, String defaultVal) {
+    public static String getDefaultIfNull(String str, String defaultVal) {
         return isBlank(str) ? defaultVal : str;
     }
 }

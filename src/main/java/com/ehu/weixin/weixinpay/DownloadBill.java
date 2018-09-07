@@ -41,7 +41,7 @@ public class DownloadBill {
         packageParams.put("bill_date", time);
         packageParams.put("bill_type", "ALL");
         packageParams.put("tar_type", "GZIP");
-        packageParams.put("sign", Signature.getSign(packageParams));
+        packageParams.put("sign", Signature.getSign(packageParams, config.getWxPay_app_key()));
         sendRequest(XmlUtils.mapToXml(packageParams), desPath);
     }
 

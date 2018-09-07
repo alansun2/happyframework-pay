@@ -49,7 +49,7 @@ public class GetPrepayInfo {
         packageParams.put("out_trade_no", order.getOrderId());
         packageParams.put("notify_url", order.getNotifyUrl());
         packageParams.put("trade_type", order.getTradeType());
-        packageParams.put("sign", Signature.getSign(packageParams));
+        packageParams.put("sign", Signature.getSign(packageParams, config.getWxPay_app_key()));
         String prepayId = sendPrepay(packageParams, "prepay_id");//得到prepayid
         packageParams.put("nonce_str", nonceStr);
 
@@ -61,7 +61,7 @@ public class GetPrepayInfo {
         finalPackage.put("package", "Sign=WXPay");
         finalPackage.put("partnerid", config.getWxPay_mch_id());
         finalPackage.put("prepayid", prepayId);
-        finalPackage.put("sign", Signature.getSign(finalPackage));
+        finalPackage.put("sign", Signature.getSign(finalPackage, config.getWxPay_app_key()));
 
         WeChatResponseVO weChatResponseVO = new WeChatResponseVO();
         weChatResponseVO.setAppId(config.getWxPay_appid());
@@ -96,7 +96,7 @@ public class GetPrepayInfo {
         packageParams.put("out_trade_no", order.getOrderId());
         packageParams.put("notify_url", order.getNotifyUrl());
         packageParams.put("trade_type", order.getTradeType());
-        packageParams.put("sign", Signature.getSign(packageParams));
+        packageParams.put("sign", Signature.getSign(packageParams, config.getWxPay_app_key()));
         return sendPrepay(packageParams, "code_url");//得到prepayid
     }
 
@@ -124,7 +124,7 @@ public class GetPrepayInfo {
         packageParams.put("notify_url", order.getNotifyUrl());
         packageParams.put("trade_type", order.getTradeType());
         packageParams.put("openid", order.getOpenid());
-        packageParams.put("sign", Signature.getSign(packageParams));
+        packageParams.put("sign", Signature.getSign(packageParams, config.getWxPay_app_key()));
         String prepayId = sendPrepay(packageParams, "prepay_id");//得到prepayid
 
         String timeStamp = WeChatUtils.getTimeStamp();
@@ -141,7 +141,7 @@ public class GetPrepayInfo {
         weChatResponseVO.setPackageValue("prepay_id=" + prepayId);
         weChatResponseVO.setNonceStr(nonceStr);
         weChatResponseVO.setSignType("MD5");
-        weChatResponseVO.setSign(Signature.getSign(finalPackage));
+        weChatResponseVO.setSign(Signature.getSign(finalPackage, config.getWxPay_app_key()));
         return weChatResponseVO;
     }
 

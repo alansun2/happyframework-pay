@@ -34,7 +34,7 @@ public class QueryOrder {
         packageParams.put("mch_id", config.getWxPay_mch_id());
         packageParams.put("nonce_str", nonce_str);
         packageParams.put("out_trade_no", out_trade_no);
-        packageParams.put("sign", Signature.getSign(packageParams));
+        packageParams.put("sign", Signature.getSign(packageParams, config.getWxPay_app_key()));
         Map<String, String> resultMap = WeChatUtils.getResponseInfo(packageParams, requestUrl);
         return judgeOrderState(resultMap, queryFlag);
     }

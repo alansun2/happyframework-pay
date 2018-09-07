@@ -1,6 +1,7 @@
 package com.ehu.weixin;
 
 import com.ehu.bean.PayResponse;
+import com.ehu.config.EhPayConfig;
 import com.ehu.exception.PayException;
 import com.ehu.util.StringUtils;
 import com.ehu.weixin.entity.*;
@@ -70,7 +71,8 @@ public class WeChatPayUtil {
         //清掉返回数据对象里面的Sign数据（不能把这个数据也加进去进行签名），然后用签名算法进行签名
         map.remove("sign");
         //将API返回的数据根据用签名算法进行计算新的签名，用来跟API返回的签名进行比较
-        String signLocal = Signature.getSign(map);
+        EhPayConfig config = EhPayConfig.getInstance();
+        String signLocal = Signature.getSign(map, config.getWxPay_app_key());
         log.info("生成的签名是:" + signLocal);
         if (!signLocal.equals(signResponse)) {
             //签名验不过，表示这个API返回的数据有可能已经被篡改了

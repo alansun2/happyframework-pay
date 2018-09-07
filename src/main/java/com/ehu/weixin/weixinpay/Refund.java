@@ -42,7 +42,7 @@ public class Refund {
         packageParams.put("total_fee", orderMoney);
         packageParams.put("refund_fee", refundMoney);
         packageParams.put("op_user_id", config.getWxPay_mch_id());
-        packageParams.put("sign", Signature.getSign(packageParams));
+        packageParams.put("sign", Signature.getSign(packageParams, config.getWxPay_app_key()));
         Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, requestUrl, config.getWxPay_ca(), config.getWxPay_code());
 
         return WeChatUtils.wechatResponseHandler(map);
@@ -70,7 +70,7 @@ public class Refund {
         packageParams.put("total_fee", orderMoney);
         packageParams.put("refund_fee", refundMoney);
         packageParams.put("op_user_id", config.getWxPay_mch_id());
-        packageParams.put("sign", Signature.getSign(packageParams));
+        packageParams.put("sign", Signature.getSign(packageParams, config.getWxPay_app_key()));
         Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, requestUrl, config.getWxPay_ca(), config.getWxPay_code());
 
         return WeChatUtils.wechatResponseHandler(map);

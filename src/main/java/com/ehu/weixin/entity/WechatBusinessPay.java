@@ -39,4 +39,32 @@ public class WechatBusinessPay {
      * ,必填
      */
     private String checkName = "NO_CHECK";
+
+    //-----------------------------------------------------------------------------------
+    //以下属性为自定义时添加
+
+    /**
+     * 与商户号绑定的appId
+     */
+    private String mchAppid;
+
+    /**
+     * 商户号
+     */
+    private String mchid;
+
+    /**
+     * ssl证书地址
+     */
+    private String caPath;
+
+    /**
+     * 密码
+     */
+    private String code;
+
+    /**
+     * 签名密匙
+     */
+    private String privateKey;
 }

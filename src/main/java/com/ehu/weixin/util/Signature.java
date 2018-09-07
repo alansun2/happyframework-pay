@@ -1,7 +1,6 @@
 package com.ehu.weixin.util;
 
 
-import com.ehu.config.EhPayConfig;
 import com.ehu.util.MD5Util;
 
 import java.security.NoSuchAlgorithmException;
@@ -20,8 +19,8 @@ public class Signature {
      * @param map
      * @return
      */
-    public static String getSign(Map<String, String> map) {
-        EhPayConfig config = EhPayConfig.getInstance();
+    public static String getSign(Map<String, String> map, String appKey) {
+
         ArrayList<String> list = new ArrayList<>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
             if (!entry.getValue().equals("")) {
@@ -36,7 +35,7 @@ public class Signature {
             sb.append(arrayToSort[i]);
         }
         String result = sb.toString();
-        result += "key=" + config.getWxPay_app_key();
+        result += "key=" + appKey;
         try {
             result = MD5Util.MD5(result).toUpperCase();
         } catch (NoSuchAlgorithmException e) {

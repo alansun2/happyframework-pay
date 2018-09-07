@@ -72,9 +72,10 @@ public class TransferMoney {
         EhPayConfig config = EhPayConfig.getInstance();
         PayResponse<Boolean> response = new PayResponse<>();
         params.setAmount(Integer.parseInt(WeChatUtils.getFinalMoney(params.getAmount())));
+        String wxPublicKey = StringUtils.getDefaultIfNull(params.getWxPublicKey(), config.getWxPay_public_key());
         try {
-            params.setEncBankNo(RSAUtils.encryptByPublicKeyToString(params.getEncBankNo().getBytes(), config.getWxPay_public_key()));
-            params.setEncTrueName(RSAUtils.encryptByPublicKeyToString(params.getEncTrueName().getBytes(), config.getWxPay_public_key()));
+            params.setEncBankNo(RSAUtils.encryptByPublicKeyToString(params.getEncBankNo().getBytes(), wxPublicKey));
+            params.setEncTrueName(RSAUtils.encryptByPublicKeyToString(params.getEncTrueName().getBytes(), wxPublicKey));
         } catch (Exception e) {
             response.setResult(false);
             response.setResultMessage("RSA error");
@@ -83,10 +84,10 @@ public class TransferMoney {
         SortedMap<String, String> packageParams = JSON.parseObject(s, new TypeReference<TreeMap<String, String>>() {
 
         });
-        packageParams.put("mch_id", config.getWxPay_mch_id());
+        packageParams.put("mch_id", StringUtils.getDefaultIfNull(params.getMchid(), config.getWxPay_mch_id()));
         packageParams.put("nonce_str", WeChatUtils.getNonceStr());
-        packageParams.put("sign", Signature.getSign(packageParams, config.getWxPay_app_key()));
-        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, URL_TOBANK, config.getWxPay_ca(), config.getWxPay_code());//发送得到微信服务器
+        packageParams.put("sign", Signature.getSign(packageParams, StringUtils.getDefaultIfNull(params.getPrivateKey(), config.getWxPay_app_key())));
+        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, URL_TOBANK, StringUtils.getDefaultIfNull(params.getCaPath(), config.getWxPay_ca()), StringUtils.getDefaultIfNull(params.getCode(), config.getWxPay_code()));//发送得到微信服务器
         WeChatUtils.wechatResponseHandler(map, response);
         return response;
     }

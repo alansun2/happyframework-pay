@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.SortedMap;
@@ -41,13 +42,14 @@ public class WeChatUtils {
         return resultMap;
     }
 
-    private static SSLConnectionSocketFactory sslsf;
+    private static Map<String, SSLConnectionSocketFactory> sslsfMap = new HashMap<>();
 
     private static SSLConnectionSocketFactory getSslsf(String keyStorePath, String keyStorepass) throws Exception {
-        if (null == sslsf) {
-            sslsf = SSlUtil.getSSL(keyStorePath, keyStorepass);
-        }
-        return sslsf;
+        if (!sslsfMap.containsKey(keyStorepass)) {
+            SSLConnectionSocketFactory sslsf = SSlUtil.getSSL(keyStorePath, keyStorepass);
+            sslsfMap.put(keyStorepass, sslsf);
+            return sslsf;
+        } else return sslsfMap.get(keyStorepass);
     }
 
     /**

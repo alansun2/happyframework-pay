@@ -217,14 +217,14 @@ public class RSAUtils {
      * @return
      * @throws Exception
      */
-    public static byte[] encryptByPublicKey(byte[] data, String publicKey)
+    public static byte[] encryptByPublicKey(byte[] data, String publicKey, String algorithm)
             throws Exception {
         byte[] keyBytes = org.apache.commons.codec.binary.Base64.decodeBase64(publicKey);
         X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
         Key publicK = keyFactory.generatePublic(x509KeySpec);
         // 对数据加密
-        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
+        Cipher cipher = Cipher.getInstance(algorithm);
         cipher.init(Cipher.ENCRYPT_MODE, publicK);
         int inputLen = data.length;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -255,8 +255,8 @@ public class RSAUtils {
      * @return 已加密数据
      * @throws Exception e
      */
-    public static String encryptByPublicKeyToString(byte[] data, String publicKey) throws Exception {
-        return Base64.getEncoder().encodeToString(encryptByPublicKey(data, publicKey));
+    public static String encryptByPublicKeyToString(byte[] data, String publicKey, String algorithm) throws Exception {
+        return Base64.getEncoder().encodeToString(encryptByPublicKey(data, publicKey, algorithm));
     }
 
     /**
@@ -347,6 +347,6 @@ public class RSAUtils {
                 "JMTVnXVPY2qcAjF+595shwUKyTjKB8v1REPB3hPF1Z75O6LwuLfyPiCrCTmVoyfq\n" +
                 "jwIDAQAB";
 
-        byte[] bytes = encryptByPublicKey("dsd".getBytes(), publicKey);
+        byte[] bytes = encryptByPublicKey("dsd".getBytes(), publicKey, KEY_ALGORITHM);
     }
 }

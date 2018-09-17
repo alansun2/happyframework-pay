@@ -33,6 +33,11 @@ public class TransferMoney {
     private static final String URL_TOBANK = "https://api.mch.weixin.qq.com/mmpaysptrans/pay_bank";
 
     /**
+     * RSA 算法
+     */
+    public static final String algorithm = "RSA/ECB/OAEPWITHSHA-1ANDMGF1PADDING";
+
+    /**
      * 微信转账到零钱
      *
      * @param wechatBusinessPay {@link WechatBusinessPay}
@@ -71,14 +76,14 @@ public class TransferMoney {
     public static PayResponse<Boolean> transferToBankCard(TransferToBankCardParams params) throws PayException {
         EhPayConfig config = EhPayConfig.getInstance();
         PayResponse<Boolean> response = new PayResponse<>();
-        params.setAmount(Integer.parseInt(WeChatUtils.getFinalMoney(params.getAmount())));
         String wxPublicKey = StringUtils.getDefaultIfNull(params.getWxPublicKey(), config.getWxPay_public_key());
         try {
-            params.setEncBankNo(RSAUtils.encryptByPublicKeyToString(params.getEncBankNo().getBytes(), wxPublicKey));
-            params.setEncTrueName(RSAUtils.encryptByPublicKeyToString(params.getEncTrueName().getBytes(), wxPublicKey));
+            params.setEncBankNo(RSAUtils.encryptByPublicKeyToString(params.getEncBankNo().getBytes(), wxPublicKey, algorithm));
+            params.setEncTrueName(RSAUtils.encryptByPublicKeyToString(params.getEncTrueName().getBytes(), wxPublicKey, algorithm));
         } catch (Exception e) {
             response.setResult(false);
             response.setResultMessage("RSA error");
+            return response;
         }
 
         String ca = StringUtils.getDefaultIfNull(params.getCaPath(), config.getWxPay_ca());
@@ -95,7 +100,7 @@ public class TransferMoney {
         SortedMap<String, String> packageParams = JSON.parseObject(s, new TypeReference<TreeMap<String, String>>() {
 
         });
-
+        packageParams.put("amount", WeChatUtils.getFinalMoney(params.getAmount()));
         packageParams.put("mch_id", mchId);
         packageParams.put("nonce_str", WeChatUtils.getNonceStr());
         packageParams.put("sign", Signature.getSign(packageParams, privateKey));

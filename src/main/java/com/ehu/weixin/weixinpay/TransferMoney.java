@@ -80,14 +80,26 @@ public class TransferMoney {
             response.setResult(false);
             response.setResultMessage("RSA error");
         }
+
+        String ca = StringUtils.getDefaultIfNull(params.getCaPath(), config.getWxPay_ca());
+        String code = StringUtils.getDefaultIfNull(params.getCode(), config.getWxPay_code());
+        String mchId = StringUtils.getDefaultIfNull(params.getMchid(), config.getWxPay_mch_id());
+        String privateKey = StringUtils.getDefaultIfNull(params.getPrivateKey(), config.getWxPay_app_key());
+        params.setPrivateKey(null);
+        params.setWxPublicKey(null);
+        params.setCaPath(null);
+        params.setCode(null);
+        params.setMchid(null);
+
         String s = JSON.toJSONString(params, new LowerUnderscoreFilter());
         SortedMap<String, String> packageParams = JSON.parseObject(s, new TypeReference<TreeMap<String, String>>() {
 
         });
-        packageParams.put("mch_id", StringUtils.getDefaultIfNull(params.getMchid(), config.getWxPay_mch_id()));
+
+        packageParams.put("mch_id", mchId);
         packageParams.put("nonce_str", WeChatUtils.getNonceStr());
-        packageParams.put("sign", Signature.getSign(packageParams, StringUtils.getDefaultIfNull(params.getPrivateKey(), config.getWxPay_app_key())));
-        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, URL_TOBANK, StringUtils.getDefaultIfNull(params.getCaPath(), config.getWxPay_ca()), StringUtils.getDefaultIfNull(params.getCode(), config.getWxPay_code()));//发送得到微信服务器
+        packageParams.put("sign", Signature.getSign(packageParams, privateKey));
+        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, URL_TOBANK, ca, code);//发送得到微信服务器
         WeChatUtils.wechatResponseHandler(map, response);
         return response;
     }

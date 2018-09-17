@@ -219,7 +219,7 @@ public class RSAUtils {
      */
     public static byte[] encryptByPublicKey(byte[] data, String publicKey)
             throws Exception {
-        byte[] keyBytes = Base64.getDecoder().decode(publicKey);
+        byte[] keyBytes = org.apache.commons.codec.binary.Base64.decodeBase64(publicKey);
         X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
         Key publicK = keyFactory.generatePublic(x509KeySpec);
@@ -271,7 +271,7 @@ public class RSAUtils {
      */
     public static byte[] encryptByPrivateKey(byte[] data, String privateKey)
             throws Exception {
-        byte[] keyBytes = Base64.getDecoder().decode(privateKey);
+        byte[] keyBytes = org.apache.commons.codec.binary.Base64.decodeBase64((privateKey));
         PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
         Key privateK = keyFactory.generatePrivate(pkcs8KeySpec);
@@ -331,9 +331,22 @@ public class RSAUtils {
 
 
     public static void main(String[] args) throws Exception {
-        Map<String, Object> objectMap = genKeyPair();
-        String privateKey = getPrivateKey(objectMap);
-        String sign = sign("dd".getBytes(), privateKey, SIGNATURE_ALGORITHM_SHA1);
-        String dd1 = Base64.getEncoder().encodeToString(encryptByPrivateKey("dd".getBytes(), privateKey));
+//        Map<String, Object> objectMap = genKeyPair();
+//        String privateKey = getPrivateKey(objectMap);
+//        String publicKey = getPublicKey(objectMap);
+//        String sign = sign("dd".getBytes(), privateKey, SIGNATURE_ALGORITHM_SHA1);
+//        String dd1 = Base64.getEncoder().encodeToString(encryptByPrivateKey("dd".getBytes(), privateKey));
+//        byte[] bytes = encryptByPublicKey("hah".getBytes(), publicKey);
+//        byte[] bytes1 = decryptByPrivateKey(bytes, privateKey);
+//        String sd = new String(bytes1);
+        String publicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArT82k67xybiJS9AD8nNA\n" +
+                "euDYdrtCRaxkS6cgs8L9h83eqlDTlrdwzBVSv5V4imTq/URbXn4K0V/KJ1TwDrqO\n" +
+                "I8hamGB0fvU13WW1NcJuv41RnJVua0QAlS3tS1JzOZpMS9BEGeFvyFF/epbi/m9+\n" +
+                "lkUWG94FccArNnBtBqqvFncXgQsm98JB3a42NbS1ePP/hMI7Kkz+JNMyYsWkrOUF\n" +
+                "DCXAbSZkWBJekY4nGZtK1erqGRve8JbxTWirAm/s08rUrjOuZFA21/EI2nea3Did\n" +
+                "JMTVnXVPY2qcAjF+595shwUKyTjKB8v1REPB3hPF1Z75O6LwuLfyPiCrCTmVoyfq\n" +
+                "jwIDAQAB";
+
+        byte[] bytes = encryptByPublicKey("dsd".getBytes(), publicKey);
     }
 }

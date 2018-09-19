@@ -174,7 +174,7 @@ public class AlipayUtils {
                 .retryIfException()
                 .retryIfResult(response ->
                         response == null
-                                || !response.isSuccess()
+//                                || !response.isSuccess()
                                 || "SYSTEM_ERROR".equals(response.getSubCode())
                                 || "40004".equals(response.getCode())
                                 || "20000".equals(response.getCode()))

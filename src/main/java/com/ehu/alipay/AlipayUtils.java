@@ -365,7 +365,7 @@ public class AlipayUtils {
             response.setResult(false);
             response.setResultMessage("response null error");
         } else if (call.isSuccess()) {
-            if (!PayBaseConstants.ALIPAY_RETURN_CODE_10000.equals(call.getSubCode())) {
+            if (!PayBaseConstants.ALIPAY_RETURN_CODE_10000.equals(call.getCode())) {
                 response.setResult(false);
                 response.setResultCode(call.getSubCode());
                 response.setResultMessage(call.getSubMsg());

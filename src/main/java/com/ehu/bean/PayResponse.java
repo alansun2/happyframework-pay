@@ -1,6 +1,7 @@
 package com.ehu.bean;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -9,8 +10,13 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class PayResponse<T extends Object> {
     private T result;
     private String resultCode;
     private String resultMessage;
+
+    public PayResponse(T result){
+        this.result = result;
+    }
 }

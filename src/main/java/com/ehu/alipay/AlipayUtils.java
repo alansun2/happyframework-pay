@@ -182,7 +182,7 @@ public class AlipayUtils {
                 .withStopStrategy(StopStrategies.stopAfterAttempt(3))
                 .build();
 
-        PayResponse<Boolean> response = new PayResponse<>();
+        PayResponse<Boolean> response = new PayResponse<>(true);
         AlipayFundTransToaccountTransferResponse call = null;
         try {
             call = retryer.call(callable);

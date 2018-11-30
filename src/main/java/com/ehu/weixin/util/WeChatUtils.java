@@ -2,11 +2,12 @@ package com.ehu.weixin.util;
 
 import com.ehu.bean.PayResponse;
 import com.ehu.exception.PayException;
-import com.ehu.util.MD5Util;
 import com.ehu.util.SSlUtil;
 import com.ehu.util.XmlUtils;
 import com.ehu.weixin.client.TenpayHttpClient;
+import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -15,11 +16,12 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.jdom2.JDOMException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -164,13 +166,9 @@ public class WeChatUtils {
      *
      * @return 随机数
      */
-    public static String getNonceStr() throws PayException {
+    public static String getNonceStr() {
         Random random = new Random();
-        try {
-            return MD5Util.MD5(String.valueOf(random.nextInt(10000)));
-        } catch (NoSuchAlgorithmException e) {
-            throw new PayException("md5 error");
-        }
+        return DigestUtils.md5Hex(String.valueOf(random.nextInt(10000)));
     }
 
     /**
@@ -189,7 +187,47 @@ public class WeChatUtils {
      */
     public static String getFinalMoney(double price) {
         String finalmoney = String.format("%.2f", price);//转为两位小数
-        Integer i = Integer.parseInt(finalmoney.replace(".", ""));
-        return i.toString();//转为分
+        int i = Integer.parseInt(finalmoney.replace(".", ""));
+        return Integer.toString(i);//转为分
+    }
+
+    /**
+     * 处理微信回调信息
+     *
+     * @param httpServletRequest httpServletRequest
+     * @return paramsMap
+     * @throws IOException   e
+     * @throws JDOMException e
+     */
+    public static Map<String, String> getWechatPayCallBackmap(HttpServletRequest httpServletRequest) throws Exception {
+        BufferedReader reader;
+        String line;
+        StringBuilder inputString = new StringBuilder();
+        reader = httpServletRequest.getReader();
+        try {
+            // 获取收到的报文
+            while ((line = reader.readLine()) != null) {
+                inputString.append(line);
+            }
+
+            return XmlUtils.xmlToMap(inputString.toString());
+        } finally {
+            if (reader != null) {
+                reader.close();
+            }
+        }
+    }
+
+    /**
+     * 生成微信回调xml
+     *
+     * @param type 1：SUCCESS;2:FAIL
+     * @return str
+     * @throws Exception e
+     */
+    public static String getWXReturn(int type) throws Exception {
+        if (1 == type)
+            return XmlUtils.mapToXml(ImmutableMap.of("return_code", "SUCCESS", "return_msg", "OK"));
+        return XmlUtils.mapToXml(ImmutableMap.of("return_code", "FAIL", "return_msg", "alerdy ok"));
     }
 }

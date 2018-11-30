@@ -1,9 +1,8 @@
 package com.ehu.weixin.util;
 
 
-import com.ehu.util.MD5Util;
+import org.apache.commons.codec.digest.DigestUtils;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -36,11 +35,7 @@ public class Signature {
         }
         String result = sb.toString();
         result += "key=" + appKey;
-        try {
-            result = MD5Util.MD5(result).toUpperCase();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("md5 error");
-        }
+        result = DigestUtils.md5Hex(result).toUpperCase();
         return result;
     }
 }

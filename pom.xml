@@ -3,21 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ehoo100</groupId>
     <artifactId>ehu-pay</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
-    <name>ehu-pay</name>
+    <version>3.2.2-SNAPSHOT</version>
+    <name>pay</name>
     <packaging>jar</packaging>
     <description>支付</description>
-    <!-- <profiles> <profile> 开发 <id>dev</id> <properties> <profiles.active>dev</profiles.active>
-        <deploy.url>http://localhost:8080/manager/text</deploy.url> </properties>
-        <activation> <activeByDefault>true</activeByDefault> </activation> </profile>
-        <profile> 本地 <id>in</id> <properties> <profiles.active>in</profiles.active>
-        <deploy.url>http://localhost:8080/manager/text</deploy.url> </properties>
-        </profile> <profile> 测试环境 <id>test</id> <properties> <profiles.active>test</profiles.active>
-        <deploy.url>http://114.55.234.83:8083/manager/text</deploy.url> </properties>
-        </profile> <profile> 生产环境 <id>pro</id> <properties> <profiles.active>pro</profiles.active>
-        </properties> </profile> </profiles> -->
+
     <properties>
         <lombok.version>1.16.14</lombok.version>
+        <guava-retrying.version>2.0.0</guava-retrying.version>
     </properties>
 
     <dependencies>
@@ -28,22 +21,16 @@
             <version>4.5.3</version>
         </dependency>
         <!-- httpclient end -->
-        <!-- jdom -->
-        <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom</artifactId>
-            <version>2.0.2</version>
-        </dependency>
-        <!-- jdom -->
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.8</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.alipay.sdk/alipay-sdk-java -->
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>alipay</artifactId>
-            <version>1.1.0</version>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -63,56 +50,39 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.7.25</version>
         </dependency>
-        <!-- slf4j start -->
-        <!--fast json-->
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>23.0</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom2</artifactId>
+            <version>2.0.6</version>
+        </dependency>
+
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.17</version>
+            <version>1.2.47</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.rholder</groupId>
+            <artifactId>guava-retrying</artifactId>
+            <version>${guava-retrying.version}</version>
         </dependency>
     </dependencies>
-
-
-    <repositories>
-        <repository>
-            <id>central</id>
-            <name>Maven Central</name>
-            <url>https://repo1.maven.org/maven2/</url>
-
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>ehuRelease</id>
-            <name>release</name>
-            <url>http://120.55.162.216:8081/nexus/content/repositories/ehuReleases/</url>
-
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>ehusnapshots</id>
-            <name>snapshots</name>
-            <url>http://120.55.162.216:8081/nexus/content/repositories/ehusnaphosts/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-
-    </repositories>
 
     <build>
         <plugins>
@@ -120,18 +90,28 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.7</source> <!-- jdk版本 -->
-                    <target>1.7</target>
+                    <source>1.8</source> <!-- jdk版本 -->
+                    <target>1.8</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <configuration>
+                    <attach>true</attach>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-        <!-- <resources> <resource> <directory>src/main/resources</directory> 资源根目录排除各环境的配置，使用单独的资源目录来指定
-            <excludes> <exclude>config/profile/dev/*</exclude> <exclude>config/profile/in/*</exclude>
-            <exclude>config/profile/test/*</exclude> <exclude>config/profile/pro/*</exclude>
-            </excludes> </resource> <resource> <directory>src/main/resources/config/profile/${profiles.active}</directory>
-            </resource> <resource> <directory>src/main/java/com/ehu/mapper</directory>
-            <includes> <include>*.xml</include> </includes> </resource> </resources> -->
         <finalName>ehu-pay</finalName>
     </build>
     <distributionManagement>

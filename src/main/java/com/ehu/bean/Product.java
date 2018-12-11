@@ -22,8 +22,8 @@ public interface Product {
             body = Joiner.on(",").join(products.stream().map(o -> (o.getName())).collect(Collectors.toList()));
 
             body = body.replaceAll("\\ ", "");
-            if (body.length() > 49) {
-                body = body.substring(0, 49) + "等";
+            if (body.length() > 47) {
+                body = body.substring(0, 47) + "等";
             }
         }
         return body;

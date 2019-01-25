@@ -176,7 +176,7 @@ public class AlipayUtils {
                         response == null
 //                                || !response.isSuccess()
                                 || "SYSTEM_ERROR".equals(response.getSubCode())
-                                || "40004".equals(response.getCode())
+//                                || "40004".equals(response.getCode())
                                 || "20000".equals(response.getCode()))
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(3))
@@ -373,8 +373,8 @@ public class AlipayUtils {
             }
         } else {
             response.setResult(false);
-            response.setResultCode(call.getCode());
-            response.setResultMessage(call.getMsg());
+            response.setResultCode(call.getSubCode());
+            response.setResultMessage(call.getSubMsg());
             log.error(JSON.toJSONString(call));
         }
     }

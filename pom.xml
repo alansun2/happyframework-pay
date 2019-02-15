@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ehoo100</groupId>
     <artifactId>ehu-pay</artifactId>
-    <version>3.2.2-SNAPSHOT</version>
+    <version>3.2.3-SNAPSHOT</version>
     <name>pay</name>
     <packaging>jar</packaging>
     <description>支付</description>

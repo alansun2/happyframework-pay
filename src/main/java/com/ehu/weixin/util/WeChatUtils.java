@@ -134,7 +134,7 @@ public class WeChatUtils {
      *
      * @param wxResponseMap 微信返回MAP
      */
-    public static void wechatResponseHandler(Map<String, String> wxResponseMap, PayResponse<Boolean> response) {
+    public static void wechatResponseHandler(Map<String, String> wxResponseMap, PayResponse response) {
         if (null == wxResponseMap || wxResponseMap.isEmpty()) {
             response.setResultMessage("微信返回有误");
             response.setResult(false);

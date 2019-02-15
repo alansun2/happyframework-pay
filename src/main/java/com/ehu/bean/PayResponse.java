@@ -11,12 +11,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PayResponse<T extends Object> {
-    private T result;
+public class PayResponse<T> {
+    private Boolean result;
     private String resultCode;
     private String resultMessage;
+    private T data;
 
-    public PayResponse(T result){
-        this.result = result;
+    public PayResponse(T data) {
+        this.data = data;
     }
 }

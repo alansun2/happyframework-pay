@@ -33,6 +33,11 @@ public class TransferMoney {
     private static final String URL_TOBANK = "https://api.mch.weixin.qq.com/mmpaysptrans/pay_bank";
 
     /**
+     * 转账到银行卡
+     */
+    private static final String QUERY_URL_TOBANK = "https://api.mch.weixin.qq.com/mmpaysptrans/query_bank";
+
+    /**
      * RSA 算法
      */
     public static final String algorithm = "RSA/ECB/OAEPWITHSHA-1ANDMGF1PADDING";
@@ -106,6 +111,27 @@ public class TransferMoney {
         packageParams.put("sign", Signature.getSign(packageParams, privateKey));
         Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, URL_TOBANK, ca, code);//发送得到微信服务器
         WeChatUtils.wechatResponseHandler(map, response);
+        return response;
+    }
+
+    /**
+     * 查询企业付款到银行卡
+     *
+     * @param partnerTradeNo 商户订单号
+     */
+    public static PayResponse getResultOfTransferToBank(String partnerTradeNo) throws PayException {
+        EhPayConfig config = EhPayConfig.getInstance();
+        SortedMap<String, String> packageParams = new TreeMap<>();
+        packageParams.put("mch_id", config.getWxPay_mch_id());
+        packageParams.put("partner_trade_no", partnerTradeNo);
+        packageParams.put("nonce_str", WeChatUtils.getNonceStr());
+        packageParams.put("sign", Signature.getSign(packageParams, config.getWxPay_app_key()));
+        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, URL_TOBANK, config.getWxPay_ca(), config.getWxPay_code());//发送得到微信服务器
+        PayResponse<Map<String, String>> response = new PayResponse<>();
+        WeChatUtils.wechatResponseHandler(map, response);
+        if (response.getResult()) {
+            response.setData(map);
+        }
         return response;
     }
 }

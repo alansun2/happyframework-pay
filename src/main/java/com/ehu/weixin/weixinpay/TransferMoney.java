@@ -126,7 +126,7 @@ public class TransferMoney {
         packageParams.put("partner_trade_no", partnerTradeNo);
         packageParams.put("nonce_str", WeChatUtils.getNonceStr());
         packageParams.put("sign", Signature.getSign(packageParams, config.getWxPay_app_key()));
-        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, URL_TOBANK, config.getWxPay_ca(), config.getWxPay_code());//发送得到微信服务器
+        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, QUERY_URL_TOBANK, config.getWxPay_ca(), config.getWxPay_code());//发送得到微信服务器
         PayResponse<Map<String, String>> response = new PayResponse<>();
         WeChatUtils.wechatResponseHandler(map, response);
         if (response.getResult()) {

@@ -119,7 +119,7 @@ public class TransferMoney {
      *
      * @param partnerTradeNo 商户订单号
      */
-    public static PayResponse getResultOfTransferToBank(String partnerTradeNo) throws PayException {
+    public static PayResponse<Map<String, String>> getResultOfTransferToBank(String partnerTradeNo) throws PayException {
         EhPayConfig config = EhPayConfig.getInstance();
         SortedMap<String, String> packageParams = new TreeMap<>();
         packageParams.put("mch_id", config.getWxPay_mch_id());

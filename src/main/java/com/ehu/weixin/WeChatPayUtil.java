@@ -168,7 +168,7 @@ public class WeChatPayUtil {
      * 成功付款时间	   pay_succ_time	   否	String(32)	微信侧付款成功时间（但无法保证银行不会退票）
      * 失败原因	       reason	           否	String(128)	订单失败原因（如：余额不足）
      */
-    public static PayResponse getResultOfTransferToBank(String partnerTradeNo) throws PayException {
+    public static PayResponse<Map<String, String>> getResultOfTransferToBank(String partnerTradeNo) throws PayException {
         return TransferMoney.getResultOfTransferToBank(partnerTradeNo);
     }
 }

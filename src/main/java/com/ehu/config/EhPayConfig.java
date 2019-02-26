@@ -121,6 +121,10 @@ public class EhPayConfig {
      * 微信唯一标示
      */
     private String wxPay_appid;
+    /**
+     * 申请商户号的appid或商户号绑定的appid
+     * 供微信转账使用
+     */
     private String wxPay_mch_appid;
     private String wxPay_app_key;
     private String wxPay_spbill_create_ip;

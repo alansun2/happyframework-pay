@@ -44,7 +44,7 @@ public class WechatBusinessPay {
     //以下属性为自定义时添加
 
     /**
-     * 与商户号绑定的appId
+     * 申请商户号的appid或商户号绑定的appid
      */
     private String mchAppid;
 

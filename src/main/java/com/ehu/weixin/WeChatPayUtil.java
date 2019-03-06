@@ -114,7 +114,7 @@ public class WeChatPayUtil {
      * @return boolean
      * @throws PayException e
      */
-    public static boolean weChatBusinessPayForUser(WechatBusinessPay wechatBusinessPay) throws PayException {
+    public static PayResponse<Map<String, String>> weChatBusinessPayForUser(WechatBusinessPay wechatBusinessPay) throws PayException {
         return TransferMoney.weChatPayBusinessPayforUser(wechatBusinessPay);
     }
 

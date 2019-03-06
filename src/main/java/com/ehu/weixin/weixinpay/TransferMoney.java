@@ -49,7 +49,7 @@ public class TransferMoney {
      * @return true or false
      * @throws PayException e
      */
-    public static boolean weChatPayBusinessPayforUser(WechatBusinessPay wechatBusinessPay) throws PayException {
+    public static PayResponse<Map<String, String>> weChatPayBusinessPayforUser(WechatBusinessPay wechatBusinessPay) throws PayException {
         EhPayConfig config = EhPayConfig.getInstance();
 
         SortedMap<String, String> packageParams = new TreeMap<>();
@@ -69,7 +69,12 @@ public class TransferMoney {
         packageParams.put("desc", wechatBusinessPay.getDesc());
         packageParams.put("sign", Signature.getSign(packageParams, StringUtils.getDefaultIfNull(wechatBusinessPay.getPrivateKey(), config.getWxPay_app_key())));
         Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, REQUESTURL, StringUtils.getDefaultIfNull(wechatBusinessPay.getCaPath(), config.getWxPay_ca()), StringUtils.getDefaultIfNull(wechatBusinessPay.getCode(), config.getWxPay_code()));//发送得到微信服务器
-        return WeChatUtils.wechatResponseHandler(map);
+        PayResponse<Map<String, String>> response = new PayResponse<>();
+        WeChatUtils.wechatResponseHandler(map, response);
+        if (response.getResult()) {
+            response.setData(map);
+        }
+        return response;
     }
 
     /**

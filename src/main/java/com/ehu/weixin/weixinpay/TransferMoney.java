@@ -40,7 +40,7 @@ public class TransferMoney {
     /**
      * RSA 算法
      */
-    public static final String algorithm = "RSA/ECB/OAEPWITHSHA-1ANDMGF1PADDING";
+    private static final String ALGORITHM = "RSA/ECB/OAEPWITHSHA-1ANDMGF1PADDING";
 
     /**
      * 微信转账到零钱
@@ -61,14 +61,15 @@ public class TransferMoney {
         /*NO_CHECK：不校验真实姓名
         FORCE_CHECK：强校验真实姓名（未实名认证的用户会校验失败，无法转账）*/
         packageParams.put("check_name", wechatBusinessPay.getCheckName());
-        if (!wechatBusinessPay.getCheckName().equals("NO_CHECK")) {
+        if (!"NO_CHECK".equals(wechatBusinessPay.getCheckName())) {
             packageParams.put("re_user_name", wechatBusinessPay.getReUserName());
         }
         packageParams.put("amount", WeChatUtils.getFinalMoney(wechatBusinessPay.getAmount()));
         packageParams.put("spbill_create_ip", config.getWxPay_spbill_create_ip());
         packageParams.put("desc", wechatBusinessPay.getDesc());
         packageParams.put("sign", Signature.getSign(packageParams, StringUtils.getDefaultIfNull(wechatBusinessPay.getPrivateKey(), config.getWxPay_app_key())));
-        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, REQUESTURL, StringUtils.getDefaultIfNull(wechatBusinessPay.getCaPath(), config.getWxPay_ca()), StringUtils.getDefaultIfNull(wechatBusinessPay.getCode(), config.getWxPay_code()));//发送得到微信服务器
+        //发送得到微信服务器
+        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, REQUESTURL, StringUtils.getDefaultIfNull(wechatBusinessPay.getCaPath(), config.getWxPay_ca()), StringUtils.getDefaultIfNull(wechatBusinessPay.getCode(), config.getWxPay_code()));
         PayResponse<Map<String, String>> response = new PayResponse<>();
         WeChatUtils.wechatResponseHandler(map, response);
         if (response.getResult()) {
@@ -88,8 +89,8 @@ public class TransferMoney {
         PayResponse<Boolean> response = new PayResponse<>();
         String wxPublicKey = StringUtils.getDefaultIfNull(params.getWxPublicKey(), config.getWxPay_public_key());
         try {
-            params.setEncBankNo(RSAUtils.encryptByPublicKeyToString(params.getEncBankNo().getBytes(), wxPublicKey, algorithm));
-            params.setEncTrueName(RSAUtils.encryptByPublicKeyToString(params.getEncTrueName().getBytes(), wxPublicKey, algorithm));
+            params.setEncBankNo(RSAUtils.encryptByPublicKeyToString(params.getEncBankNo().getBytes(), wxPublicKey, ALGORITHM));
+            params.setEncTrueName(RSAUtils.encryptByPublicKeyToString(params.getEncTrueName().getBytes(), wxPublicKey, ALGORITHM));
         } catch (Exception e) {
             response.setResult(false);
             response.setResultMessage("RSA error");
@@ -114,7 +115,8 @@ public class TransferMoney {
         packageParams.put("mch_id", mchId);
         packageParams.put("nonce_str", WeChatUtils.getNonceStr());
         packageParams.put("sign", Signature.getSign(packageParams, privateKey));
-        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, URL_TOBANK, ca, code);//发送得到微信服务器
+        //发送得到微信服务器
+        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, URL_TOBANK, ca, code);
         WeChatUtils.wechatResponseHandler(map, response);
         return response;
     }
@@ -131,7 +133,8 @@ public class TransferMoney {
         packageParams.put("partner_trade_no", partnerTradeNo);
         packageParams.put("nonce_str", WeChatUtils.getNonceStr());
         packageParams.put("sign", Signature.getSign(packageParams, config.getWxPay_app_key()));
-        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, QUERY_URL_TOBANK, config.getWxPay_ca(), config.getWxPay_code());//发送得到微信服务器
+        //发送得到微信服务器
+        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, QUERY_URL_TOBANK, config.getWxPay_ca(), config.getWxPay_code());
         PayResponse<Map<String, String>> response = new PayResponse<>();
         WeChatUtils.wechatResponseHandler(map, response);
         if (response.getResult()) {

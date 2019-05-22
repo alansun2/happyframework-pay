@@ -39,6 +39,8 @@ import java.util.concurrent.TimeUnit;
  * 功能：支付宝接口公用工具类
  * 详细：该类是请求、通知返回两个文件所调用的公用函数核心处理文件
  * 日期：2015-01-10
+ *
+ * @author AlanSun
  */
 @Slf4j
 public class AlipayUtils {
@@ -72,27 +74,6 @@ public class AlipayUtils {
      * @throws Exception e
      */
     public static String createPayInfo1(AlipayOrder order) throws Exception {
-/*        //实例化具体API对应的request类,类名称和接口名称对应,当前调用接口名称：alipay.trade.app.pay
-        AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
-        //SDK已经封装掉了公共参数，这里只需要传入业务参数。以下方法为sdk的model入参方式(model和biz_content同时存在的情况下取biz_content)。
-        AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
-        model.setBody(order.getBody());
-        model.setSubject(order.getSubject());
-        model.setOutTradeNo(order.getOrderId());
-        model.setTimeoutExpress(order.getTimeoutExpress());
-        model.setTotalAmount(order.getPrice());
-        model.setProductCode("QUICK_MSECURITY_PAY");//固定值
-        request.setBizModel(model);
-        request.setNotifyUrl(config.getAlipay_second_hand_notify_url());
-        try {
-            //这里和普通的接口调用不同，使用的是sdkExecute
-            AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
-            log.info(response.getBody());//就是orderString 可以直接给客户端请求，无需再做处理。
-            return response.getBody();
-        } catch (AlipayApiException e) {
-            log.error("构建支付信息失败：", e);
-            throw new PayException("构建支付信息失败,请重试");
-        }*/
         return null;
     }
 
@@ -109,8 +90,8 @@ public class AlipayUtils {
         //isSign不是true，与安全校验码、请求时的参数格式（如：带自定义参数等）、编码格式有关
         String responseTxt = "true";
         if (params.get("notify_id") != null) {
-            String notify_id = params.get("notify_id");
-            responseTxt = AlipayNotify.verifyResponse(notify_id);
+            String notifyId = params.get("notify_id");
+            responseTxt = AlipayNotify.verifyResponse(notifyId);
         }
         String sign = "";
         if (params.get("sign") != null) {
@@ -164,7 +145,7 @@ public class AlipayUtils {
      * @param params {@link TransferSingleParams}
      * @return
      */
-    public static PayResponse<Boolean> transferSingle(TransferSingleParams params) {
+    public static PayResponse<AlipayResponse> transferSingle(TransferSingleParams params) {
         AlipayFundTransToaccountTransferRequest request = new AlipayFundTransToaccountTransferRequest();
         String paramStr = JSON.toJSONString(params, new LowerUnderscoreFilter());
         request.setBizContent(paramStr);
@@ -182,7 +163,7 @@ public class AlipayUtils {
                 .withStopStrategy(StopStrategies.stopAfterAttempt(3))
                 .build();
 
-        PayResponse<Boolean> response = new PayResponse<>(true);
+        PayResponse<AlipayResponse> response = new PayResponse<>();
         AlipayFundTransToaccountTransferResponse call = null;
         try {
             call = retryer.call(callable);
@@ -202,7 +183,8 @@ public class AlipayUtils {
      * @throws PayException e
      */
     public static String scanPay(ScanPayOrder scanPayOrder) throws PayException {
-        AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();//创建API对应的request类
+        //创建API对应的request类
+        AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
         request.setNotifyUrl(scanPayOrder.getNotifyUrl());
         request.setBizContent("{" +
                 "\"out_trade_no\":\"" + scanPayOrder.getOutTradeNo() + "\"," +
@@ -232,14 +214,16 @@ public class AlipayUtils {
      * @throws PayException e
      */
     public static boolean aliPayRefund(AlipayRefund alipayRefund) throws PayException {
-        AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();//创建API对应的request类
+        //创建API对应的request类
+        AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
         StringBuilder sb = new StringBuilder();
         sb.append("{" + "\"out_trade_no\":\"").append(alipayRefund.getOutTradeNo()).append("\",");
         if (!StringUtils.isBlank(alipayRefund.getOutRequestNo())) {
             sb.append("\"out_request_no\":\"").append(alipayRefund.getOutRequestNo()).append("\",");
         }
         sb.append("\"refund_amount\":\"").append(alipayRefund.getRefundAmount()).append("\"}");
-        request.setBizContent(sb.toString()); //设置业务参数
+        //设置业务参数
+        request.setBizContent(sb.toString());
 
         try {
             AlipayTradeRefundResponse response = alipayClient.execute(request);
@@ -311,8 +295,9 @@ public class AlipayUtils {
             response = alipayClient.execute(request);
             if (response.isSuccess()) {
                 try {
-                    if (!StringUtils.isBlank(aliSrcPath))
+                    if (!StringUtils.isBlank(aliSrcPath)) {
                         FileUtils.copyURLToFile(new URL(response.getBillDownloadUrl()), new File(aliSrcPath), 10000, 10000);
+                    }
                 } catch (IOException e) {
                     log.error("获取财务账单url失败", e);
                     return response.getBillDownloadUrl();
@@ -338,8 +323,8 @@ public class AlipayUtils {
      */
     public static Map<String, String> getAlipayCallBackMap(HttpServletRequest request) {
         //获取支付宝POST过来反馈信息
-        Map<String, String> params = new HashMap<>();
         Map<String, String[]> requestParams = request.getParameterMap();
+        Map<String, String> params = new HashMap<>(requestParams.size());
         for (String name : requestParams.keySet()) {
             String[] values = requestParams.get(name);
             String valueStr = "";
@@ -348,7 +333,6 @@ public class AlipayUtils {
                         : valueStr + values[i] + ",";
             }
             //乱码解决，这段代码在出现乱码时使用。如果mysign和sign不相等也可以使用这段代码转化
-            //valueStr = new String(valueStr.getBytes("ISO-8859-1"), "gbk");
             params.put(name, valueStr);
         }
         return params;
@@ -360,7 +344,7 @@ public class AlipayUtils {
      * @param response response
      * @param call     支付宝返回结果
      */
-    private static void responseHandler(PayResponse<Boolean> response, AlipayResponse call) {
+    private static <T extends AlipayResponse> void responseHandler(PayResponse<T> response, T call) {
         if (null == call) {
             response.setResult(false);
             response.setResultMessage("response null error");
@@ -369,7 +353,10 @@ public class AlipayUtils {
                 response.setResult(false);
                 response.setResultCode(call.getSubCode());
                 response.setResultMessage(call.getSubMsg());
+                response.setData(call);
                 log.error(JSON.toJSONString(call));
+            } else {
+                response.setResult(true);
             }
         } else {
             response.setResult(false);

@@ -34,7 +34,8 @@ public interface Product {
                 int length = sbTem.toString().getBytes().length;
                 if (length > PRODUCT_NAME_LENGTH) {
                     if (i == 0) {
-                        sb.append(StringUtils.subStringSpecifyBytes(sbTem.toString(), PRODUCT_NAME_LENGTH));
+                        String str = sbTem.toString();
+                        sb.append(StringUtils.subStringSpecifyBytes(str.length() > 49 ? str.substring(0, 49) : str, PRODUCT_NAME_LENGTH));
                         countSum++;//计算有多少个商品被加入
                         break;
                     } else {
@@ -86,7 +87,7 @@ public interface Product {
 
     static void main(String[] args) {
         List<Product> products = new ArrayList<>();
-        Product product = () -> "东山本港白鲳鱼满两斤包邮，不满两斤，";
+        Product product = () -> "东山本港白鲳鱼满两斤包邮，不满两斤，必须拍邮费,,,/不然送,东山手工墨鱼汁肠满两斤从的的的士大夫收到";
         products.add(product);
         product = () -> "东山本港白鲳鱼满两斤包邮，不满两斤，必须拍邮费,,,/不然送,东山手工墨鱼汁肠满两斤从的的的";
         products.add(product);

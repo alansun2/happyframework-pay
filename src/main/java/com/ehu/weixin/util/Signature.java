@@ -10,15 +10,15 @@ import java.util.Map;
 
 /**
  * @author Alan
- * @create 18-8-16
+ * @createtime 18-8-16
  */
 public class Signature {
 
     /**
-     * @param map
-     * @return
+     * @param map 待签名的参数
+     * @return 签名
      */
-    public static String getSign(Map<String, String> map, String appKey) {
+    public static String getSign(Map<String, String> map, String signKey) {
 
         ArrayList<String> list = new ArrayList<>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
@@ -33,9 +33,9 @@ public class Signature {
         for (int i = 0; i < size; i++) {
             sb.append(arrayToSort[i]);
         }
-        String result = sb.toString();
-        result += "key=" + appKey;
-        result = DigestUtils.md5Hex(result).toUpperCase();
-        return result;
+        String sign = sb.toString();
+        sign += "key=" + signKey;
+        sign = DigestUtils.md5Hex(sign).toUpperCase();
+        return sign;
     }
 }

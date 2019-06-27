@@ -1,6 +1,7 @@
 package com.ehu.weixin.weixinpay;
 
-import com.ehu.config.EhPayConfig;
+import com.ehu.bean.DownloadParam;
+import com.ehu.config.Wechat;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
@@ -26,29 +27,30 @@ import java.util.TreeMap;
  */
 @Slf4j
 public class DownloadBill {
-    private static final String downloadbillurl = "https://api.mch.weixin.qq.com/pay/downloadbill";
+    private static final String DOWNLOADBILLURL = "https://api.mch.weixin.qq.com/pay/downloadbill";
 
     @SuppressWarnings("unchecked")
-    public static void downloadBill(String time, String desPath) throws PayException {
-        EhPayConfig config = EhPayConfig.getInstance();
-
+    public static void downloadBill(DownloadParam param) throws PayException {
+        Wechat config = Wechat.getInstance();
+        Wechat.WechatMch wechatMch = config.getMchMap().get(param.getMchNo());
+        String mchAppId = config.getMchAppidMap().get(param.getMchAppIdNo());
         //封装获取prepayid
         String nonce_str = WeChatUtils.getNonceStr();
         SortedMap<String, String> packageParams = new TreeMap<String, String>();
-        packageParams.put("appid", config.getWxPay_appid());
-        packageParams.put("mch_id", config.getWxPay_mch_id());
+        packageParams.put("appid", mchAppId);
+        packageParams.put("mch_id", wechatMch.getMchId());
         packageParams.put("nonce_str", nonce_str);
-        packageParams.put("bill_date", time);
+        packageParams.put("bill_date", param.getTime());
         packageParams.put("bill_type", "ALL");
         packageParams.put("tar_type", "GZIP");
-        packageParams.put("sign", Signature.getSign(packageParams, config.getWxPay_app_key()));
-        sendRequest(XmlUtils.mapToXml(packageParams), desPath);
+        packageParams.put("sign", Signature.getSign(packageParams, wechatMch.getSignKey()));
+        sendRequest(XmlUtils.mapToXml(packageParams), param.getDesPath());
     }
 
     private static void sendRequest(String param, String path) throws PayException {
         // 创建默认的httpClient实例.
         // 创建httppost
-        HttpPost httppost = new HttpPost(downloadbillurl);
+        HttpPost httppost = new HttpPost(DOWNLOADBILLURL);
         StringEntity uefEntity;
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
             uefEntity = new StringEntity(param, "UTF-8");

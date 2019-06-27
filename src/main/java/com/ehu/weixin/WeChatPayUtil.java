@@ -1,7 +1,8 @@
 package com.ehu.weixin;
 
+import com.ehu.bean.DownloadParam;
 import com.ehu.bean.PayResponse;
-import com.ehu.config.EhPayConfig;
+import com.ehu.config.Wechat;
 import com.ehu.exception.PayException;
 import com.ehu.util.StringUtils;
 import com.ehu.weixin.entity.*;
@@ -49,7 +50,7 @@ public class WeChatPayUtil {
      * @throws PayException e
      */
     public static Object queryWeChatOrder(String transaction_id, String queryFlag) throws PayException {
-        return QueryOrder.getQuertResult(transaction_id, queryFlag);
+        return QueryOrder.getQueryResult(transaction_id, queryFlag);
     }
 
     /**
@@ -71,8 +72,8 @@ public class WeChatPayUtil {
         //清掉返回数据对象里面的Sign数据（不能把这个数据也加进去进行签名），然后用签名算法进行签名
         map.remove("sign");
         //将API返回的数据根据用签名算法进行计算新的签名，用来跟API返回的签名进行比较
-        EhPayConfig config = EhPayConfig.getInstance();
-        String signLocal = Signature.getSign(map, config.getWxPay_app_key());
+        Wechat config = Wechat.getInstance();
+        String signLocal = Signature.getSign(map, config.getMchMap().get(Wechat.DEFAULT_MCH).getSignKey());
         log.info("生成的签名是:" + signLocal);
         if (!signLocal.equals(signResponse)) {
             //签名验不过，表示这个API返回的数据有可能已经被篡改了
@@ -145,12 +146,11 @@ public class WeChatPayUtil {
     /**
      * 下载账单
      *
-     * @param time    下载那一天的账单
-     * @param desPath 下载文件存放绝对路径 （包含文件名）
+     * @param param {@link DownloadParam}
      * @throws PayException e
      */
-    public static void downloadBill(String time, String desPath) throws PayException {
-        DownloadBill.downloadBill(time, desPath);
+    public static void downloadBill(DownloadParam param) throws PayException {
+        DownloadBill.downloadBill(param);
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.ehu.alipay.util;
 
-import com.ehu.config.EhPayConfig;
+import com.ehu.config.AliPay;
 import com.ehu.util.RSAUtils;
 
 import java.io.BufferedReader;
@@ -17,6 +17,7 @@ import java.util.Map;
  * 日期：2015-01-10
  */
 public class AlipayNotify {
+    private static final AliPay config = AliPay.getInstance();
 
     /**
      * 根据反馈回来的信息，生成签名结果
@@ -25,18 +26,17 @@ public class AlipayNotify {
      * @param sign   比对的签名结果
      * @return 生成的签名结果
      */
-    public static boolean getSignVeryfy(Map<String, String> Params, String sign) {
+    public static boolean getSignVerify(Map<String, String> Params, String sign) {
 
-        EhPayConfig config = EhPayConfig.getInstance();
         //过滤空值、sign与sign_type参数
         Map<String, String> sParaNew = AlipayFunction.paraFilter(Params);
         //获取待签名字符串
         String preSignStr = AlipayFunction.createLinkString(sParaNew);
         //获得签名验证结果
         boolean isSign = false;
-        if ("RSA".equals(config.getAlipay_sign_type())) {
+        if ("RSA".equals(config.getSignType())) {
             try {
-                isSign = RSAUtils.verify(preSignStr.getBytes(config.getAlipay_input_charset()), config.getAlipay_public_key(), sign, RSAUtils.SIGNATURE_ALGORITHM_SHA1);
+                isSign = RSAUtils.verify(preSignStr.getBytes(config.getInputCharset()), config.getPublicKey(), sign, RSAUtils.SIGNATURE_ALGORITHM_SHA1);
             } catch (Exception e) {
                 return false;
             }
@@ -57,9 +57,8 @@ public class AlipayNotify {
     public static String verifyResponse(String notify_id) {
         //获取远程服务器ATN结果，验证是否是支付宝服务器发来的请求
 
-        EhPayConfig config = EhPayConfig.getInstance();
-        String partner = config.getAlipay_partner();
-        String veryfy_url = config.getAlipay_verify_url() + "partner=" + partner + "&notify_id=" + notify_id;
+        String partner = config.getPartner();
+        String veryfy_url = config.getVerifyUrl() + "partner=" + partner + "&notify_id=" + notify_id;
 
         return checkUrl(veryfy_url);
     }

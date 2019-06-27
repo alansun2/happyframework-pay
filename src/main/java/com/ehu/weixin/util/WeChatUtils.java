@@ -33,7 +33,8 @@ public class WeChatUtils {
 
     public static Map<String, String> getResponseInfo(SortedMap<String, String> map, String requestUrl) throws PayException {
         Map<String, String> resultMap = null;
-        String params = XmlUtils.mapToXml(map);//map转String
+        //map转String
+        String params = XmlUtils.mapToXml(map);
         TenpayHttpClient httpClient = new TenpayHttpClient();
         httpClient.setReqContent(requestUrl);
         String resContent;

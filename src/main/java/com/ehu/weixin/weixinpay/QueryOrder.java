@@ -1,10 +1,10 @@
 package com.ehu.weixin.weixinpay;
 
+import com.ehu.config.Wechat;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
-import com.ehu.config.EhPayConfig;
 import com.ehu.util.StringUtils;
 import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.util.WeChatUtils;
@@ -22,30 +22,49 @@ import java.util.TreeMap;
  */
 @Slf4j
 public class QueryOrder {
-    static final String requestUrl = "https://api.mch.weixin.qq.com/pay/orderquery";
+    private static final String REQUESTURL = "https://api.mch.weixin.qq.com/pay/orderquery";
 
+    /**
+     * 查询微信支付是否成功
+     *
+     * @param out_trade_no 商户订单号
+     * @param queryFlag    如果该值不填写则返回订单状态，如果填写了该值，则会比较订单状态和该值是否相等，相等返回true，否则返回异常
+     * @param mchNos       指定商户
+     * @return String or Boolean
+     * @throws PayException queryFlag != null and 订单状态 != queryFlag
+     */
     @SuppressWarnings("unchecked")
-    public static Object getQuertResult(String out_trade_no, String queryFlag) throws PayException {
-        EhPayConfig config = EhPayConfig.getInstance();
+    public static Object getQueryResult(String out_trade_no, String queryFlag, int... mchNos) throws PayException {
+        Wechat config = Wechat.getInstance();
+
+        if (mchNos.length > 1) {
+            throw new IllegalArgumentException("mchNo length must 1");
+        }
+        int mchNo = Wechat.DEFAULT_MCH;
+        if (mchNos.length != 0) {
+            mchNo = mchNos[0];
+        }
+
+        Wechat.WechatMch wechatMch = config.getMchMap().get(mchNo);
 
         String nonce_str = WeChatUtils.getNonceStr();
-        SortedMap<String, String> packageParams = new TreeMap<String, String>();
-        packageParams.put("appid", config.getWxPay_appid());
-        packageParams.put("mch_id", config.getWxPay_mch_id());
+        SortedMap<String, String> packageParams = new TreeMap<>();
+        packageParams.put("appid", config.getAppId());
+        packageParams.put("mch_id", wechatMch.getMchId());
         packageParams.put("nonce_str", nonce_str);
         packageParams.put("out_trade_no", out_trade_no);
-        packageParams.put("sign", Signature.getSign(packageParams, config.getWxPay_app_key()));
-        Map<String, String> resultMap = WeChatUtils.getResponseInfo(packageParams, requestUrl);
+        packageParams.put("sign", Signature.getSign(packageParams, wechatMch.getSignKey()));
+        Map<String, String> resultMap = WeChatUtils.getResponseInfo(packageParams, REQUESTURL);
         return judgeOrderState(resultMap, queryFlag);
     }
 
     /**
      * 判断订单状态
      *
-     * @param resultMap
-     * @param queryFlag
-     * @return
-     * @throws PayException
+     * @param resultMap 微信返回结果
+     * @param queryFlag 如果该值不填写则返回订单状态，如果填写了该值，则会比较订单状态和该值是否相等，相等返回true，否则返回异常
+     * @return String or Boolean
+     * @throws PayException queryFlag != null and 订单状态 != queryFlag
      */
     private static Object judgeOrderState(Map<String, String> resultMap, final String queryFlag) throws PayException {
         if (resultMap.containsKey("return_code") && PayBaseConstants.RETURN_SUCCESS.equals(resultMap.get("return_code"))) {

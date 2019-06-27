@@ -9,7 +9,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class WeChatpayOrder {
+public class WeChatpayOrder extends Mch{
     /**
      * 订单id
      */

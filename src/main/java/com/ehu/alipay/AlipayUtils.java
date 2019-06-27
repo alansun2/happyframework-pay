@@ -12,7 +12,7 @@ import com.ehu.alipay.util.AlipayFunction;
 import com.ehu.alipay.util.AlipayNotify;
 import com.ehu.bean.LowerUnderscoreFilter;
 import com.ehu.bean.PayResponse;
-import com.ehu.config.EhPayConfig;
+import com.ehu.config.AliPay;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
@@ -45,8 +45,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class AlipayUtils {
 
-    public static EhPayConfig config = EhPayConfig.getInstance();
-    private static AlipayClient alipayClient = new DefaultAlipayClient(config.getAlipay_open_api(), config.getAlipay_app_id(), config.getAlipay_private_key(), "json", config.getAlipay_input_charset(), config.getAlipay_open_public_key());
+    public static final AliPay config = AliPay.getInstance();
+    private static AlipayClient alipayClient = new DefaultAlipayClient(config.getOpenApi(), config.getAppId(), config.getPrivateKey(), "json", config.getInputCharset(), config.getOpenPublicKey());
 
     /**
      * 创建支付宝订单支付信息（无线）
@@ -63,7 +63,7 @@ public class AlipayUtils {
         } catch (Exception e) {
             throw new PayException("生成支付失败");
         }
-        return orderInfo + "&sign=\"" + sign + "\"&sign_type=\"" + config.getAlipay_sign_type() + "\"";
+        return orderInfo + "&sign=\"" + sign + "\"&sign_type=\"" + config.getSignType() + "\"";
     }
 
     /**
@@ -97,7 +97,7 @@ public class AlipayUtils {
         if (params.get("sign") != null) {
             sign = params.get("sign");
         }
-        boolean isSign = AlipayNotify.getSignVeryfy(params, sign);
+        boolean isSign = AlipayNotify.getSignVerify(params, sign);
         return isSign && "true".equals(responseTxt);
     }
 
@@ -109,14 +109,13 @@ public class AlipayUtils {
      * @throws Exception e
      */
     public static String alipayRefund(AlipayRefundOrder alipayRefundOrder) throws Exception {
-        EhPayConfig config = EhPayConfig.getInstance();
         Map<String, String> orderInfo = AlipayFunction.getRefundInfoMap(alipayRefundOrder);
         String prestr = AlipayFunction.createLinkString(orderInfo);
         String sign = AlipayFunction.createSign(prestr);
-        orderInfo.put("notify_url", URLEncoder.encode(orderInfo.get("notify_url"), config.getAlipay_input_charset()));
-        orderInfo.put("detail_data", URLEncoder.encode(orderInfo.get("detail_data"), config.getAlipay_input_charset()));
+        orderInfo.put("notify_url", URLEncoder.encode(orderInfo.get("notify_url"), config.getInputCharset()));
+        orderInfo.put("detail_data", URLEncoder.encode(orderInfo.get("detail_data"), config.getInputCharset()));
         String linkstr = AlipayFunction.createLinkString(orderInfo);
-        return config.getAlipay_gateway_url() + linkstr + "&sign=" + sign + "&sign_type=" + config.getAlipay_sign_type();
+        return config.getGatewayUrl() + linkstr + "&sign=" + sign + "&sign_type=" + config.getSignType();
     }
 
     /**
@@ -129,14 +128,13 @@ public class AlipayUtils {
      * @throws Exception e
      */
     public static String alipayTransferMoney(AlipayTransferMoney alipayTransferMoney) throws Exception {
-        EhPayConfig config = EhPayConfig.getInstance();
         Map<String, String> orderInfo = AlipayFunction.getTransferMoneyMap(alipayTransferMoney);
         String prestr = AlipayFunction.createLinkString(orderInfo);
         String sign = AlipayFunction.createSign(prestr);
-        orderInfo.put("notify_url", URLEncoder.encode(orderInfo.get("notify_url"), config.getAlipay_input_charset()));
-        orderInfo.put("detail_data", URLEncoder.encode(orderInfo.get("detail_data"), config.getAlipay_input_charset()));
+        orderInfo.put("notify_url", URLEncoder.encode(orderInfo.get("notify_url"), config.getInputCharset()));
+        orderInfo.put("detail_data", URLEncoder.encode(orderInfo.get("detail_data"), config.getInputCharset()));
         String linkstr = AlipayFunction.createLinkString(orderInfo);
-        return config.getAlipay_gateway_url() + linkstr + "&sign=" + sign + "&sign_type=" + config.getAlipay_sign_type();
+        return config.getGatewayUrl() + linkstr + "&sign=" + sign + "&sign_type=" + config.getSignType();
     }
 
     /**

@@ -9,7 +9,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class TransferToBankCardParams {
+public class TransferToBankCardParams extends Mch {
     /**
      * 商户订单号，需保持唯一（只允许数字[0~9]或字母[A~Z]和[a~z]，最短8位，最长32位）
      * 最长32

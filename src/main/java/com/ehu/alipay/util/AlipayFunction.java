@@ -3,7 +3,7 @@ package com.ehu.alipay.util;
 import com.ehu.alipay.entity.AlipayOrder;
 import com.ehu.alipay.entity.AlipayRefundOrder;
 import com.ehu.alipay.entity.AlipayTransferMoney;
-import com.ehu.config.EhPayConfig;
+import com.ehu.config.AliPay;
 import com.ehu.util.RSAUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,6 +22,8 @@ import java.util.*;
  */
 @Slf4j
 public class AlipayFunction {
+    private static final AliPay config = AliPay.getInstance();
+
     /**
      * 除去数组中的空值和签名参数
      *
@@ -83,10 +85,9 @@ public class AlipayFunction {
      * @throws Exception e
      */
     public static String createSign(String str) throws Exception {
-        EhPayConfig config = EhPayConfig.getInstance();
-        String sign = RSAUtils.sign(str.getBytes(config.getAlipay_input_charset()), config.getAlipay_private_key(), RSAUtils.SIGNATURE_ALGORITHM_SHA1);
+        String sign = RSAUtils.sign(str.getBytes(config.getInputCharset()), config.getPrivateKey(), RSAUtils.SIGNATURE_ALGORITHM_SHA1);
         // 仅需对sign 做URL编码
-        sign = URLEncoder.encode(sign, config.getAlipay_input_charset());
+        sign = URLEncoder.encode(sign, config.getInputCharset());
 
         return sign;
     }
@@ -99,9 +100,8 @@ public class AlipayFunction {
      * @throws UnsupportedEncodingException e
      */
     public static String getOrderInfo(AlipayOrder order) throws UnsupportedEncodingException {
-        EhPayConfig config = EhPayConfig.getInstance();
         return "partner=\"" +
-                config.getAlipay_partner() +
+                config.getPartner() +
                 "\"&out_trade_no=\"" +
                 order.getOrderId() +
                 "\"&subject=\"" +
@@ -111,15 +111,15 @@ public class AlipayFunction {
                 "\"&total_fee=\"" +
                 order.getPrice() +
                 "\"&notify_url=\"" +
-                URLEncoder.encode(order.getNotifyUrl(), config.getAlipay_input_charset()) +
+                URLEncoder.encode(order.getNotifyUrl(), config.getInputCharset()) +
                 "\"&service=\"mobile.securitypay.pay" +
                 "\"&_input_charset=\"" +
-                config.getAlipay_input_charset() +
+                config.getInputCharset() +
                 "\"&payment_type=\"1" +
                 "\"&seller_id=\"" +
-                config.getAlipay_seller() +
+                config.getSeller() +
                 "\"&it_b_pay=\"" +
-                config.getAlipay_time_out() +
+                config.getTimeOut() +
                 "\"";
     }
 
@@ -129,18 +129,16 @@ public class AlipayFunction {
      *
      * @param refundOrder 订单信息
      * @return 支付宝退款订单信息Map
-     * @throws Exception e
      */
-    public static Map<String, String> getRefundInfoMap(AlipayRefundOrder refundOrder) throws Exception {
+    public static Map<String, String> getRefundInfoMap(AlipayRefundOrder refundOrder) {
 
-        EhPayConfig config = EhPayConfig.getInstance();
         Map<String, String> map = new HashMap<>();
         // 接口名称， 固定值
         map.put("service", "refund_fastpay_by_platform_pwd");
         // 合作者身份ID
-        map.put("partner", config.getAlipay_partner());
+        map.put("partner", config.getPartner());
         // 参数编码， 固定值
-        map.put("_input_charset", config.getAlipay_input_charset());
+        map.put("_input_charset", config.getInputCharset());
         // 服务器异步通知页面路径，网址需要做URL编码
         map.put("notify_url", refundOrder.getNotifyUrl());
         // 退款时间
@@ -152,7 +150,7 @@ public class AlipayFunction {
         // 单笔数据集
         map.put("detail_data", refundOrder.getDetailData());
         // 卖家支付宝账号
-        map.put("seller_email", config.getAlipay_seller());
+        map.put("seller_email", config.getSeller());
 
         return map;
     }
@@ -164,16 +162,15 @@ public class AlipayFunction {
      * @return map
      */
     public static Map<String, String> getTransferMoneyMap(AlipayTransferMoney alipayTransferMoney) {
-        EhPayConfig config = EhPayConfig.getInstance();
         LocalDateTime now = LocalDateTime.now();
         //把请求参数打包成数组
         Map<String, String> sParaTemp = new HashMap<>();
         sParaTemp.put("service", "batch_trans_notify");
-        sParaTemp.put("partner", config.getAlipay_partner());
-        sParaTemp.put("_input_charset", config.getAlipay_input_charset());
+        sParaTemp.put("partner", config.getPartner());
+        sParaTemp.put("_input_charset", config.getInputCharset());
         sParaTemp.put("notify_url", alipayTransferMoney.getNotifyUrl());
-        sParaTemp.put("email", config.getAlipay_seller());
-        sParaTemp.put("account_name", config.getAlipay_account_name());
+        sParaTemp.put("email", config.getSeller());
+        sParaTemp.put("account_name", config.getAccountName());
         sParaTemp.put("pay_date", now.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
         sParaTemp.put("batch_no", now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
         sParaTemp.put("batch_fee", alipayTransferMoney.getBatchFee());
@@ -195,14 +192,13 @@ public class AlipayFunction {
      * @return map
      */
     public static Map<String, String> getAuthMap() {
-        EhPayConfig config = EhPayConfig.getInstance();
         Map<String, String> map = new HashMap<>();
         map.put("apiname", "com.alipay.account.auth");
         map.put("method", "alipay.open.auth.sdk.code.get");
-        map.put("app_id", config.getAlipay_app_id());
+        map.put("app_id", config.getAppId());
         map.put("app_name", "mc");
         map.put("biz_type", "openservice");
-        map.put("pid", config.getAlipay_app_id());
+        map.put("pid", config.getAppId());
         map.put("product_id", "APP_FAST_LOGIN");
         map.put("scope", "kuaijie");
         map.put("target_id", UUID.randomUUID().toString().replace("-", ""));

@@ -12,7 +12,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class WechatBusinessPay {
+public class WechatBusinessPay extends Mch {
     /**
      * 商户端订单号（唯一）,必填
      */

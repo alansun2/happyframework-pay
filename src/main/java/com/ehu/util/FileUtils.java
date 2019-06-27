@@ -52,4 +52,26 @@ public class FileUtils {
             }
         }
     }
+
+    /**
+     * 获取文件流
+     *
+     * @param path 文件路径
+     * @return content
+     */
+    public static String readFile(String path) {
+        StringBuilder key = new StringBuilder();
+        File file = new File(path);
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String tempString;
+            // 一次读入一行，直到读入null为文件结束
+            while ((tempString = reader.readLine()) != null) {
+                key.append(tempString);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return key.toString();
+    }
 }

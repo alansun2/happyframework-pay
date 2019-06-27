@@ -213,7 +213,7 @@ public class HttpClientUtil {
             CertificateException, IOException, UnrecoverableKeyException,
             KeyManagementException {
 
-        // ca
+        // caPath
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(HttpClientUtil.SunX509);
         KeyStore trustKeyStore = KeyStore.getInstance(HttpClientUtil.JKS);
         trustKeyStore.load(trustFileInputStream, HttpClientUtil

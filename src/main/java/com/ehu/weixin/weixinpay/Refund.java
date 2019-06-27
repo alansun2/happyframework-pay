@@ -1,7 +1,7 @@
 package com.ehu.weixin.weixinpay;
 
+import com.ehu.config.Wechat;
 import com.ehu.exception.PayException;
-import com.ehu.config.EhPayConfig;
 import com.ehu.weixin.entity.WeChatRefundInfo;
 import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.util.WeChatUtils;
@@ -18,32 +18,43 @@ import java.util.TreeMap;
  */
 public class Refund {
 
-    static final String requestUrl = "https://api.mch.weixin.qq.com/secapi/pay/refund";
+    private static final String requestUrl = "https://api.mch.weixin.qq.com/secapi/pay/refund";
 
+    /**
+     * app支付退款
+     *
+     * @param params {@link WeChatRefundInfo}
+     * @return true：退款成功
+     * @throws PayException e
+     */
     @SuppressWarnings("unchecked")
-    public static boolean weChatRefundOper(WeChatRefundInfo weChatRefundInfo) throws PayException {
-        EhPayConfig config = EhPayConfig.getInstance();
-        String orderMoney = WeChatUtils.getFinalMoney(weChatRefundInfo.getTotalFee());
-        String refundMoney = WeChatUtils.getFinalMoney(weChatRefundInfo.getRefundFee());
+    public static boolean weChatRefundOper(WeChatRefundInfo params) throws PayException {
+        Wechat config = Wechat.getInstance();
+
+        String orderMoney = WeChatUtils.getFinalMoney(params.getTotalFee());
+        String refundMoney = WeChatUtils.getFinalMoney(params.getRefundFee());
 
         while (orderMoney.startsWith("0")) {
-            orderMoney = orderMoney.substring(1, orderMoney.length());
+            orderMoney = orderMoney.substring(1);
         }
         while (refundMoney.startsWith("0")) {
-            refundMoney = refundMoney.substring(1, refundMoney.length());
+            refundMoney = refundMoney.substring(1);
         }
 
-        SortedMap<String, String> packageParams = new TreeMap<String, String>();
-        packageParams.put("appid", config.getWxPay_appid());
-        packageParams.put("mch_id", config.getWxPay_mch_id());
+        Wechat.WechatMch wechatMch = config.getMchMap().get(params.getMchNo());
+
+        SortedMap<String, String> packageParams = new TreeMap<>();
+        packageParams.put("appid", config.getAppId());
+        packageParams.put("mch_id", wechatMch.getMchId());
         packageParams.put("nonce_str", WeChatUtils.getNonceStr());
-        packageParams.put("out_trade_no", weChatRefundInfo.getOutTradeNo());
-        packageParams.put("out_refund_no", weChatRefundInfo.getOutRefundNo());//商户系统内部的退款单号，商户系统内部唯一，同一退款单号多次请求只退一笔
+        packageParams.put("out_trade_no", params.getOutTradeNo());
+        //商户系统内部的退款单号，商户系统内部唯一，同一退款单号多次请求只退一笔
+        packageParams.put("out_refund_no", params.getOutRefundNo());
         packageParams.put("total_fee", orderMoney);
         packageParams.put("refund_fee", refundMoney);
-        packageParams.put("op_user_id", config.getWxPay_mch_id());
-        packageParams.put("sign", Signature.getSign(packageParams, config.getWxPay_app_key()));
-        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, requestUrl, config.getWxPay_ca(), config.getWxPay_code());
+        packageParams.put("op_user_id", wechatMch.getMchId());
+        packageParams.put("sign", Signature.getSign(packageParams, wechatMch.getSignKey()));
+        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, requestUrl, wechatMch.getCa(), wechatMch.getCaCode());
 
         return WeChatUtils.wechatResponseHandler(map);
     }
@@ -51,27 +62,29 @@ public class Refund {
     /**
      * 小程序退款
      *
-     * @param weChatRefundInfo
-     * @return
-     * @throws PayException
+     * @param params {@link WeChatRefundInfo}
+     * @return true：退款成功
+     * @throws PayException e
      */
     @SuppressWarnings("unchecked")
-    public static boolean weChatRefundOperXcx(WeChatRefundInfo weChatRefundInfo) throws PayException {
-        EhPayConfig config = EhPayConfig.getInstance();
-        String orderMoney = WeChatUtils.getFinalMoney(weChatRefundInfo.getTotalFee());
-        String refundMoney = WeChatUtils.getFinalMoney(weChatRefundInfo.getRefundFee());
+    public static boolean weChatRefundOperXcx(WeChatRefundInfo params) throws PayException {
+        Wechat config = Wechat.getInstance();
+        String orderMoney = WeChatUtils.getFinalMoney(params.getTotalFee());
+        String refundMoney = WeChatUtils.getFinalMoney(params.getRefundFee());
+
+        Wechat.WechatMch wechatMch = config.getMchMap().get(params.getMchNo());
 
         SortedMap<String, String> packageParams = new TreeMap<>();
-        packageParams.put("appid", config.getWxxcx_appid());
-        packageParams.put("mch_id", config.getWxPay_mch_id());
+        packageParams.put("appid", config.getAppletsAppId());
+        packageParams.put("mch_id", wechatMch.getMchId());
         packageParams.put("nonce_str", WeChatUtils.getNonceStr());
-        packageParams.put("out_trade_no", weChatRefundInfo.getOutTradeNo());
-        packageParams.put("out_refund_no", weChatRefundInfo.getOutRefundNo());//商户系统内部的退款单号，商户系统内部唯一，同一退款单号多次请求只退一笔
+        packageParams.put("out_trade_no", params.getOutTradeNo());
+        packageParams.put("out_refund_no", params.getOutRefundNo());//商户系统内部的退款单号，商户系统内部唯一，同一退款单号多次请求只退一笔
         packageParams.put("total_fee", orderMoney);
         packageParams.put("refund_fee", refundMoney);
-        packageParams.put("op_user_id", config.getWxPay_mch_id());
-        packageParams.put("sign", Signature.getSign(packageParams, config.getWxPay_app_key()));
-        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, requestUrl, config.getWxPay_ca(), config.getWxPay_code());
+        packageParams.put("op_user_id", wechatMch.getMchId());
+        packageParams.put("sign", Signature.getSign(packageParams, wechatMch.getSignKey()));
+        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, requestUrl, wechatMch.getCa(), wechatMch.getCaCode());
 
         return WeChatUtils.wechatResponseHandler(map);
     }

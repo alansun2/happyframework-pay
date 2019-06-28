@@ -56,7 +56,7 @@ public class TransferMoney {
         Wechat config = Wechat.getInstance();
 
         SortedMap<String, String> packageParams = new TreeMap<>();
-        packageParams.put("mch_appid", config.getMchAppidMap().get(mchAppIdNo));
+        packageParams.put("mch_appid", config.getMchAppIdMap().get(mchAppIdNo));
         packageParams.put("mchid", config.getMchMap().get(mchNo).getMchId());
         packageParams.put("nonce_str", WeChatUtils.getNonceStr());
         packageParams.put("partner_trade_no", params.getOrderId());

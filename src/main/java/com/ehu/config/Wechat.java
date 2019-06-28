@@ -8,12 +8,13 @@ import java.util.Map;
 
 @Getter
 @ConfigurationProperties(prefix = "pay.wechat")
-public final class Wechat {
+public class Wechat {
     public static final Integer DEFAULT_MCH = 1;
 
     private static final Wechat WECHAT_INSTANCE = new Wechat();
 
     private Wechat() {
+        System.out.print("Wechat init");
     }
 
     public static Wechat getInstance() {
@@ -47,7 +48,7 @@ public final class Wechat {
      * 申请商户号的appid或商户号绑定的appid
      * 供微信转账使用
      */
-    private Map<Integer, String> mchAppidMap;
+    private Map<Integer, String> mchAppIdMap;
 
     public void setAppId(String appId) {
         WECHAT_INSTANCE.appId = appId;
@@ -65,8 +66,8 @@ public final class Wechat {
         WECHAT_INSTANCE.mchMap = mchMap;
     }
 
-    public void setMchAppidMap(Map<Integer, String> mchAppidMap) {
-        WECHAT_INSTANCE.mchAppidMap = mchAppidMap;
+    public void setMchAppIdMap(Map<Integer, String> mchAppIdMap) {
+        WECHAT_INSTANCE.mchAppIdMap = mchAppIdMap;
     }
 
     /**

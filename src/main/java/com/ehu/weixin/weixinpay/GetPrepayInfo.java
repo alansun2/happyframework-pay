@@ -1,10 +1,12 @@
 package com.ehu.weixin.weixinpay;
 
+import com.ehu.bean.HttpParams;
 import com.ehu.config.Wechat;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
+import com.ehu.util.HttpClientUtil;
 import com.ehu.util.XmlUtils;
 import com.ehu.weixin.client.TenpayHttpClient;
 import com.ehu.weixin.entity.WeChatResponseVO;
@@ -13,6 +15,7 @@ import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.util.WeChatUtils;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -33,7 +36,7 @@ public class GetPrepayInfo {
      * @throws PayException e
      */
     @SuppressWarnings("unchecked")
-    public static WeChatResponseVO gerneratorPrepay(WeChatpayOrder order) throws PayException {
+    public static WeChatResponseVO generatorPrepay(WeChatpayOrder order) throws PayException {
         int mchNo = order.getMchNo();
         Wechat config = Wechat.getInstance();
 
@@ -54,8 +57,11 @@ public class GetPrepayInfo {
         packageParams.put("notify_url", order.getNotifyUrl());
         packageParams.put("trade_type", order.getTradeType());
         packageParams.put("sign", Signature.getSign(packageParams, signKey));
+
         //得到prepayid
-        String prepayId = getSpecificKey(sendPrepay(packageParams), "prepay_id");
+//        String prepayId = getSpecificKey(sendPrepay(packageParams), "prepay_id");
+        String prepayId = sendReqeust(packageParams);
+
         packageParams.put("nonce_str", nonceStr);
 
         //签名
@@ -196,6 +202,44 @@ public class GetPrepayInfo {
             log.error("httpClient.callHttpPost(requestUrl, params) 返回false" + params);
             throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008);
         }
+    }
+
+    private static String sendReqeust(SortedMap<String, String> map) {
+        String params = XmlUtils.mapToXml(map);
+        HttpParams httpParams = new HttpParams();
+        httpParams.setUrl(REQUESTURL);
+        httpParams.setStrEntity(params);
+        try {
+            String responseStr = HttpClientUtil.doPost(httpParams);
+            return responseStr;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (httpClient.callHttpPost(REQUESTURL, params)) {
+            String resContent = httpClient.getResContent();
+            log.info(resContent);
+            Map<String, String> responseMap;
+            try {
+                responseMap = XmlUtils.xmlToMap(resContent);
+            } catch (Exception e) {
+                log.error(PayResultMessageConstants.STRING_WECHATPAY_10008, e);
+                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008);
+            }
+            if (PayBaseConstants.RETURN_FAIL.equals(responseMap.get("return_code"))) {
+                log.error(params + responseMap.toString());
+                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008);
+            }
+            if (PayBaseConstants.REFUND_FAIL.equalsIgnoreCase(responseMap.get("result_code"))) {
+                log.error(params + responseMap.toString());
+                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008);
+            }
+
+            return responseMap;
+        } else {
+            log.error("httpClient.callHttpPost(requestUrl, params) 返回false" + params);
+            throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008);
+        }
+        return "";
     }
 
 

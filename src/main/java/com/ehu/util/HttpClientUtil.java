@@ -15,7 +15,6 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
@@ -35,42 +34,35 @@ public class HttpClientUtil {
 
     private static HttpClient httpClient;
 
-    private static SSLConnectionSocketFactory sslsf;
-
     private static ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
+    private static Map<String, SSLConnectionSocketFactory> sslsfMap = new HashMap<>();
+
     private static SSLConnectionSocketFactory getSslsf(String keyStorePath, String keyStorepass) throws Exception {
-        if (null == sslsf) {
-            sslsf = SSlUtil.getSSL(keyStorePath, keyStorepass);
-        }
-        return sslsf;
+        if (!sslsfMap.containsKey(keyStorepass)) {
+            SSLConnectionSocketFactory sslsf = SSlUtil.getSSL(keyStorePath, keyStorepass);
+            sslsfMap.put(keyStorepass, sslsf);
+            return sslsf;
+        } else return sslsfMap.get(keyStorepass);
     }
 
-    private static void init(String keyStorePath, String keyStorepass, boolean useCert) {
+    private static void init(String keyStorePath, String keyStorepass) {
         log.info("初始化HttpClientTest~~~开始");
         try {
-//            SSLContextBuilder builder = new SSLContextBuilder();
-//            builder.loadTrustMaterial(SSlUtil.getKeyStore("/opt/appdata/ssl/server.keystore", "tissot"), new TrustSelfSignedStrategy());
-            Registry<ConnectionSocketFactory> socketFactoryRegistry;
-            if (useCert) {
+            // 初始化连接管理器
+            PoolingHttpClientConnectionManager connectionManager = null;
+            if (!StringUtils.isBlank(keyStorepass)) {
                 // 配置同时支持 HTTP 和 HTPPS
-                socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create().register(
+                Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create().register(
                         "http", PlainConnectionSocketFactory.getSocketFactory()).register(
                         "https", getSslsf(keyStorePath, keyStorepass)).build();
-            } else {
-                socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
-                        .register("http", PlainConnectionSocketFactory.getSocketFactory())
-                        .register("https", SSLConnectionSocketFactory.getSocketFactory())
-                        .build();
+                connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+                // 将最大连接数增加到200，实际项目最好从配置文件中读取这个值
+                connectionManager.setMaxTotal(1000);
+
+                // 设置最大路由
+                connectionManager.setDefaultMaxPerRoute(2);
             }
-            // 初始化连接管理器
-            PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-
-            // 将最大连接数增加到200，实际项目最好从配置文件中读取这个值
-            connectionManager.setMaxTotal(1000);
-
-            // 设置最大路由
-            connectionManager.setDefaultMaxPerRoute(2);
 
             poolConnManagerMap.put(keyStorepass, connectionManager);
 
@@ -90,10 +82,10 @@ public class HttpClientUtil {
         }
     }
 
-    private static CloseableHttpClient getConnection(String keyStorePath, String keyStorepass, boolean useCert) {
-        if (!useCert) keyStorepass = "-1";
+    private static CloseableHttpClient getConnection(String keyStorePath, String keyStorepass) {
+        if (StringUtils.isBlank(keyStorepass)) keyStorepass = "-1";
         if (!poolConnManagerMap.containsKey(keyStorepass) || null == requestConfig) {
-            init(keyStorePath, keyStorepass, useCert);
+            init(keyStorePath, keyStorepass);
         }
 
         if (null != httpClient) {
@@ -105,8 +97,10 @@ public class HttpClientUtil {
                 .setConnectionManager(connectionManager)
                 // 设置请求配置
                 .setDefaultRequestConfig(requestConfig)
+                //关闭重试
+                .disableAutomaticRetries()
                 // 设置重试次数
-                .setRetryHandler(new DefaultHttpRequestRetryHandler(0, false))
+//                .setRetryHandler(new DefaultHttpRequestRetryHandler(0, false))
                 .build();
         if (connectionManager != null && connectionManager.getTotalStats() != null) {
             log.info("now client pool {}", connectionManager.getTotalStats().toString());
@@ -119,9 +113,9 @@ public class HttpClientUtil {
      *
      * @param httpParams http参数
      */
-    public static String doPost(String keyStorePath, String keyStorepass, boolean useCert, HttpParams httpParams) throws IOException {
+    public static String doPost(String keyStorePath, String keyStorepass, HttpParams httpParams) throws IOException {
         HttpPost post = new HttpPost(httpParams.getUrl());
-        if (httpParams.getHeaders() == null) {
+        if (httpParams.getHeaders() != null) {
             post.setHeaders(httpParams.getHeaders());
         }
         if (httpParams.getStrEntity() != null) {
@@ -130,23 +124,44 @@ public class HttpClientUtil {
         }
         // Send the post request and get the response
 
-        return getConnection(keyStorePath, keyStorepass, useCert).execute(post, responseHandler);
+        return getConnection(keyStorePath, keyStorepass).execute(post, responseHandler);
+    }
+
+    /**
+     * post
+     *
+     * @param httpParams http参数
+     */
+    public static String doPost(HttpParams httpParams) throws IOException {
+        HttpPost post = new HttpPost(httpParams.getUrl());
+        if (httpParams.getHeaders() != null) {
+            post.setHeaders(httpParams.getHeaders());
+        }
+        if (httpParams.getStrEntity() != null) {
+            StringEntity se = new StringEntity(httpParams.getStrEntity(), "UTF-8");
+            post.setEntity(se);
+        }
+        // Send the post request and get the response
+
+        return getConnection(null, null).execute(post, responseHandler);
     }
 
     /**
      * 执行GET请求
      *
-     * @param httpParams
-     * @return
-     * @throws IOException
+     * @param keyStorePath 证书地址
+     * @param keyStorepass 证书密码
+     * @param httpParams   参数
+     * @return response
+     * @throws IOException e
      */
-    public static String doGet(String keyStorePath, String keyStorepass, boolean useCert, HttpParams httpParams) throws IOException {
+    public static String doGet(String keyStorePath, String keyStorepass, HttpParams httpParams) throws IOException {
         // 创建http GET请求
         HttpGet httpGet = new HttpGet(httpParams.getUrl());
         if (httpParams.getHeaders() == null) {
             httpGet.setHeaders(httpParams.getHeaders());
         }
-        return getConnection(keyStorePath, keyStorepass, useCert).execute(httpGet, responseHandler);
+        return getConnection(keyStorePath, keyStorepass).execute(httpGet, responseHandler);
     }
 
     public static void main(String[] str) throws IOException, NoSuchAlgorithmException, KeyManagementException {
@@ -164,7 +179,7 @@ public class HttpClientUtil {
         httpParams.setUrl("https://www.baidu.com");
         try {
             for (int i = 0; i < 10; i++) {
-                String s = doGet(null, null, false, httpParams);
+                String s = doGet(null, null, httpParams);
                 System.out.println(s);
             }
         } catch (IOException e) {

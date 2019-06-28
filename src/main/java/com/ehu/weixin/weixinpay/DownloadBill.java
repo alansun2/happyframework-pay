@@ -33,7 +33,7 @@ public class DownloadBill {
     public static void downloadBill(DownloadParam param) throws PayException {
         Wechat config = Wechat.getInstance();
         Wechat.WechatMch wechatMch = config.getMchMap().get(param.getMchNo());
-        String mchAppId = config.getMchAppidMap().get(param.getMchAppIdNo());
+        String mchAppId = config.getMchAppIdMap().get(param.getMchAppIdNo());
         //封装获取prepayid
         String nonce_str = WeChatUtils.getNonceStr();
         SortedMap<String, String> packageParams = new TreeMap<String, String>();

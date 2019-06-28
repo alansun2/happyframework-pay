@@ -32,10 +32,11 @@ public class WeChatpayOrder extends Mch{
     private String notifyUrl;
     /**
      * [APP,NATIVE,JSAPI]
-     * NATIVE:扫码
-     * JSAPI:小程序，网页
+     * APP:    app
+     * NATIVE: 扫码
+     * JSAPI:  小程序，网页
      */
-    private String tradeType;
+    private String tradeType = "APP";
 
     public void setBody(String body) {
         if (body.length() > 49) {

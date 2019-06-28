@@ -30,7 +30,7 @@ public class WeChatPayUtil {
         if ("JSAPI".equals(order.getTradeType())) {
             return GetPrepayInfo.gerneratorPrepayXcx(order);
         } else {
-            return GetPrepayInfo.gerneratorPrepay(order);
+            return GetPrepayInfo.generatorPrepay(order);
         }
     }
 

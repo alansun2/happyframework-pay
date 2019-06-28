@@ -199,25 +199,15 @@ public class TenpayHttpClient {
 		try {
 			this.callHttps();
 			isRet = true;
-		} catch (UnrecoverableKeyException e) {
-			this.errInfo = e.getMessage();
-		} catch (KeyManagementException e) {
-			this.errInfo = e.getMessage();
-		} catch (CertificateException e) {
-			this.errInfo = e.getMessage();
-		} catch (KeyStoreException e) {
-			this.errInfo = e.getMessage();
-		} catch (NoSuchAlgorithmException e) {
-			this.errInfo = e.getMessage();
-		} catch (IOException e) {
+		} catch (UnrecoverableKeyException | KeyManagementException | CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
 			this.errInfo = e.getMessage();
 		}
-		
+
 		return isRet;
 		
 	}
 	
-	protected void callHttp() throws IOException {
+	private void callHttp() throws IOException {
 		
 		if("POST".equals(this.method.toUpperCase())) {
 			String url = HttpClientUtil.getURL(this.reqContent);
@@ -232,7 +222,7 @@ public class TenpayHttpClient {
 		
 	} 
 	
-	protected void callHttps() throws IOException, CertificateException,
+	private void callHttps() throws IOException, CertificateException,
 			KeyStoreException, NoSuchAlgorithmException,
 			UnrecoverableKeyException, KeyManagementException {
 
@@ -298,7 +288,7 @@ public class TenpayHttpClient {
 	 * @param postData
 	 * @throws IOException
 	 */
-	public void httpPostMethod(String url, byte[] postData)
+	private void httpPostMethod(String url, byte[] postData)
 			throws IOException {
 
 		HttpURLConnection conn = HttpClientUtil.getHttpURLConnection(url);
@@ -312,7 +302,7 @@ public class TenpayHttpClient {
 	 * @param url
 	 * @throws IOException
 	 */
-	protected void httpGetMethod(String url) throws IOException {
+	private void httpGetMethod(String url) throws IOException {
 		
 		HttpURLConnection httpConnection =
 			HttpClientUtil.getHttpURLConnection(url);
@@ -333,7 +323,7 @@ public class TenpayHttpClient {
 	 * @param sslContext
 	 * @throws IOException
 	 */
-	protected void httpsGetMethod(String url, SSLContext sslContext)
+	private void httpsGetMethod(String url, SSLContext sslContext)
 			throws IOException {
 
 		SSLSocketFactory sf = sslContext.getSocketFactory();
@@ -346,8 +336,8 @@ public class TenpayHttpClient {
 
 	}
 	
-	protected void httpsPostMethod(String url, byte[] postData,
-			SSLContext sslContext) throws IOException {
+	private void httpsPostMethod(String url, byte[] postData,
+								 SSLContext sslContext) throws IOException {
 
 		SSLSocketFactory sf = sslContext.getSocketFactory();
 
@@ -363,7 +353,7 @@ public class TenpayHttpClient {
 	 * 设置http请求默认属性
 	 * @param httpConnection
 	 */
-	protected void setHttpRequest(HttpURLConnection httpConnection) {
+	private void setHttpRequest(HttpURLConnection httpConnection) {
 		
 		//设置连接超时时间
 		httpConnection.setConnectTimeout(this.timeOut * 1000);
@@ -385,7 +375,7 @@ public class TenpayHttpClient {
 	 * 处理应答
 	 * @throws IOException
 	 */
-	protected void doResponse() throws IOException {
+	private void doResponse() throws IOException {
 		
 		if(null == this.inputStream) {
 			return;
@@ -405,7 +395,7 @@ public class TenpayHttpClient {
 	 * @param postData
 	 * @throws IOException
 	 */
-	protected void doPost(HttpURLConnection conn, byte[] postData)
+	private void doPost(HttpURLConnection conn, byte[] postData)
 			throws IOException {
 
 		// 以post方式通信
@@ -439,7 +429,7 @@ public class TenpayHttpClient {
 	 * @param conn
 	 * @throws IOException
 	 */
-	protected void doGet(HttpURLConnection conn) throws IOException {
+	private void doGet(HttpURLConnection conn) throws IOException {
 		
 		//以GET方式通信
 		conn.setRequestMethod("GET");

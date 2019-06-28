@@ -25,9 +25,9 @@ pay:
     open-public-key: eee #开放平台支付宝公钥 表示一个路径，示例：/root/a/private-key
   wechat:
     app-id: aaa #微信app付款的appid
-    applets-appid: ccc #小程序appid
+    applets-app-id: ccc #小程序appid
     spbill-create-ip: bbb #调用接口的ip
-    mch-appid-map: #与商户号绑定的appid或小程序appid，主要用于转账到微信零钱
+    mch-app-id-map: #与商户号绑定的appid或小程序appid，主要用于转账到微信零钱
       1: ddd
       2: eee
     mch-map: #商户号信息，默认第一个为primary
@@ -59,8 +59,8 @@ alipay
 wechat
 * app-id: 微信app付款的appid
 * spbill-create-ip: 调用接口的ip
-* applets-appid: 小程序appid
-* mch-appid-map: 与商户号绑定的appid或小程序appid，主要用于转账到微信零钱
+* applets-app-id: 小程序appid
+* mch-app-id-map: 与商户号绑定的appid或小程序appid，主要用于转账到微信零钱
   > 该属性为一个map，key为`Integer`，value为`String`
 * mch-map: 商户号信息，默认第一个为primary
   > 该属性为一个map，key为`Integer`，value为`WechatMch`

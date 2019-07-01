@@ -71,30 +71,4 @@ public class TransferToBankCardParams extends Mch {
      * 可选
      */
     private String desc;
-
-    //------------------------------------------------------------------------------------------------------------------
-    /**
-     * ssl证书地址
-     */
-    private String caPath;
-
-    /**
-     * 密码
-     */
-    private String code;
-
-    /**
-     * 微信公钥
-     */
-    private String wxPublicKey;
-
-    /**
-     * 商户号
-     */
-    private String mchid;
-
-    /**
-     * 签名密匙
-     */
-    private String privateKey;
 }

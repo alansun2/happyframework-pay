@@ -1,15 +1,21 @@
-package com.ehu.weixin.weixinpay;
+package com.ehu.weixin.service;
 
+import com.alan344.utils.HttpClientUtils;
+import com.alan344.utils.HttpParams;
 import com.ehu.config.Wechat;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
+import com.ehu.util.MapStringStringResponseHandler;
 import com.ehu.util.StringUtils;
+import com.ehu.util.XmlUtils;
 import com.ehu.weixin.util.Signature;
-import com.ehu.weixin.util.WeChatUtils;
+import com.ehu.weixin.util.WechatUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpException;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -22,7 +28,7 @@ import java.util.TreeMap;
  */
 @Slf4j
 public class QueryOrder {
-    private static final String REQUESTURL = "https://api.mch.weixin.qq.com/pay/orderquery";
+    private static final String REQUEST_URL = "https://api.mch.weixin.qq.com/pay/orderquery";
 
     /**
      * 查询微信支付是否成功
@@ -47,15 +53,26 @@ public class QueryOrder {
 
         Wechat.WechatMch wechatMch = config.getMchMap().get(mchNo);
 
-        String nonce_str = WeChatUtils.getNonceStr();
+        String nonce_str = WechatUtils.getNonceStr();
         SortedMap<String, String> packageParams = new TreeMap<>();
         packageParams.put("appid", config.getAppId());
         packageParams.put("mch_id", wechatMch.getMchId());
         packageParams.put("nonce_str", nonce_str);
         packageParams.put("out_trade_no", out_trade_no);
         packageParams.put("sign", Signature.getSign(packageParams, wechatMch.getSignKey()));
-        Map<String, String> resultMap = WeChatUtils.getResponseInfo(packageParams, REQUESTURL);
+
+        Map<String, String> resultMap = sendRequest(packageParams);
         return judgeOrderState(resultMap, queryFlag);
+    }
+
+    private static Map<String, String> sendRequest(SortedMap<String, String> packageParams) {
+        HttpParams httpParams = HttpParams.builder().url(REQUEST_URL).strEntity(XmlUtils.mapToXml(packageParams)).build();
+        try {
+            return HttpClientUtils.doPostWithResponseHandler(httpParams, new MapStringStringResponseHandler());
+        } catch (IOException | HttpException e) {
+            log.error("查询订单信息失败", e);
+            throw new PayException("查询订单信息失败");
+        }
     }
 
     /**

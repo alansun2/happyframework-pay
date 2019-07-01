@@ -9,7 +9,6 @@ import com.alipay.api.request.*;
 import com.alipay.api.response.*;
 import com.ehu.alipay.entity.*;
 import com.ehu.alipay.util.AlipayFunction;
-import com.ehu.alipay.util.AlipayNotify;
 import com.ehu.bean.LowerUnderscoreFilter;
 import com.ehu.bean.PayResponse;
 import com.ehu.config.AliPay;
@@ -22,12 +21,10 @@ import com.github.rholder.retry.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -75,30 +72,6 @@ public class AlipayUtils {
      */
     public static String createPayInfo1(AlipayOrder order) throws Exception {
         return null;
-    }
-
-    /**
-     * 验证消息是否是支付宝发出的合法消息
-     *
-     * @param params 通知返回来的参数数组
-     * @return 验证结果
-     */
-    public static boolean verify(Map<String, String> params) {
-
-        //判断responsetTxt是否为true，isSign是否为true
-        //responsetTxt的结果不是true，与服务器设置问题、合作身份者ID、notify_id一分钟失效有关
-        //isSign不是true，与安全校验码、请求时的参数格式（如：带自定义参数等）、编码格式有关
-        String responseTxt = "true";
-        if (params.get("notify_id") != null) {
-            String notifyId = params.get("notify_id");
-            responseTxt = AlipayNotify.verifyResponse(notifyId);
-        }
-        String sign = "";
-        if (params.get("sign") != null) {
-            sign = params.get("sign");
-        }
-        boolean isSign = AlipayNotify.getSignVerify(params, sign);
-        return isSign && "true".equals(responseTxt);
     }
 
     /**
@@ -312,29 +285,6 @@ public class AlipayUtils {
     }
 
     //------------------------------------------------------------------------------------------------------------------
-
-    /**
-     * 处理支付宝返回参数
-     *
-     * @param request HttpServletRequest
-     * @return paramsMap
-     */
-    public static Map<String, String> getAlipayCallBackMap(HttpServletRequest request) {
-        //获取支付宝POST过来反馈信息
-        Map<String, String[]> requestParams = request.getParameterMap();
-        Map<String, String> params = new HashMap<>(requestParams.size());
-        for (String name : requestParams.keySet()) {
-            String[] values = requestParams.get(name);
-            String valueStr = "";
-            for (int i = 0; i < values.length; i++) {
-                valueStr = (i == values.length - 1) ? valueStr + values[i]
-                        : valueStr + values[i] + ",";
-            }
-            //乱码解决，这段代码在出现乱码时使用。如果mysign和sign不相等也可以使用这段代码转化
-            params.put(name, valueStr);
-        }
-        return params;
-    }
 
     /**
      * 处理支付宝返回结果

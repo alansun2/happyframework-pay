@@ -7,18 +7,16 @@ import com.ehu.exception.PayException;
 import com.ehu.util.StringUtils;
 import com.ehu.weixin.entity.*;
 import com.ehu.weixin.util.Signature;
-import com.ehu.weixin.weixinpay.*;
+import com.ehu.weixin.service.*;
 import lombok.extern.slf4j.Slf4j;
-import org.jdom2.JDOMException;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
  * @author AlanSun
  */
 @Slf4j
-public class WeChatPayUtil {
+public class WechatPayUtil {
 
     /**
      * 微信支付(app支付与jsapi共用)
@@ -26,9 +24,9 @@ public class WeChatPayUtil {
      *
      * @throws PayException e
      */
-    public static WeChatResponseVO createWeiXinPackage(WeChatpayOrder order) throws PayException {
-        if ("JSAPI".equals(order.getTradeType())) {
-            return GetPrepayInfo.gerneratorPrepayXcx(order);
+    public static WeChatResponseVO createWeiXinPackage(WechatPayOrder order) throws PayException {
+        if (WechatTradeTypeEnum.JSAPI.equals(order.getTradeType())) {
+            return GetPrepayInfo.generatorPrepayXcx(order);
         } else {
             return GetPrepayInfo.generatorPrepay(order);
         }
@@ -37,11 +35,11 @@ public class WeChatPayUtil {
     /**
      * 获取扫码支付二维码
      *
-     * @param order WeChatpayOrder
+     * @param order WechatPayOrder
      * @throws PayException e
      */
-    public static String getQrCode(WeChatpayOrder order) throws PayException {
-        return GetPrepayInfo.gerneratorPrepayScan(order);
+    public static String getQrCode(WechatPayOrder order) throws PayException {
+        return GetPrepayInfo.generatorPrepayScan(order);
     }
 
     /**
@@ -54,37 +52,7 @@ public class WeChatPayUtil {
     }
 
     /**
-     * 检验API返回的数据里面的签名是否合法，避免数据在传输的过程中被第三方篡改
-     *
-     * @param map API返回的XML数据字符串
-     * @return API签名是否合法
-     * @throws JDOMException          e
-     * @throws IOException            e
-     * @throws IllegalAccessException e
-     */
-    public static boolean checkIsSignValidFromResponseString(Map<String, String> map) throws JDOMException, IOException, IllegalAccessException {
-        String signResponse = map.get("sign");
-        if (StringUtils.isBlank(signResponse)) {
-            log.error("API返回的数据签名数据不存在，有可能被第三方篡改!!!");
-            return false;
-        }
-        log.info("服务器回包里面的签名是:" + signResponse);
-        //清掉返回数据对象里面的Sign数据（不能把这个数据也加进去进行签名），然后用签名算法进行签名
-        map.remove("sign");
-        //将API返回的数据根据用签名算法进行计算新的签名，用来跟API返回的签名进行比较
-        Wechat config = Wechat.getInstance();
-        String signLocal = Signature.getSign(map, config.getMchMap().get(Wechat.DEFAULT_MCH).getSignKey());
-        log.info("生成的签名是:" + signLocal);
-        if (!signLocal.equals(signResponse)) {
-            //签名验不过，表示这个API返回的数据有可能已经被篡改了
-            log.error("API返回的数据签名验证不通过，有可能被第三方篡改!!!");
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * app微信退款
+     * 微信退款
      * <p>
      * 注意：
      * <p>
@@ -98,33 +66,26 @@ public class WeChatPayUtil {
      * <p>
      * 4、每个支付订单的部分退款次数不能超过50次
      *
+     * @param tradeType {@link WechatTradeTypeEnum}
      * @return boolean
      * @throws PayException e
      */
-    public static boolean weChatRefund(WeChatRefundInfo weChatRefundInfo) throws PayException {
-        return Refund.weChatRefundOper(weChatRefundInfo);
+    public static boolean weChatRefund(WeChatRefundInfo weChatRefundInfo, WechatTradeTypeEnum tradeType) throws PayException {
+        if (WechatTradeTypeEnum.APP.equals(tradeType)) {
+            return Refund.weChatRefund(weChatRefundInfo);
+        } else {
+            return Refund.weChatRefundXcx(weChatRefundInfo);
+        }
     }
 
     /**
-     * 小程序微信退款
-     * <p>
-     * 注意：
-     * <p>
-     * 1、交易时间超过一年的订单无法提交退款
-     * <p>
-     * 2、微信支付退款支持单笔交易分多次退款，多次退款需要提交原支付订单的商户订单号和设置不同的退款单号。申请退款总金额不能超过订单金额。 一笔退款失败后重新提交，请不要更换退款单号，请使用原商户退款单号
-     * <p>
-     * 3、请求频率限制：150qps，即每秒钟正常的申请退款请求次数不超过150次
-     * <p>
-     * 错误或无效请求频率限制：6qps，即每秒钟异常或错误的退款申请请求不超过6次
-     * <p>
-     * 4、每个支付订单的部分退款次数不能超过50次
+     * 下载财务账单
      *
-     * @return boolean
+     * @param param {@link DownloadParam}
      * @throws PayException e
      */
-    public static boolean weChatRefundXcx(WeChatRefundInfo weChatRefundInfo) throws PayException {
-        return Refund.weChatRefundOperXcx(weChatRefundInfo);
+    public static void downloadBill(DownloadParam param) throws PayException {
+        DownloadBill.downloadBill(param);
     }
 
     /**
@@ -135,22 +96,12 @@ public class WeChatPayUtil {
      * <p>
      * 注意：以上规则中的限额2w、100w由于计算规则与风控策略的关系，不是完全精确值，金额仅做参考，请不要依赖此金额做系统处理，应以接口实际返回和查询结果为准，请知晓。
      *
-     * @param wechatBusinessPay
+     * @param wechatBusinessPay {@link WechatBusinessPay}
      * @return boolean
      * @throws PayException e
      */
     public static PayResponse<Map<String, String>> weChatBusinessPayForUser(WechatBusinessPay wechatBusinessPay) throws PayException {
-        return TransferMoney.weChatPayBusinessPayforUser(wechatBusinessPay);
-    }
-
-    /**
-     * 下载账单
-     *
-     * @param param {@link DownloadParam}
-     * @throws PayException e
-     */
-    public static void downloadBill(DownloadParam param) throws PayException {
-        DownloadBill.downloadBill(param);
+        return TransferMoney.weChatPayBusinessPayForUser(wechatBusinessPay);
     }
 
     /**

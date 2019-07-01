@@ -1,8 +1,8 @@
 package com.ehu.util;
 
 import com.ehu.exception.PayException;
-import com.ehu.weixin.util.HttpClientUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
@@ -21,8 +21,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 
 @Slf4j
@@ -42,7 +44,7 @@ public class XmlUtils {
             documentBuilderFactory.setExpandEntityReferences(false);
             documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            InputStream stream = new ByteArrayInputStream(strXML.getBytes("UTF-8"));
+            InputStream stream = new ByteArrayInputStream(strXML.getBytes(StandardCharsets.UTF_8));
             org.w3c.dom.Document doc = documentBuilder.parse(stream);
             doc.getDocumentElement().normalize();
             NodeList nodeList = doc.getDocumentElement().getChildNodes();
@@ -106,16 +108,17 @@ public class XmlUtils {
     /**
      * 获取xml编码字符
      *
-     * @param strxml
-     * @return
-     * @throws IOException
-     * @throws JDOMException
+     * @param strXml xml
+     * @return 字符编码
+     * @throws IOException   io
+     * @throws JDOMException xml error
      */
-    public static String getXMLEncoding(String strxml) throws JDOMException, IOException {
-        InputStream in = HttpClientUtil.String2Inputstream(strxml);
+    public static String getXMLEncoding(String strXml) throws JDOMException, IOException {
+        InputStream in = IOUtils.toInputStream(strXml, StandardCharsets.UTF_8);
         SAXBuilder builder = new SAXBuilder();
         Document doc = builder.build(in);
         in.close();
-        return (String) doc.getProperty("encoding");
+        Object encoding = doc.getProperty("encoding");
+        return Objects.isNull(encoding) ? null : encoding.toString();
     }
 }

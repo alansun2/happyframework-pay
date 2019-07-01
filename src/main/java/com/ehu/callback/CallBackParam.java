@@ -1,4 +1,4 @@
-package com.ehu.bean;
+package com.ehu.callback;
 
 import lombok.Getter;
 import lombok.Setter;

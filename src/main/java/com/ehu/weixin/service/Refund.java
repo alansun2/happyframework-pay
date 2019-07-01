@@ -1,11 +1,18 @@
-package com.ehu.weixin.weixinpay;
+package com.ehu.weixin.service;
 
+import com.alan344.utils.HttpClientUtils;
+import com.alan344.utils.HttpParams;
 import com.ehu.config.Wechat;
 import com.ehu.exception.PayException;
+import com.ehu.util.MapStringStringResponseHandler;
+import com.ehu.util.XmlUtils;
 import com.ehu.weixin.entity.WeChatRefundInfo;
 import com.ehu.weixin.util.Signature;
-import com.ehu.weixin.util.WeChatUtils;
+import com.ehu.weixin.util.WechatUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpException;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -16,9 +23,10 @@ import java.util.TreeMap;
  *
  * @author AlanSun
  */
+@Slf4j
 public class Refund {
 
-    private static final String requestUrl = "https://api.mch.weixin.qq.com/secapi/pay/refund";
+    private static final String REQUEST_URL = "https://api.mch.weixin.qq.com/secapi/pay/refund";
 
     /**
      * app支付退款
@@ -28,11 +36,11 @@ public class Refund {
      * @throws PayException e
      */
     @SuppressWarnings("unchecked")
-    public static boolean weChatRefundOper(WeChatRefundInfo params) throws PayException {
+    public static boolean weChatRefund(WeChatRefundInfo params) throws PayException {
         Wechat config = Wechat.getInstance();
 
-        String orderMoney = WeChatUtils.getFinalMoney(params.getTotalFee());
-        String refundMoney = WeChatUtils.getFinalMoney(params.getRefundFee());
+        String orderMoney = WechatUtils.getFinalMoney(params.getTotalFee());
+        String refundMoney = WechatUtils.getFinalMoney(params.getRefundFee());
 
         while (orderMoney.startsWith("0")) {
             orderMoney = orderMoney.substring(1);
@@ -46,7 +54,7 @@ public class Refund {
         SortedMap<String, String> packageParams = new TreeMap<>();
         packageParams.put("appid", config.getAppId());
         packageParams.put("mch_id", wechatMch.getMchId());
-        packageParams.put("nonce_str", WeChatUtils.getNonceStr());
+        packageParams.put("nonce_str", WechatUtils.getNonceStr());
         packageParams.put("out_trade_no", params.getOutTradeNo());
         //商户系统内部的退款单号，商户系统内部唯一，同一退款单号多次请求只退一笔
         packageParams.put("out_refund_no", params.getOutRefundNo());
@@ -54,9 +62,9 @@ public class Refund {
         packageParams.put("refund_fee", refundMoney);
         packageParams.put("op_user_id", wechatMch.getMchId());
         packageParams.put("sign", Signature.getSign(packageParams, wechatMch.getSignKey()));
-        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, requestUrl, wechatMch.getCa(), wechatMch.getCaCode());
+        Map<String, String> map = sendRequest(packageParams, wechatMch);
 
-        return WeChatUtils.wechatResponseHandler(map);
+        return WechatUtils.wechatResponseHandler(map);
     }
 
     /**
@@ -67,25 +75,39 @@ public class Refund {
      * @throws PayException e
      */
     @SuppressWarnings("unchecked")
-    public static boolean weChatRefundOperXcx(WeChatRefundInfo params) throws PayException {
+    public static boolean weChatRefundXcx(WeChatRefundInfo params) throws PayException {
         Wechat config = Wechat.getInstance();
-        String orderMoney = WeChatUtils.getFinalMoney(params.getTotalFee());
-        String refundMoney = WeChatUtils.getFinalMoney(params.getRefundFee());
+        String orderMoney = WechatUtils.getFinalMoney(params.getTotalFee());
+        String refundMoney = WechatUtils.getFinalMoney(params.getRefundFee());
 
         Wechat.WechatMch wechatMch = config.getMchMap().get(params.getMchNo());
 
         SortedMap<String, String> packageParams = new TreeMap<>();
         packageParams.put("appid", config.getAppletsAppId());
         packageParams.put("mch_id", wechatMch.getMchId());
-        packageParams.put("nonce_str", WeChatUtils.getNonceStr());
+        packageParams.put("nonce_str", WechatUtils.getNonceStr());
         packageParams.put("out_trade_no", params.getOutTradeNo());
-        packageParams.put("out_refund_no", params.getOutRefundNo());//商户系统内部的退款单号，商户系统内部唯一，同一退款单号多次请求只退一笔
+        //商户系统内部的退款单号，商户系统内部唯一，同一退款单号多次请求只退一笔
+        packageParams.put("out_refund_no", params.getOutRefundNo());
         packageParams.put("total_fee", orderMoney);
         packageParams.put("refund_fee", refundMoney);
         packageParams.put("op_user_id", wechatMch.getMchId());
         packageParams.put("sign", Signature.getSign(packageParams, wechatMch.getSignKey()));
-        Map<String, String> map = WeChatUtils.wechatPostWithSSL(packageParams, requestUrl, wechatMch.getCa(), wechatMch.getCaCode());
 
-        return WeChatUtils.wechatResponseHandler(map);
+        Map<String, String> map = sendRequest(packageParams, wechatMch);
+
+        return WechatUtils.wechatResponseHandler(map);
+    }
+
+    private static Map<String, String> sendRequest(SortedMap<String, String> packageParams, Wechat.WechatMch wechatMch) {
+        HttpParams httpParams = HttpParams.builder().url(REQUEST_URL).strEntity(XmlUtils.mapToXml(packageParams)).build();
+        try {
+            return HttpClientUtils.doPostWithSslAndResponseHandler(wechatMch.getCa(), wechatMch.getCaCode(), httpParams, new MapStringStringResponseHandler());
+        } catch (IOException | HttpException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("退款失败", e);
+            }
+            throw new PayException("退款失败");
+        }
     }
 }

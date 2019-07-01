@@ -9,7 +9,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class WeChatpayOrder extends Mch{
+public class WechatPayOrder extends Mch {
     /**
      * 订单id
      */
@@ -36,12 +36,5 @@ public class WeChatpayOrder extends Mch{
      * NATIVE: 扫码
      * JSAPI:  小程序，网页
      */
-    private String tradeType = "APP";
-
-    public void setBody(String body) {
-        if (body.length() > 49) {
-            body = body.substring(0, 49);
-        }
-        this.body = body.trim();
-    }
+    private WechatTradeTypeEnum tradeType = WechatTradeTypeEnum.APP;
 }

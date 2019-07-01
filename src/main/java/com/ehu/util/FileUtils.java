@@ -27,7 +27,7 @@ public class FileUtils {
             }
             File file1 = new File(desPath.substring(0, desPath.lastIndexOf("/")));
             if (!file1.exists()) {
-                file1.mkdirs();
+                boolean mkdirs = file1.mkdirs();
             }
             bis = new BufferedInputStream(in);
             OutputStream out = new FileOutputStream(file, true);
@@ -38,7 +38,7 @@ public class FileUtils {
                 bos.write(buff, 0, length);
             }
         } catch (IOException e) {
-            log.error("从inputstream获取数据失败", e);
+            log.error("从inputStream获取数据失败", e);
         } finally {
             try {
                 if (bis != null) {
@@ -48,7 +48,7 @@ public class FileUtils {
                     bos.close();
                 }
             } catch (IOException e) {
-                log.error("从inputstream获取数据失败", e);
+                log.error("从inputStream获取数据失败", e);
             }
         }
     }

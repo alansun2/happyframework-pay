@@ -1,5 +1,7 @@
-package com.ehu.weixin.weixinpay;
+package com.ehu.weixin.service;
 
+import com.alan344.utils.HttpClientUtils;
+import com.alan344.utils.HttpParams;
 import com.ehu.bean.DownloadParam;
 import com.ehu.config.Wechat;
 import com.ehu.constants.PayResultCodeConstants;
@@ -8,14 +10,10 @@ import com.ehu.exception.PayException;
 import com.ehu.util.FileUtils;
 import com.ehu.util.XmlUtils;
 import com.ehu.weixin.util.Signature;
-import com.ehu.weixin.util.WeChatUtils;
+import com.ehu.weixin.util.WechatUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.HttpResponse;
 
 import java.io.IOException;
 import java.util.SortedMap;
@@ -27,19 +25,18 @@ import java.util.TreeMap;
  */
 @Slf4j
 public class DownloadBill {
-    private static final String DOWNLOADBILLURL = "https://api.mch.weixin.qq.com/pay/downloadbill";
+    private static final String DOWNLOAD_BILL_URL = "https://api.mch.weixin.qq.com/pay/downloadbill";
 
     @SuppressWarnings("unchecked")
     public static void downloadBill(DownloadParam param) throws PayException {
         Wechat config = Wechat.getInstance();
         Wechat.WechatMch wechatMch = config.getMchMap().get(param.getMchNo());
         String mchAppId = config.getMchAppIdMap().get(param.getMchAppIdNo());
-        //封装获取prepayid
-        String nonce_str = WeChatUtils.getNonceStr();
-        SortedMap<String, String> packageParams = new TreeMap<String, String>();
+
+        SortedMap<String, String> packageParams = new TreeMap<>();
         packageParams.put("appid", mchAppId);
         packageParams.put("mch_id", wechatMch.getMchId());
-        packageParams.put("nonce_str", nonce_str);
+        packageParams.put("nonce_str", WechatUtils.getNonceStr());
         packageParams.put("bill_date", param.getTime());
         packageParams.put("bill_type", "ALL");
         packageParams.put("tar_type", "GZIP");
@@ -48,18 +45,14 @@ public class DownloadBill {
     }
 
     private static void sendRequest(String param, String path) throws PayException {
-        // 创建默认的httpClient实例.
-        // 创建httppost
-        HttpPost httppost = new HttpPost(DOWNLOADBILLURL);
-        StringEntity uefEntity;
-        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
-            uefEntity = new StringEntity(param, "UTF-8");
-            httppost.setEntity(uefEntity);
-            try (CloseableHttpResponse response = httpclient.execute(httppost)) {
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    FileUtils.streamHandler(entity.getContent(), path);
-                }
+        HttpParams httpParams = HttpParams.builder().url(DOWNLOAD_BILL_URL).strEntity(param).build();
+        try {
+            HttpResponse httpResponse = HttpClientUtils.doPost(httpParams);
+            HttpEntity entity = httpResponse.getEntity();
+            if (entity != null) {
+//                org.apache.commons.io.FileUtils.copyInputStreamToFile();
+
+                FileUtils.streamHandler(entity.getContent(), path);
             }
         } catch (IOException e) {
             log.error("获取微信账单失败", e);

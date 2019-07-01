@@ -102,19 +102,18 @@ public class AlipayUtils {
      */
     public static String alipayTransferMoney(AlipayTransferMoney alipayTransferMoney) throws Exception {
         Map<String, String> orderInfo = AlipayFunction.getTransferMoneyMap(alipayTransferMoney);
-        String prestr = AlipayFunction.createLinkString(orderInfo);
-        String sign = AlipayFunction.createSign(prestr);
+        String preStr = AlipayFunction.createLinkString(orderInfo);
+        String sign = AlipayFunction.createSign(preStr);
         orderInfo.put("notify_url", URLEncoder.encode(orderInfo.get("notify_url"), config.getInputCharset()));
         orderInfo.put("detail_data", URLEncoder.encode(orderInfo.get("detail_data"), config.getInputCharset()));
-        String linkstr = AlipayFunction.createLinkString(orderInfo);
-        return config.getGatewayUrl() + linkstr + "&sign=" + sign + "&sign_type=" + config.getSignType();
+        String linkStr = AlipayFunction.createLinkString(orderInfo);
+        return config.getGatewayUrl() + linkStr + "&sign=" + sign + "&sign_type=" + config.getSignType();
     }
 
     /**
      * 支付宝 单笔转账到支付宝
      *
      * @param params {@link TransferSingleParams}
-     * @return
      */
     public static PayResponse<AlipayResponse> transferSingle(TransferSingleParams params) {
         AlipayFundTransToaccountTransferRequest request = new AlipayFundTransToaccountTransferRequest();

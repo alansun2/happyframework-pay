@@ -2,11 +2,8 @@ package com.ehu.weixin;
 
 import com.ehu.bean.DownloadParam;
 import com.ehu.bean.PayResponse;
-import com.ehu.config.Wechat;
 import com.ehu.exception.PayException;
-import com.ehu.util.StringUtils;
 import com.ehu.weixin.entity.*;
-import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.service.*;
 import lombok.extern.slf4j.Slf4j;
 

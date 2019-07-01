@@ -1,4 +1,4 @@
-package com.ehu.weixin.util;
+package com.ehu.util;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
@@ -135,7 +135,7 @@ public class HttpClientUtil {
         if (-1 != indexOf) {
             String k = pair.substring(0, indexOf);
             String v = pair.substring(indexOf + 1, pair.length());
-            if (null != k && !"".equals(k)) {
+            if (!"".equals(k)) {
                 m.put(k, v);
             }
         } else {

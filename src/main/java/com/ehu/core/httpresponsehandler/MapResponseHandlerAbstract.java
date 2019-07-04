@@ -1,4 +1,4 @@
-package com.ehu.util;
+package com.ehu.core.httpresponsehandler;
 
 import org.apache.http.impl.client.AbstractResponseHandler;
 

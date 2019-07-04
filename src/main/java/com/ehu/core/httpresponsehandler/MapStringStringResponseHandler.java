@@ -1,4 +1,4 @@
-package com.ehu.util;
+package com.ehu.core.httpresponsehandler;
 
 import com.alan344happyframework.util.XmlUtils;
 import org.apache.http.HttpEntity;

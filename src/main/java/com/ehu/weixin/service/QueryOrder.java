@@ -8,7 +8,7 @@ import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
-import com.ehu.util.MapStringStringResponseHandler;
+import com.ehu.core.httpresponsehandler.MapStringStringResponseHandler;
 import com.alan344happyframework.util.XmlUtils;
 import com.ehu.weixin.entity.WeChatQueryResult;
 import com.ehu.weixin.util.Signature;

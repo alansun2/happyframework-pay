@@ -1,4 +1,4 @@
-package com.ehu.callback;
+package com.ehu.core.callback;
 
 /**
  * @author 53479

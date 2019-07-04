@@ -1,9 +1,7 @@
-package com.ehu.callback;
+package com.ehu.core.callback;
 
 import lombok.Getter;
 import lombok.Setter;
-
-import java.math.BigDecimal;
 
 /**
  * @author alan

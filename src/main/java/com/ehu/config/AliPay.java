@@ -47,6 +47,10 @@ public class AliPay {
      * 支付宝网关地址
      */
     private String gatewayUrl = "https://openapi.alipay.com/gateway.do";
+    /**
+     * 支付宝回调地址
+     */
+    private String notifyUrl;
 
     public void setPrivateKey(String privateKey) {
         ALIPAY_INSTANCE.privateKey = FileUtils.readFile(privateKey);
@@ -74,5 +78,9 @@ public class AliPay {
 
     public void setGatewayUrl(String gatewayUrl) {
         ALIPAY_INSTANCE.gatewayUrl = gatewayUrl;
+    }
+
+    public void setNotifyUrl(String notifyUrl) {
+        ALIPAY_INSTANCE.notifyUrl = notifyUrl;
     }
 }

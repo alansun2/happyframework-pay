@@ -1,4 +1,4 @@
-package com.ehu.bean;
+package com.ehu.core;
 
 import com.alan344happyframework.util.StringUtils;
 

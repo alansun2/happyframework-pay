@@ -1,4 +1,4 @@
-package com.ehu.callback;
+package com.ehu.core.callback;
 
 import com.alan344happyframework.util.StringUtils;
 import com.ehu.config.Wechat;

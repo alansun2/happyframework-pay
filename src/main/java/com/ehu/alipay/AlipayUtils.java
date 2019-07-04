@@ -1,28 +1,27 @@
 package com.ehu.alipay;
 
+import com.alan344happyframework.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.AlipayResponse;
 import com.alipay.api.DefaultAlipayClient;
-import com.alipay.api.domain.AlipayDataDataserviceBillDownloadurlQueryModel;
-import com.alipay.api.domain.AlipayTradeAppPayModel;
-import com.alipay.api.domain.AlipayTradeQueryModel;
-import com.alipay.api.domain.AlipayTradeRefundModel;
+import com.alipay.api.domain.*;
 import com.alipay.api.request.*;
 import com.alipay.api.response.*;
-import com.ehu.alipay.entity.AlipayOrder;
 import com.ehu.alipay.entity.AlipayRefund;
-import com.ehu.alipay.entity.ScanPayOrder;
 import com.ehu.alipay.entity.TransferSingleParams;
-import com.ehu.bean.LowerUnderscoreFilter;
+import com.ehu.bean.PayInfoResponse;
+import com.ehu.bean.PayOrder;
 import com.ehu.bean.PayResponse;
+import com.ehu.bean.ScanPayOrder;
 import com.ehu.config.AliPay;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
+import com.ehu.core.LowerUnderscoreFilter;
+import com.ehu.core.Pay;
 import com.ehu.exception.PayException;
-import com.alan344happyframework.util.StringUtils;
 import com.github.rholder.retry.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -44,20 +43,10 @@ import java.util.concurrent.TimeUnit;
  * @author AlanSun
  */
 @Slf4j
-public class AlipayUtils {
+public class AlipayUtils implements Pay {
 
     public static final AliPay config = AliPay.getInstance();
     private static AlipayClient alipayClient = new DefaultAlipayClient(config.getGatewayUrl(), config.getAppId(), config.getPrivateKey(), "json", config.getInputCharset(), config.getOpenPublicKey());
-
-    /**
-     * 创建支付宝订单支付信息（无线）
-     *
-     * @param order 订单信息
-     * @return 支付宝订单支付信息（无线）
-     */
-    public static String createPayInfo(AlipayOrder order) throws PayException {
-        return createPayInfoV2(order);
-    }
 
     /**
      * 创建支付宝订单支付信息（无线）
@@ -67,29 +56,74 @@ public class AlipayUtils {
      * @param order 订单信息
      * @return 支付宝订单支付信息（无线）
      */
-    private static String createPayInfoV2(AlipayOrder order) {
+    @Override
+    public PayInfoResponse createPayInfo(PayOrder order) {
         //实例化具体API对应的request类,类名称和接口名称对应,当前调用接口名称：alipay.trade.app.pay
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
+
         //SDK已经封装掉了公共参数，这里只需要传入业务参数。以下方法为sdk的model入参方式(model和biz_content同时存在的情况下取biz_content)。
-        AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
+        AlipayTradeAppPayModel model = order.getAlipayTradeAppPayModel();
+        if (model == null) {
+            model = new AlipayTradeAppPayModel();
+            model.setTimeoutExpress("90m");
+        }
+
+        model.setOutTradeNo(order.getOrderId());
         model.setBody(order.getBody());
         model.setSubject(order.getSubject());
-        model.setOutTradeNo(order.getOrderId());
-        model.setTimeoutExpress(order.getTimeoutExpress());
         model.setTotalAmount(order.getPrice());
         //固定值
         model.setProductCode("QUICK_MSECURITY_PAY");
         request.setBizModel(model);
-        request.setNotifyUrl(order.getNotifyUrl());
+        request.setNotifyUrl(StringUtils.getDefaultIfNull(order.getNotifyUrl(), config.getNotifyUrl()));
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
             AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
-            log.info(response.getBody());//就是orderString 可以直接给客户端请求，无需再做处理。
-            return response.getBody();
+            //就是orderString 可以直接给客户端请求，无需再做处理。
+            log.info(response.getBody());
+            return PayInfoResponse.builder().alipayStr(response.getBody()).build();
         } catch (AlipayApiException e) {
             log.error("构建支付信息失败：", e);
             throw new PayException("构建支付信息失败,请重试");
         }
+    }
+
+    /**
+     * 线下扫码支付：扫码支付获取二维码
+     *
+     * @return 二维码地址
+     * @throws PayException e
+     */
+    @Override
+    public String getQrCode(ScanPayOrder payOrder) throws PayException {
+        //创建API对应的request类
+        AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
+        request.setNotifyUrl(StringUtils.getDefaultIfNull(payOrder.getNotifyUrl(), config.getNotifyUrl()));
+
+        AlipayTradePrecreateModel alipayTradePrecreateModel = payOrder.getAlipayTradePrecreateModel();
+        if (alipayTradePrecreateModel == null) {
+            alipayTradePrecreateModel = new AlipayTradePrecreateModel();
+            alipayTradePrecreateModel.setTimeoutExpress("90m");
+        }
+        alipayTradePrecreateModel.setOutTradeNo(payOrder.getOrderId());
+        alipayTradePrecreateModel.setBody(payOrder.getBody());
+        alipayTradePrecreateModel.setSubject(payOrder.getSubject());
+        alipayTradePrecreateModel.setTotalAmount(payOrder.getPrice());
+        alipayTradePrecreateModel.setStoreId(payOrder.getStoreId());
+
+        request.setBizModel(alipayTradePrecreateModel);
+
+        AlipayTradePrecreateResponse response;
+        try {
+            response = alipayClient.execute(request);
+            if (PayBaseConstants.ALIPAY_RETURN_CODE_10000.equals(response.getCode())) {
+                return response.getQrCode();
+            }
+        } catch (Exception e) {
+            log.error("支付宝扫码错误", e);
+            throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30001, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30001);
+        }
+        return null;
     }
 
     /**
@@ -126,36 +160,6 @@ public class AlipayUtils {
 
         responseHandler(response, call);
         return response;
-    }
-
-    /**
-     * 线下扫码支付：扫码支付获取二维码
-     *
-     * @return 二维码地址
-     * @throws PayException e
-     */
-    public static String scanPay(ScanPayOrder scanPayOrder) throws PayException {
-        //创建API对应的request类
-        AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
-        request.setNotifyUrl(scanPayOrder.getNotifyUrl());
-        request.setBizContent("{" +
-                "\"out_trade_no\":\"" + scanPayOrder.getOutTradeNo() + "\"," +
-                "\"total_amount\":" + scanPayOrder.getTotalAmount() + "," +
-                "\"subject\":\"" + scanPayOrder.getSubject() + "\"," +
-                "\"body\":\"" + scanPayOrder.getBody() + "\"," +
-                "\"store_id\":\"" + scanPayOrder.getStoreId() + "\"," +
-                "\"timeout_express\":\"90m\"}");//设置业务参数
-        AlipayTradePrecreateResponse response;
-        try {
-            response = alipayClient.execute(request);
-            if (PayBaseConstants.ALIPAY_RETURN_CODE_10000.equals(response.getCode())) {
-                return response.getQrCode();
-            }
-        } catch (Exception e) {
-            log.error("支付宝扫码错误", e);
-            throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30001, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30001);
-        }
-        return null;
     }
 
     /**

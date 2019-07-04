@@ -1,4 +1,4 @@
-package com.ehu.callback;
+package com.ehu.core.callback;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

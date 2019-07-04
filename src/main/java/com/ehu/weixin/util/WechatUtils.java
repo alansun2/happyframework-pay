@@ -1,5 +1,6 @@
 package com.ehu.weixin.util;
 
+import com.alan344happyframework.constants.SeparatorConstants;
 import com.ehu.bean.PayResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -13,20 +14,20 @@ public class WechatUtils {
     /**
      * 处理微信返回
      *
-     * @param wxResponse 微信返回MAP
+     * @param wxResponseMap 微信返回MAP
      * @return boolean
      */
-    public static boolean wechatResponseHandler(Map<String, String> wxResponse) {
+    public static boolean wechatResponseHandler(Map<String, String> wxResponseMap) {
         boolean flag = false;
-        if (null == wxResponse || wxResponse.isEmpty()) {
+        if (null == wxResponseMap || wxResponseMap.isEmpty()) {
             log.error("微信返回有误");
             return false;
         }
 
-        wxResponse.forEach((k, v) -> log.info(k + ":::" + v));
+        log.info("微信返回信息：{}", wxResponseMap.toString());
 
-        if (wxResponse.containsKey("return_code") && "SUCCESS".equals(wxResponse.get("return_code"))) {
-            if (wxResponse.containsKey("result_code") && "SUCCESS".equals(wxResponse.get("result_code"))) {
+        if (wxResponseMap.containsKey("return_code") && "SUCCESS".equals(wxResponseMap.get("return_code"))) {
+            if (wxResponseMap.containsKey("result_code") && "SUCCESS".equals(wxResponseMap.get("result_code"))) {
                 flag = true;
             }
         }
@@ -45,7 +46,7 @@ public class WechatUtils {
             return;
         }
 
-        wxResponseMap.forEach((k, v) -> log.info(k + ":::" + v));
+        log.info("微信返回信息：{}", wxResponseMap.toString());
 
         if (wxResponseMap.containsKey("return_code") && "SUCCESS".equals(wxResponseMap.get("return_code"))) {
             if ("SUCCESS".equals(wxResponseMap.get("result_code"))) {
@@ -89,10 +90,10 @@ public class WechatUtils {
      *
      * @param price 单位： 元
      */
-    public static String getFinalMoney(double price) {
+    public static String getFinalMoney(String price) {
         //转为两位小数
         String finalMoney = String.format("%.2f", price);
-        int i = Integer.parseInt(finalMoney.replace(".", ""));
+        int i = Integer.parseInt(finalMoney.replace(SeparatorConstants.DOT, SeparatorConstants.EMPTY));
         //转为分
         return Integer.toString(i);
     }

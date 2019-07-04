@@ -1,7 +1,7 @@
 package com.ehu.weixin;
 
-import com.ehu.bean.DownloadParam;
-import com.ehu.bean.PayResponse;
+import com.ehu.bean.*;
+import com.ehu.core.Pay;
 import com.ehu.exception.PayException;
 import com.ehu.weixin.entity.*;
 import com.ehu.weixin.service.*;
@@ -13,7 +13,7 @@ import java.util.Map;
  * @author AlanSun
  */
 @Slf4j
-public class WechatPayUtils {
+public class WechatPayUtils implements Pay {
 
     /**
      * 微信支付(app支付与jsapi共用)
@@ -21,22 +21,24 @@ public class WechatPayUtils {
      *
      * @throws PayException e
      */
-    public static WeChatResponseVO createWeiXinPackage(WechatPayOrder order) throws PayException {
-        if (WechatTradeTypeEnum.JSAPI.equals(order.getTradeType())) {
-            return GetPrepayInfo.generatorPrepayXcx(order);
+    @Override
+    public PayInfoResponse createPayInfo(PayOrder order) throws PayException {
+        if (WechatTradeTypeEnum.JSAPI.equals(order.getWechatPayOrder().getTradeType())) {
+            return PayInfoResponse.builder().weChatResponseVO(GetPrepayInfo.generatorPrepayXcx(order)).build();
         } else {
-            return GetPrepayInfo.generatorPrepay(order);
+            return PayInfoResponse.builder().weChatResponseVO(GetPrepayInfo.generatorPrepay(order)).build();
         }
     }
 
     /**
      * 获取扫码支付二维码
      *
-     * @param order WechatPayOrder
+     * @param payOrder {@link ScanPayOrder}
      * @throws PayException e
      */
-    public static String getQrCode(WechatPayOrder order) throws PayException {
-        return GetPrepayInfo.generatorPrepayScan(order);
+    @Override
+    public String getQrCode(ScanPayOrder payOrder) throws PayException {
+        return GetPrepayInfo.generatorPrepayScan(payOrder);
     }
 
     /**

@@ -1,14 +1,17 @@
 package com.ehu.weixin.service;
 
 import com.alan344happyframework.util.HttpClientUtils;
+import com.alan344happyframework.util.StringUtils;
+import com.alan344happyframework.util.XmlUtils;
 import com.alan344happyframework.util.bean.HttpParams;
+import com.ehu.bean.PayOrder;
+import com.ehu.bean.ScanPayOrder;
 import com.ehu.config.Wechat;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
 import com.ehu.util.MapStringStringResponseHandler;
-import com.alan344happyframework.util.XmlUtils;
 import com.ehu.weixin.entity.WeChatResponseVO;
 import com.ehu.weixin.entity.WechatPayOrder;
 import com.ehu.weixin.util.Signature;
@@ -37,13 +40,14 @@ public class GetPrepayInfo {
      * @throws PayException e
      */
     @SuppressWarnings("unchecked")
-    public static WeChatResponseVO generatorPrepay(WechatPayOrder order) throws PayException {
-        int mchNo = order.getMchNo();
+    public static WeChatResponseVO generatorPrepay(PayOrder order) throws PayException {
+        WechatPayOrder wechatPayOrder = order.getWechatPayOrder();
+        int mchNo = wechatPayOrder.getMchNo();
         Wechat config = Wechat.getInstance();
         config.getMchAppIdMap().get(Wechat.DEFAULT_MCH);
 
         //默认使用第一个appid进行支付
-        String appId = config.getMchAppIdMap().get(order.getMchAppIdNo());
+        String appId = config.getMchAppIdMap().get(wechatPayOrder.getMchAppIdNo());
         Wechat.WechatMch wechatMch = config.getMchMap().get(mchNo);
         String mchId = wechatMch.getMchId();
         String signKey = wechatMch.getSignKey();
@@ -57,8 +61,8 @@ public class GetPrepayInfo {
         packageParams.put("out_trade_no", order.getOrderId());
         packageParams.put("total_fee", WechatUtils.getFinalMoney(order.getPrice()));
         packageParams.put("spbill_create_ip", config.getSpbillCreateIp());
-        packageParams.put("notify_url", order.getNotifyUrl());
-        packageParams.put("trade_type", order.getTradeType().getTradeType());
+        packageParams.put("notify_url", StringUtils.getDefaultIfNull(order.getNotifyUrl(), config.getNotifyUrl()));
+        packageParams.put("trade_type", wechatPayOrder.getTradeType().getTradeType());
         packageParams.put("sign", Signature.getSign(packageParams, signKey));
 
         //得到prepayid
@@ -93,8 +97,9 @@ public class GetPrepayInfo {
      * @return 支付信息
      * @throws PayException e
      */
-    public static WeChatResponseVO generatorPrepayXcx(WechatPayOrder order) throws PayException {
-        int mchNo = order.getMchNo();
+    public static WeChatResponseVO generatorPrepayXcx(PayOrder order) throws PayException {
+        WechatPayOrder wechatPayOrder = order.getWechatPayOrder();
+        int mchNo = wechatPayOrder.getMchNo();
         Wechat config = Wechat.getInstance();
 
         String appletsAppId = config.getAppletsAppId();
@@ -112,9 +117,9 @@ public class GetPrepayInfo {
         packageParams.put("out_trade_no", order.getOrderId());
         packageParams.put("total_fee", WechatUtils.getFinalMoney(order.getPrice()));
         packageParams.put("spbill_create_ip", config.getSpbillCreateIp());
-        packageParams.put("notify_url", order.getNotifyUrl());
-        packageParams.put("trade_type", order.getTradeType().getTradeType());
-        packageParams.put("openid", order.getOpenid());
+        packageParams.put("notify_url", StringUtils.getDefaultIfNull(order.getNotifyUrl(), config.getNotifyUrl()));
+        packageParams.put("trade_type", wechatPayOrder.getTradeType().getTradeType());
+        packageParams.put("openid", wechatPayOrder.getOpenid());
         packageParams.put("sign", Signature.getSign(packageParams, signKey));
         //得到prepayid
         String prepayId = getSpecificKey(sendRequest(packageParams), "prepay_id");
@@ -145,23 +150,30 @@ public class GetPrepayInfo {
      * @throws PayException e
      */
     @SuppressWarnings("unchecked")
-    public static String generatorPrepayScan(WechatPayOrder order) throws PayException {
+    public static String generatorPrepayScan(ScanPayOrder order) throws PayException {
+        WechatPayOrder wechatPayOrder = order.getWechatPayOrder();
         Wechat config = Wechat.getInstance();
-        int mchNo = order.getMchNo();
+        int mchNo = wechatPayOrder.getMchNo();
 
         Wechat.WechatMch wechatMch = config.getMchMap().get(mchNo);
         //封装获取prepayid
         String nonceStr = WechatUtils.getNonceStr();
         SortedMap<String, String> packageParams = new TreeMap<>();
-        packageParams.put("appid", config.getMchAppIdMap().get(order.getMchAppIdNo()));
+        packageParams.put("appid", config.getMchAppIdMap().get(wechatPayOrder.getMchAppIdNo()));
         packageParams.put("mch_id", wechatMch.getMchId());
         packageParams.put("nonce_str", nonceStr);
         packageParams.put("body", order.getBody());
         packageParams.put("out_trade_no", order.getOrderId());
         packageParams.put("total_fee", WechatUtils.getFinalMoney(order.getPrice()));
         packageParams.put("spbill_create_ip", config.getSpbillCreateIp());
-        packageParams.put("notify_url", order.getNotifyUrl());
-        packageParams.put("trade_type", order.getTradeType().getTradeType());
+        packageParams.put("notify_url", StringUtils.getDefaultIfNull(order.getNotifyUrl(), config.getNotifyUrl()));
+        packageParams.put("trade_type", wechatPayOrder.getTradeType().getTradeType());
+
+        if (StringUtils.isNotEmpty(order.getStoreId())) {
+            packageParams.put("scene_info", "{\"store_info\" : {\n" +
+                    "\"id\": \"" + order.getStoreId() + "\" }}");
+        }
+
         packageParams.put("sign", Signature.getSign(packageParams, wechatMch.getSignKey()));
         //得到prepayid
         return getSpecificKey(sendRequest(packageParams), "code_url");

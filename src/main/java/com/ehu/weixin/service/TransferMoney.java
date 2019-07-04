@@ -5,7 +5,7 @@ import com.alan344happyframework.util.RSAUtils;
 import com.alan344happyframework.util.bean.HttpParams;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.ehu.bean.LowerUnderscoreFilter;
+import com.ehu.core.LowerUnderscoreFilter;
 import com.ehu.bean.PayResponse;
 import com.ehu.config.Wechat;
 import com.ehu.exception.PayException;

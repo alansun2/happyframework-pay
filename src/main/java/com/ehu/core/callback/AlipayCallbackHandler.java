@@ -1,4 +1,4 @@
-package com.ehu.callback;
+package com.ehu.core.callback;
 
 import com.alipay.api.internal.util.AlipaySignature;
 import com.ehu.config.AliPay;

@@ -11,25 +11,9 @@ import lombok.Setter;
 @Setter
 public class WechatPayOrder extends Mch {
     /**
-     * 订单id
-     */
-    private String orderId;
-    /**
-     * 订单价格
-     */
-    private double price;
-    /**
-     * 订单详情
-     */
-    private String body;
-    /**
      * openid 微信小程序必传
      */
     private String openid;
-    /**
-     * 回调地址
-     */
-    private String notifyUrl;
     /**
      * [APP,NATIVE,JSAPI]
      * APP:    app

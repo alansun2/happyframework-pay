@@ -44,6 +44,10 @@ public class Wechat {
      * 默认使用第一个appid进行支付，退款，查询订单
      */
     private Map<Integer, String> mchAppIdMap;
+    /**
+     * 支付回调地址
+     */
+    private String notifyUrl;
 
     public void setAppletsAppId(String appletsAppId) {
         WECHAT_INSTANCE.appletsAppId = appletsAppId;
@@ -59,6 +63,10 @@ public class Wechat {
 
     public void setMchAppIdMap(Map<Integer, String> mchAppIdMap) {
         WECHAT_INSTANCE.mchAppIdMap = mchAppIdMap;
+    }
+
+    public void setNotifyUrl(String notifyUrl) {
+        WECHAT_INSTANCE.notifyUrl = notifyUrl;
     }
 
     /**

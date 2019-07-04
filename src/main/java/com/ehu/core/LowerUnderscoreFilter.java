@@ -1,4 +1,4 @@
-package com.ehu.bean;
+package com.ehu.core;
 
 import com.alibaba.fastjson.serializer.NameFilter;
 import com.google.common.base.CaseFormat;

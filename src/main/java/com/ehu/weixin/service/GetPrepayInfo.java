@@ -1,14 +1,14 @@
 package com.ehu.weixin.service;
 
-import com.alan344.utils.HttpClientUtils;
-import com.alan344.utils.HttpParams;
+import com.alan344happyframework.util.HttpClientUtils;
+import com.alan344happyframework.util.bean.HttpParams;
 import com.ehu.config.Wechat;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
 import com.ehu.util.MapStringStringResponseHandler;
-import com.ehu.util.XmlUtils;
+import com.alan344happyframework.util.XmlUtils;
 import com.ehu.weixin.entity.WeChatResponseVO;
 import com.ehu.weixin.entity.WechatPayOrder;
 import com.ehu.weixin.util.Signature;
@@ -40,8 +40,10 @@ public class GetPrepayInfo {
     public static WeChatResponseVO generatorPrepay(WechatPayOrder order) throws PayException {
         int mchNo = order.getMchNo();
         Wechat config = Wechat.getInstance();
+        config.getMchAppIdMap().get(Wechat.DEFAULT_MCH);
 
-        String appId = config.getAppId();
+        //默认使用第一个appid进行支付
+        String appId = config.getMchAppIdMap().get(order.getMchAppIdNo());
         Wechat.WechatMch wechatMch = config.getMchMap().get(mchNo);
         String mchId = wechatMch.getMchId();
         String signKey = wechatMch.getSignKey();
@@ -151,7 +153,7 @@ public class GetPrepayInfo {
         //封装获取prepayid
         String nonceStr = WechatUtils.getNonceStr();
         SortedMap<String, String> packageParams = new TreeMap<>();
-        packageParams.put("appid", config.getAppId());
+        packageParams.put("appid", config.getMchAppIdMap().get(order.getMchAppIdNo()));
         packageParams.put("mch_id", wechatMch.getMchId());
         packageParams.put("nonce_str", nonceStr);
         packageParams.put("body", order.getBody());

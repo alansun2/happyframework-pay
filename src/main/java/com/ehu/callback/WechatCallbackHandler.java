@@ -1,11 +1,11 @@
 package com.ehu.callback;
 
+import com.alan344happyframework.util.StringUtils;
 import com.ehu.config.Wechat;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.exception.PayException;
-import com.ehu.util.StringUtils;
-import com.ehu.util.XmlUtils;
+import com.alan344happyframework.util.XmlUtils;
 import com.ehu.weixin.util.Signature;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
@@ -104,7 +104,7 @@ public class WechatCallbackHandler implements CallbackHandler {
      */
     public static boolean checkIsSignValidFromResponseString(Map<String, String> map) {
         String signResponse = map.get("sign");
-        if (StringUtils.isBlank(signResponse)) {
+        if (StringUtils.isEmpty(signResponse)) {
             log.error("API返回的数据签名数据不存在，有可能被第三方篡改!!!");
             return false;
         }
@@ -114,6 +114,7 @@ public class WechatCallbackHandler implements CallbackHandler {
         //将API返回的数据根据用签名算法进行计算新的签名，用来跟API返回的签名进行比较
         Wechat config = Wechat.getInstance();
 
+        //获取签名
         String signLocal = Signature.getSign(map, config.getMchMap().get(Wechat.DEFAULT_MCH).getSignKey());
 
         if (!signLocal.equals(signResponse)) {
@@ -143,7 +144,7 @@ public class WechatCallbackHandler implements CallbackHandler {
                 inputString.append(line);
             }
 
-            return XmlUtils.xmlToMap(inputString.toString());
+            return com.alan344happyframework.util.XmlUtils.xmlToMap(inputString.toString());
         } finally {
             if (reader != null) {
                 reader.close();

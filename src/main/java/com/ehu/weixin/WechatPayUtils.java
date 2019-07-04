@@ -13,7 +13,7 @@ import java.util.Map;
  * @author AlanSun
  */
 @Slf4j
-public class WechatPayUtil {
+public class WechatPayUtils {
 
     /**
      * 微信支付(app支付与jsapi共用)
@@ -44,8 +44,8 @@ public class WechatPayUtil {
      *
      * @throws PayException e
      */
-    public static Object queryWeChatOrder(String transaction_id, String queryFlag) throws PayException {
-        return QueryOrder.getQueryResult(transaction_id, queryFlag);
+    public static Object queryWeChatOrder(WeChatQueryResult params) throws PayException {
+        return QueryOrder.getQueryResult(params);
     }
 
     /**

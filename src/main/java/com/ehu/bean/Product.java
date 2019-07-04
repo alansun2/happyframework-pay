@@ -1,6 +1,6 @@
 package com.ehu.bean;
 
-import com.ehu.util.StringUtils;
+import com.alan344happyframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

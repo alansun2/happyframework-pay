@@ -22,5 +22,5 @@ public class AlipayRefund {
     /**
      * 本次退款金额
      */
-    private double refundAmount;
+    private String refundAmount;
 }

@@ -1,14 +1,14 @@
 package com.ehu.weixin.service;
 
-import com.alan344.utils.HttpClientUtils;
-import com.alan344.utils.HttpParams;
+import com.alan344happyframework.util.FileUtils;
+import com.alan344happyframework.util.HttpClientUtils;
+import com.alan344happyframework.util.bean.HttpParams;
 import com.ehu.bean.DownloadParam;
 import com.ehu.config.Wechat;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
-import com.ehu.util.FileUtils;
-import com.ehu.util.XmlUtils;
+import com.alan344happyframework.util.XmlUtils;
 import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.util.WechatUtils;
 import lombok.extern.slf4j.Slf4j;

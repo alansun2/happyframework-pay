@@ -1,15 +1,16 @@
 package com.ehu.weixin.service;
 
-import com.alan344.utils.HttpClientUtils;
-import com.alan344.utils.HttpParams;
+import com.alan344happyframework.util.HttpClientUtils;
+import com.alan344happyframework.util.StringUtils;
+import com.alan344happyframework.util.bean.HttpParams;
 import com.ehu.config.Wechat;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
 import com.ehu.util.MapStringStringResponseHandler;
-import com.ehu.util.StringUtils;
-import com.ehu.util.XmlUtils;
+import com.alan344happyframework.util.XmlUtils;
+import com.ehu.weixin.entity.WeChatQueryResult;
 import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.util.WechatUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -33,36 +34,25 @@ public class QueryOrder {
     /**
      * 查询微信支付是否成功
      *
-     * @param out_trade_no 商户订单号
-     * @param queryFlag    如果该值不填写则返回订单状态，如果填写了该值，则会比较订单状态和该值是否相等，相等返回true，否则返回异常
-     * @param mchNos       指定商户
      * @return String or Boolean
      * @throws PayException queryFlag != null and 订单状态 != queryFlag
      */
     @SuppressWarnings("unchecked")
-    public static Object getQueryResult(String out_trade_no, String queryFlag, int... mchNos) throws PayException {
+    public static Object getQueryResult(WeChatQueryResult params) throws PayException {
         Wechat config = Wechat.getInstance();
 
-        if (mchNos.length > 1) {
-            throw new IllegalArgumentException("mchNo length must 1");
-        }
-        int mchNo = Wechat.DEFAULT_MCH;
-        if (mchNos.length != 0) {
-            mchNo = mchNos[0];
-        }
-
-        Wechat.WechatMch wechatMch = config.getMchMap().get(mchNo);
+        Wechat.WechatMch wechatMch = config.getMchMap().get(params.getMchNo());
 
         String nonce_str = WechatUtils.getNonceStr();
         SortedMap<String, String> packageParams = new TreeMap<>();
-        packageParams.put("appid", config.getAppId());
+        packageParams.put("appid", config.getMchAppIdMap().get(params.getMchAppIdNo()));
         packageParams.put("mch_id", wechatMch.getMchId());
         packageParams.put("nonce_str", nonce_str);
-        packageParams.put("out_trade_no", out_trade_no);
+        packageParams.put("out_trade_no", params.getOutTradeNo());
         packageParams.put("sign", Signature.getSign(packageParams, wechatMch.getSignKey()));
 
         Map<String, String> resultMap = sendRequest(packageParams);
-        return judgeOrderState(resultMap, queryFlag);
+        return judgeOrderState(resultMap, params.getQueryFlag());
     }
 
     private static Map<String, String> sendRequest(SortedMap<String, String> packageParams) {
@@ -88,7 +78,7 @@ public class QueryOrder {
             if (resultMap.containsKey("result_code") && PayBaseConstants.RETURN_SUCCESS.equals(resultMap.get("result_code"))) {
                 String resultCode = resultMap.get("result_code");
                 if (PayBaseConstants.RETURN_SUCCESS.equals(resultCode)) {
-                    if (StringUtils.isBlank(queryFlag)) {
+                    if (StringUtils.isEmpty(queryFlag)) {
                         return resultMap.get("trade_state");
                     } else {
                         String tradeState = resultMap.get("trade_state");

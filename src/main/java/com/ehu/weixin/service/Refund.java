@@ -1,11 +1,11 @@
 package com.ehu.weixin.service;
 
-import com.alan344.utils.HttpClientUtils;
-import com.alan344.utils.HttpParams;
+import com.alan344happyframework.util.HttpClientUtils;
+import com.alan344happyframework.util.bean.HttpParams;
 import com.ehu.config.Wechat;
 import com.ehu.exception.PayException;
 import com.ehu.util.MapStringStringResponseHandler;
-import com.ehu.util.XmlUtils;
+import com.alan344happyframework.util.XmlUtils;
 import com.ehu.weixin.entity.WeChatRefundInfo;
 import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.util.WechatUtils;
@@ -52,7 +52,7 @@ public class Refund {
         Wechat.WechatMch wechatMch = config.getMchMap().get(params.getMchNo());
 
         SortedMap<String, String> packageParams = new TreeMap<>();
-        packageParams.put("appid", config.getAppId());
+        packageParams.put("appid", config.getMchAppIdMap().get(params.getMchAppIdNo()));
         packageParams.put("mch_id", wechatMch.getMchId());
         packageParams.put("nonce_str", WechatUtils.getNonceStr());
         packageParams.put("out_trade_no", params.getOutTradeNo());

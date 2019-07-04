@@ -1,5 +1,6 @@
 package com.ehu.util;
 
+import com.alan344happyframework.util.XmlUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.annotation.Contract;
 import org.apache.http.annotation.ThreadingBehavior;

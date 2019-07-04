@@ -28,12 +28,10 @@ public class AlipayCallbackHandler implements CallbackHandler {
         try {
             out = response.getWriter();
             Map<String, String> params = getAlipayCallBackMap(request);
-            log.info("支付宝回调开始");
-            for (String key : params.keySet()) {
-                log.info(key + "：" + params.get(key));
-            }
+            log.info("支付宝回调开始, 参数：{}", params.toString());
+
             //调用SDK验证签名
-            if (isVerify && !AlipaySignature.rsaCheckV1(params, aliPay.getPublicKey(), aliPay.getInputCharset())) {
+            if (isVerify && !AlipaySignature.rsaCheckV1(params, aliPay.getOpenPublicKey(), aliPay.getInputCharset(), params.get("sign_type)"))) {
                 log.error(PayResultMessageConstants.STRING_CALLBACK_VER_10007);
                 throw new PayException(PayResultCodeConstants.CALLBACK_VAR_ERROR_10007, PayResultMessageConstants.STRING_CALLBACK_VER_10007);
             }

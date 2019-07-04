@@ -1,6 +1,6 @@
 package com.ehu.config;
 
-import com.ehu.util.FileUtils;
+import com.alan344happyframework.util.FileUtils;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -22,13 +22,6 @@ public class Wechat {
     }
 
     /**
-     * appId
-     * 应用：
-     * 1.app序支付
-     * 2.app序退款
-     */
-    private String appId;
-    /**
      * 小程序appid
      * <p>
      * 应用：
@@ -47,12 +40,10 @@ public class Wechat {
     /**
      * 申请商户号的appid或商户号绑定的appid
      * 供微信转账使用
+     * <p>
+     * 默认使用第一个appid进行支付，退款，查询订单
      */
     private Map<Integer, String> mchAppIdMap;
-
-    public void setAppId(String appId) {
-        WECHAT_INSTANCE.appId = appId;
-    }
 
     public void setAppletsAppId(String appletsAppId) {
         WECHAT_INSTANCE.appletsAppId = appletsAppId;

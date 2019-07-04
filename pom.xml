@@ -10,27 +10,16 @@
 
     <properties>
         <lombok.version>1.16.14</lombok.version>
-        <guava-retrying.version>2.0.0</guava-retrying.version>
-        <fastjson.version>1.2.47</fastjson.version>
-        <jdom2.version>2.0.6</jdom2.version>
-        <guava.version>28.0-jre</guava.version>
         <common-io.version>2.6</common-io.version>
         <slf4j-api.version>1.7.26</slf4j-api.version>
         <spring-boot.version>2.1.4.RELEASE</spring-boot.version>
         <alipay-sdk-java.version>3.1.0</alipay-sdk-java.version>
         <commons-codec.version>1.12</commons-codec.version>
-        <httpclient.version>4.5.3</httpclient.version>
 
         <httpclient-utils.version>1.0.0-SNAPSHOT</httpclient-utils.version>
     </properties>
 
     <dependencies>
-        <!-- httpclient start -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${httpclient.version}</version>
-        </dependency>
         <!-- httpclient end -->
         <dependency>
             <groupId>commons-codec</groupId>
@@ -42,11 +31,6 @@
             <groupId>com.alipay.sdk</groupId>
             <artifactId>alipay-sdk-java</artifactId>
             <version>${alipay-sdk-java.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alan344</groupId>
-            <artifactId>httpclient-utils</artifactId>
-            <version>${httpclient-utils.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -76,27 +60,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom2</artifactId>
-            <version>${jdom2.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.rholder</groupId>
-            <artifactId>guava-retrying</artifactId>
-            <version>${guava-retrying.version}</version>
+            <groupId>com.alan344</groupId>
+            <artifactId>happyframework-core</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>

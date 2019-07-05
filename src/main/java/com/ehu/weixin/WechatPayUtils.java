@@ -2,8 +2,11 @@ package com.ehu.weixin;
 
 import com.ehu.bean.*;
 import com.ehu.core.Pay;
+import com.ehu.core.responsehandler.WechatResponseHandler;
 import com.ehu.exception.PayException;
-import com.ehu.weixin.entity.*;
+import com.ehu.weixin.entity.TransferToBankCardParams;
+import com.ehu.weixin.entity.WeChatOrderQuery;
+import com.ehu.weixin.entity.WechatBusinessPay;
 import com.ehu.weixin.service.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,13 +20,13 @@ public class WechatPayUtils implements Pay {
 
     /**
      * 微信支付(app支付与jsapi共用)
-     * 不同的appType代表会有不同的回调地址
+     * APPLET--JSAPI支付（或小程序支付）、NATIVE--Native支付、APP--app支付，MWEB--H5支付
      *
      * @throws PayException e
      */
     @Override
-    public PayInfoResponse createPayInfo(PayOrder order) throws PayException {
-        if (WechatTradeTypeEnum.JSAPI.equals(order.getWechatPayOrder().getTradeType())) {
+    public PayInfoResponse createPayInfo(OrderPay order) throws PayException {
+        if (TradeTypeEnum.APPLET.equals(order.getTradeType())) {
             return PayInfoResponse.builder().weChatResponseVO(GetPrepayInfo.generatorPrepayXcx(order)).build();
         } else {
             return PayInfoResponse.builder().weChatResponseVO(GetPrepayInfo.generatorPrepay(order)).build();
@@ -33,21 +36,12 @@ public class WechatPayUtils implements Pay {
     /**
      * 获取扫码支付二维码
      *
-     * @param payOrder {@link ScanPayOrder}
+     * @param payOrder {@link OrderScanPay}
      * @throws PayException e
      */
     @Override
-    public String getQrCode(ScanPayOrder payOrder) throws PayException {
+    public String getQrCode(OrderScanPay payOrder) throws PayException {
         return GetPrepayInfo.generatorPrepayScan(payOrder);
-    }
-
-    /**
-     * 微信订单查询
-     *
-     * @throws PayException e
-     */
-    public static Object queryWeChatOrder(WeChatQueryResult params) throws PayException {
-        return QueryOrder.getQueryResult(params);
     }
 
     /**
@@ -65,16 +59,21 @@ public class WechatPayUtils implements Pay {
      * <p>
      * 4、每个支付订单的部分退款次数不能超过50次
      *
-     * @param tradeType {@link WechatTradeTypeEnum}
      * @return boolean
      * @throws PayException e
      */
-    public static boolean weChatRefund(WeChatRefundInfo weChatRefundInfo, WechatTradeTypeEnum tradeType) throws PayException {
-        if (WechatTradeTypeEnum.APP.equals(tradeType)) {
-            return Refund.weChatRefund(weChatRefundInfo);
-        } else {
-            return Refund.weChatRefundXcx(weChatRefundInfo);
-        }
+    @Override
+    public PayResponse refund(OrderRefund refundOrder) throws PayException {
+        return WechatResponseHandler.getInstance().handler(Refund.weChatRefund(refundOrder));
+    }
+
+    /**
+     * 微信订单查询
+     *
+     * @throws PayException e
+     */
+    public static Object queryWeChatOrder(WeChatOrderQuery params) throws PayException {
+        return QueryOrder.getQueryResult(params);
     }
 
     /**
@@ -95,12 +94,13 @@ public class WechatPayUtils implements Pay {
      * <p>
      * 注意：以上规则中的限额2w、100w由于计算规则与风控策略的关系，不是完全精确值，金额仅做参考，请不要依赖此金额做系统处理，应以接口实际返回和查询结果为准，请知晓。
      *
-     * @param wechatBusinessPay {@link WechatBusinessPay}
+     * @param params {@link WechatBusinessPay}
      * @return boolean
      * @throws PayException e
      */
-    public static PayResponse<Map<String, String>> weChatBusinessPayForUser(WechatBusinessPay wechatBusinessPay) throws PayException {
-        return TransferMoney.weChatPayBusinessPayForUser(wechatBusinessPay);
+    @Override
+    public PayResponse<Map<String, String>> transferMoneyInternal(TransferMoneyInternal params) throws PayException {
+        return TransferMoney.weChatPayBusinessPayForUser(params);
     }
 
     /**

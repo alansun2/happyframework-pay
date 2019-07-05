@@ -1,8 +1,6 @@
 package com.ehu.core;
 
-import com.ehu.bean.PayInfoResponse;
-import com.ehu.bean.PayOrder;
-import com.ehu.bean.ScanPayOrder;
+import com.ehu.bean.*;
 
 /**
  * @author 53479
@@ -15,12 +13,33 @@ public interface Pay {
      * @param order 订单
      * @return 支付信息
      */
-    PayInfoResponse createPayInfo(PayOrder order);
+    PayInfoResponse createPayInfo(OrderPay order);
 
     /**
      * 二维码扫码支付
      *
      * @return 二维码url
      */
-    String getQrCode(ScanPayOrder payOrder);
+    String getQrCode(OrderScanPay orderScanPay);
+
+    /**
+     * 订单查询
+     */
+    PayResponse queryOrder(OrderQuery orderQuery);
+
+    /**
+     * 退款
+     *
+     * @param refundOrder {@link OrderRefund}
+     * @return {@link PayResponse}
+     */
+    PayResponse refund(OrderRefund refundOrder);
+
+    /**
+     * 第三方内部转账
+     *
+     * @param params {@link TransferMoneyInternal}
+     * @return {@link PayResponse}
+     */
+    PayResponse transferMoneyInternal(TransferMoneyInternal params);
 }

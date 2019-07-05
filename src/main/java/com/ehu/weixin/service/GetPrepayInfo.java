@@ -4,14 +4,14 @@ import com.alan344happyframework.util.HttpClientUtils;
 import com.alan344happyframework.util.StringUtils;
 import com.alan344happyframework.util.XmlUtils;
 import com.alan344happyframework.util.bean.HttpParams;
-import com.ehu.bean.PayOrder;
-import com.ehu.bean.ScanPayOrder;
+import com.ehu.bean.OrderPay;
+import com.ehu.bean.OrderScanPay;
 import com.ehu.config.Wechat;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
-import com.ehu.exception.PayException;
 import com.ehu.core.httpresponsehandler.MapStringStringResponseHandler;
+import com.ehu.exception.PayException;
 import com.ehu.weixin.entity.WeChatResponseVO;
 import com.ehu.weixin.entity.WechatPayOrder;
 import com.ehu.weixin.util.Signature;
@@ -40,7 +40,7 @@ public class GetPrepayInfo {
      * @throws PayException e
      */
     @SuppressWarnings("unchecked")
-    public static WeChatResponseVO generatorPrepay(PayOrder order) throws PayException {
+    public static WeChatResponseVO generatorPrepay(OrderPay order) throws PayException {
         WechatPayOrder wechatPayOrder = order.getWechatPayOrder();
         int mchNo = wechatPayOrder.getMchNo();
         Wechat config = Wechat.getInstance();
@@ -62,7 +62,7 @@ public class GetPrepayInfo {
         packageParams.put("total_fee", WechatUtils.getFinalMoney(order.getPrice()));
         packageParams.put("spbill_create_ip", config.getSpbillCreateIp());
         packageParams.put("notify_url", StringUtils.getDefaultIfNull(order.getNotifyUrl(), config.getNotifyUrl()));
-        packageParams.put("trade_type", wechatPayOrder.getTradeType().getTradeType());
+        packageParams.put("trade_type", order.getTradeType().getTradeType());
         packageParams.put("sign", Signature.getSign(packageParams, signKey));
 
         //得到prepayid
@@ -97,7 +97,7 @@ public class GetPrepayInfo {
      * @return 支付信息
      * @throws PayException e
      */
-    public static WeChatResponseVO generatorPrepayXcx(PayOrder order) throws PayException {
+    public static WeChatResponseVO generatorPrepayXcx(OrderPay order) throws PayException {
         WechatPayOrder wechatPayOrder = order.getWechatPayOrder();
         int mchNo = wechatPayOrder.getMchNo();
         Wechat config = Wechat.getInstance();
@@ -118,7 +118,7 @@ public class GetPrepayInfo {
         packageParams.put("total_fee", WechatUtils.getFinalMoney(order.getPrice()));
         packageParams.put("spbill_create_ip", config.getSpbillCreateIp());
         packageParams.put("notify_url", StringUtils.getDefaultIfNull(order.getNotifyUrl(), config.getNotifyUrl()));
-        packageParams.put("trade_type", wechatPayOrder.getTradeType().getTradeType());
+        packageParams.put("trade_type", order.getTradeType().getTradeType());
         packageParams.put("openid", wechatPayOrder.getOpenid());
         packageParams.put("sign", Signature.getSign(packageParams, signKey));
         //得到prepayid
@@ -150,7 +150,7 @@ public class GetPrepayInfo {
      * @throws PayException e
      */
     @SuppressWarnings("unchecked")
-    public static String generatorPrepayScan(ScanPayOrder order) throws PayException {
+    public static String generatorPrepayScan(OrderScanPay order) throws PayException {
         WechatPayOrder wechatPayOrder = order.getWechatPayOrder();
         Wechat config = Wechat.getInstance();
         int mchNo = wechatPayOrder.getMchNo();
@@ -167,7 +167,7 @@ public class GetPrepayInfo {
         packageParams.put("total_fee", WechatUtils.getFinalMoney(order.getPrice()));
         packageParams.put("spbill_create_ip", config.getSpbillCreateIp());
         packageParams.put("notify_url", StringUtils.getDefaultIfNull(order.getNotifyUrl(), config.getNotifyUrl()));
-        packageParams.put("trade_type", wechatPayOrder.getTradeType().getTradeType());
+        packageParams.put("trade_type", order.getTradeType().getTradeType());
 
         if (StringUtils.isNotEmpty(order.getStoreId())) {
             packageParams.put("scene_info", "{\"store_info\" : {\n" +

@@ -12,7 +12,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class ScanPayOrder extends PayOrder {
+public class OrderScanPay extends OrderPay {
     /**
      * 门店id
      */

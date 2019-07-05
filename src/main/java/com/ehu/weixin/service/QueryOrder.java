@@ -10,7 +10,7 @@ import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
 import com.ehu.core.httpresponsehandler.MapStringStringResponseHandler;
 import com.alan344happyframework.util.XmlUtils;
-import com.ehu.weixin.entity.WeChatQueryResult;
+import com.ehu.weixin.entity.WeChatOrderQuery;
 import com.ehu.weixin.util.Signature;
 import com.ehu.weixin.util.WechatUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public class QueryOrder {
      * @throws PayException queryFlag != null and 订单状态 != queryFlag
      */
     @SuppressWarnings("unchecked")
-    public static Object getQueryResult(WeChatQueryResult params) throws PayException {
+    public static Object getQueryResult(WeChatOrderQuery params) throws PayException {
         Wechat config = Wechat.getInstance();
 
         Wechat.WechatMch wechatMch = config.getMchMap().get(params.getMchNo());

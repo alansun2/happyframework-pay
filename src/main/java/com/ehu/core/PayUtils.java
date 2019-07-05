@@ -2,7 +2,7 @@ package com.ehu.core;
 
 import com.ehu.alipay.AlipayUtils;
 import com.ehu.bean.PayInfoResponse;
-import com.ehu.bean.PayOrder;
+import com.ehu.bean.OrderPay;
 import com.ehu.bean.PayType;
 
 /**
@@ -11,8 +11,8 @@ import com.ehu.bean.PayType;
  **/
 public class PayUtils {
 
-    public static PayInfoResponse getPrePayInfo(PayOrder payOrder) {
-        if (PayType.PAY_TYPE_1 == payOrder.getPayType()) {
+    public static PayInfoResponse getPrePayInfo(OrderPay orderPay) {
+        if (PayType.PAY_TYPE_1 == orderPay.getPayType()) {
             AlipayUtils.
         } else {
 

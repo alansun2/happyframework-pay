@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PayOrder extends PayType {
+public class OrderPay extends PayBase {
     /**
      * 订单id，必填
      */
@@ -39,6 +39,6 @@ public class PayOrder extends PayType {
     /**
      * 微信其他参数
      */
-    private WechatPayOrder wechatPayOrder;
+    private WechatPayOrder wechatPayOrder = new WechatPayOrder();
 
 }

@@ -5,11 +5,13 @@ import lombok.Setter;
 
 /**
  * @author AlanSun
- * @date 2019/7/4 17:55
+ * @date 2019/7/5 13:23
  **/
 @Getter
 @Setter
-public class PayType {
+public abstract class PayBase {
+    private TradeTypeEnum tradeType;
+
     private int payType = PAY_TYPE_1;
 
     /**

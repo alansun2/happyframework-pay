@@ -8,19 +8,18 @@ import com.alipay.api.AlipayResponse;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.*;
 import com.alipay.api.request.*;
-import com.alipay.api.response.*;
-import com.ehu.alipay.entity.AlipayRefund;
+import com.alipay.api.response.AlipayDataDataserviceBillDownloadurlQueryResponse;
+import com.alipay.api.response.AlipayTradeAppPayResponse;
+import com.alipay.api.response.AlipayTradePrecreateResponse;
+import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.ehu.alipay.entity.TransferSingleParams;
-import com.ehu.bean.PayInfoResponse;
-import com.ehu.bean.PayOrder;
-import com.ehu.bean.PayResponse;
-import com.ehu.bean.ScanPayOrder;
+import com.ehu.bean.*;
 import com.ehu.config.AliPay;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
-import com.ehu.core.LowerUnderscoreFilter;
 import com.ehu.core.Pay;
+import com.ehu.core.responsehandler.AliResponseHandler;
 import com.ehu.exception.PayException;
 import com.github.rholder.retry.*;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +56,7 @@ public class AlipayUtils implements Pay {
      * @return 支付宝订单支付信息（无线）
      */
     @Override
-    public PayInfoResponse createPayInfo(PayOrder order) {
+    public PayInfoResponse createPayInfo(OrderPay order) {
         //实例化具体API对应的request类,类名称和接口名称对应,当前调用接口名称：alipay.trade.app.pay
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
 
@@ -95,7 +94,7 @@ public class AlipayUtils implements Pay {
      * @throws PayException e
      */
     @Override
-    public String getQrCode(ScanPayOrder payOrder) throws PayException {
+    public String getQrCode(OrderScanPay payOrder) throws PayException {
         //创建API对应的request类
         AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
         request.setNotifyUrl(StringUtils.getDefaultIfNull(payOrder.getNotifyUrl(), config.getNotifyUrl()));
@@ -127,110 +126,111 @@ public class AlipayUtils implements Pay {
     }
 
     /**
-     * 支付宝 单笔转账到支付宝
+     * 支付宝退款
      *
-     * @param params {@link TransferSingleParams}
+     * @throws PayException e
      */
-    public static PayResponse<AlipayResponse> transferSingle(TransferSingleParams params) {
-        AlipayFundTransToaccountTransferRequest request = new AlipayFundTransToaccountTransferRequest();
-        String paramStr = JSON.toJSONString(params, new LowerUnderscoreFilter());
-        request.setBizContent(paramStr);
+    @Override
+    public PayResponse refund(OrderRefund params) throws PayException {
+        //创建API对应的request类
+        AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
 
-        Callable<AlipayFundTransToaccountTransferResponse> callable = () -> alipayClient.execute(request);
-        Retryer<AlipayFundTransToaccountTransferResponse> retryer = RetryerBuilder.<AlipayFundTransToaccountTransferResponse>newBuilder()
-                .retryIfException()
-                .retryIfResult(response ->
-                        response == null
-//                                || !response.isSuccess()
-                                || "SYSTEM_ERROR".equals(response.getSubCode())
-//                                || "40004".equals(response.getCode())
-                                || "20000".equals(response.getCode()))
-                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-                .withStopStrategy(StopStrategies.stopAfterAttempt(3))
-                .build();
+        AlipayTradeRefundModel model = params.getAlipayTradeRefundModel();
+        if (model == null) {
+            model = new AlipayTradeRefundModel();
+        }
+        model.setOutTradeNo(params.getOrderId());
+        model.setRefundAmount(params.getRefundAmount());
+        model.setOutRequestNo(params.getRefundId());
+        model.setRefundReason(params.getRefundReason());
+        model.setRefundCurrency(params.getRefundCurrency());
+        //设置业务参数
+        request.setBizModel(model);
 
-        PayResponse<AlipayResponse> response = new PayResponse<>();
-        AlipayFundTransToaccountTransferResponse call = null;
+        AlipayResponse alipayResponse = null;
         try {
-            call = retryer.call(callable);
-        } catch (ExecutionException | RetryException e) {
-            response.setResult(false);
-            log.error("alipay transfer error", e);
+            Callable<AlipayResponse> callable = () -> alipayClient.execute(request);
+            Retryer<AlipayResponse> retryer = getAliPayRetryer();
+            alipayResponse = retryer.call(callable);
+        } catch (Exception e) {
+            log.error("支付宝扫码退款失败", e);
         }
 
-        responseHandler(response, call);
-        return response;
+        PayResponse handler = AliResponseHandler.getInstance().handler(alipayResponse);
+        return handler;
     }
 
     /**
-     * 支付宝退款
+     * （1）单日转出累计额度为100万元。
+     * <p>
+     * （2）转账给个人支付宝账户，单笔最高5万元；转账给企业支付宝账户，单笔最高10万元。
      *
-     * @param alipayRefund alipayRefund
-     * @return 退款是否成功
-     * @throws PayException e
+     * @param params {@link TransferSingleParams}
      */
-    public static boolean aliPayRefund(AlipayRefund alipayRefund) throws PayException {
-        //创建API对应的request类
-        AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
-        AlipayTradeRefundModel tradeRefundModel = new AlipayTradeRefundModel();
-        tradeRefundModel.setOutTradeNo(alipayRefund.getOutTradeNo());
-        tradeRefundModel.setRefundAmount(alipayRefund.getRefundAmount());
-        if (!StringUtils.isEmpty(alipayRefund.getOutRequestNo())) {
-            tradeRefundModel.setOutRequestNo(alipayRefund.getOutRequestNo());
+    @Override
+    public PayResponse<AlipayResponse> transferMoneyInternal(TransferMoneyInternal params) {
+        AlipayFundTransToaccountTransferRequest request = new AlipayFundTransToaccountTransferRequest();
+        AlipayFundTransToaccountTransferModel model = params.getFundTransToaccountTransferModel();
+
+        if (model == null) {
+            model = new AlipayFundTransToaccountTransferModel();
+            model.setPayeeType("ALIPAY_LOGONID");
         }
 
-        //设置业务参数
-        request.setBizModel(tradeRefundModel);
+        model.setAmount(params.getAmount());
+        model.setOutBizNo(params.getTransferId());
+        model.setRemark(params.getDesc());
+        model.setPayeeAccount(params.getPayeeAccount());
+        model.setPayerRealName(params.getReUserName());
 
+//        String paramStr = JSON.toJSONString(params, new LowerUnderscoreFilter());
+        request.setBizModel(model);
+
+        Callable<AlipayResponse> callable = () -> alipayClient.execute(request);
+        Retryer<AlipayResponse> retryer = getAliPayRetryer();
+
+        AlipayResponse alipayResponse = null;
         try {
-            AlipayTradeRefundResponse response = alipayClient.execute(request);
-            log.info("支付宝号：" + response.getTradeNo() + "此次退款金额：" + response.getRefundFee() + "退款时间：" + response.getGmtRefundPay() + "用户登录id:" + response.getBuyerLogonId());
-            if (response.isSuccess()) {
-                if (PayBaseConstants.ALIPAY_RETURN_CODE_10000.equals(response.getCode())) {
-                    return true;
-                } else {
-                    log.error("支付宝扫码退款失败,code:" + response.getCode() + "subCode" + response.getSubCode() + "subMsg" + response.getSubMsg());
-                    return false;
-                }
-            } else {
-                log.error("支付宝扫码退款失败code:" + response.getCode());
-                return false;
-            }
-        } catch (AlipayApiException e) {
-            log.error("支付宝扫码退款失败", e);
-            return false;
-        }//通过alipayClient调用API，获得对应的response类
+            alipayResponse = retryer.call(callable);
+        } catch (ExecutionException | RetryException e) {
+            log.error("alipay transfer error", e);
+        }
+
+        return responseHandler(alipayResponse);
     }
 
     /**
      * 查询支付状态
      *
-     * @param outTradeNo outTradeNo
+     * @param params params
      * @return 订单状态
      * @throws PayException e
      */
-    public static String queryOrderStatus(String outTradeNo) throws PayException {
+    @Override
+    public PayResponse queryOrder(OrderQuery params) throws PayException {
         AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
         AlipayTradeQueryModel tradeQueryModel = new AlipayTradeQueryModel();
-        tradeQueryModel.setOutTradeNo(outTradeNo);
+        tradeQueryModel.setOutTradeNo(params.getOrderId());
         request.setBizModel(tradeQueryModel);
 
-        AlipayTradeQueryResponse response;
+        Callable<AlipayTradeQueryResponse> callable = () -> alipayClient.execute(request);
+        Retryer<AlipayTradeQueryResponse> retryer = getAliPayRetryer();
+
+        AlipayTradeQueryResponse alipayResponse = null;
         try {
-            response = alipayClient.execute(request);
-            if (response.isSuccess()) {
-                return response.getTradeStatus();
-            } else {
-                if ("ACQ.TRADE_NOT_EXIST".equals(response.getSubCode())) {
-                    throw new PayException(PayResultCodeConstants.TRADE_NOT_EXIST_30005, PayResultMessageConstants.TRADE_NOT_EXIST_30005);
-                }
-                log.error("支付宝扫码查询失败" + response.getCode() + response.getSubMsg());
-                throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30003, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30003);
-            }
-        } catch (AlipayApiException e) {
+            alipayResponse = retryer.call(callable);
+        } catch (Exception e) {
             log.error("支付宝扫码查询失败", e);
-            throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30003, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30003);
         }
+
+        PayResponse response = responseHandler(alipayResponse);
+
+        if (!PayBaseConstants.RETURN_SUCCESS.equals(response.getResultCode()) && alipayResponse != null) {
+            if ("ACQ.TRADE_NOT_EXIST".equals(alipayResponse.getSubCode())) {
+                throw new PayException(PayResultCodeConstants.TRADE_NOT_EXIST_30005, PayResultMessageConstants.TRADE_NOT_EXIST_30005);
+            }
+        }
+        return response;
     }
 
     /**
@@ -278,28 +278,42 @@ public class AlipayUtils implements Pay {
     /**
      * 处理支付宝返回结果
      *
-     * @param response response
-     * @param call     支付宝返回结果
+     * @param call 支付宝返回结果
      */
-    private static <T extends AlipayResponse> void responseHandler(PayResponse<T> response, T call) {
+    private static <T extends AlipayResponse> PayResponse<T> responseHandler(T call) {
+        PayResponse<T> response = new PayResponse<>();
+        log.info("支付宝返回信息：{}", JSON.toJSONString(call));
         if (null == call) {
-            response.setResult(false);
+            response.setResultCode(PayBaseConstants.RETURN_FAIL);
             response.setResultMessage("response null error");
         } else if (call.isSuccess()) {
             if (!PayBaseConstants.ALIPAY_RETURN_CODE_10000.equals(call.getCode())) {
-                response.setResult(false);
                 response.setResultCode(call.getSubCode());
                 response.setResultMessage(call.getSubMsg());
                 response.setData(call);
-                log.error(JSON.toJSONString(call));
-            } else {
-                response.setResult(true);
             }
         } else {
-            response.setResult(false);
             response.setResultCode(call.getSubCode());
             response.setResultMessage(call.getSubMsg());
-            log.error(JSON.toJSONString(call));
         }
+
+        return response;
+    }
+
+    /**
+     * 获取支付宝重试
+     */
+    private static <T extends AlipayResponse> Retryer<T> getAliPayRetryer() {
+        return RetryerBuilder.<T>newBuilder()
+                .retryIfException()
+                .retryIfResult(response ->
+                        response == null
+//                                || !response.isSuccess()
+                                || "ACQ.SYSTEM_ERROR".equals(response.getSubCode())
+//                                || "40004".equals(response.getCode())
+                                || "20000".equals(response.getCode()))
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(3))
+                .build();
     }
 }

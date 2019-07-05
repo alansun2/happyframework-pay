@@ -2,15 +2,19 @@ package com.ehu.weixin.service;
 
 import com.alan344happyframework.util.HttpClientUtils;
 import com.alan344happyframework.util.RSAUtils;
+import com.alan344happyframework.util.StringUtils;
+import com.alan344happyframework.util.XmlUtils;
 import com.alan344happyframework.util.bean.HttpParams;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.ehu.core.LowerUnderscoreFilter;
 import com.ehu.bean.PayResponse;
+import com.ehu.bean.TransferMoneyInternal;
 import com.ehu.config.Wechat;
-import com.ehu.exception.PayException;
+import com.ehu.constants.PayBaseConstants;
+import com.ehu.core.LowerUnderscoreFilter;
 import com.ehu.core.httpresponsehandler.MapStringStringResponseHandler;
-import com.alan344happyframework.util.XmlUtils;
+import com.ehu.core.responsehandler.WechatResponseHandler;
+import com.ehu.exception.PayException;
 import com.ehu.weixin.entity.TransferToBankCardParams;
 import com.ehu.weixin.entity.WechatBusinessPay;
 import com.ehu.weixin.util.Signature;
@@ -56,9 +60,10 @@ public class TransferMoney {
      * @return true or false
      * @throws PayException e
      */
-    public static PayResponse<Map<String, String>> weChatPayBusinessPayForUser(WechatBusinessPay params) throws PayException {
-        int mchNo = params.getMchNo();
-        int mchAppIdNo = params.getMchAppIdNo();
+    public static PayResponse<Map<String, String>> weChatPayBusinessPayForUser(TransferMoneyInternal params) throws PayException {
+        WechatBusinessPay wechatBusinessPay = params.getWechatBusinessPay();
+        int mchNo = wechatBusinessPay.getMchNo();
+        int mchAppIdNo = wechatBusinessPay.getMchAppIdNo();
 
         Wechat config = Wechat.getInstance();
         String mchAppId = config.getMchAppIdMap().get(mchAppIdNo);
@@ -68,14 +73,18 @@ public class TransferMoney {
         packageParams.put("mch_appid", mchAppId);
         packageParams.put("mchid", wechatMch.getMchId());
         packageParams.put("nonce_str", WechatUtils.getNonceStr());
-        packageParams.put("partner_trade_no", params.getOrderId());
-        packageParams.put("openid", params.getOpenId());
+        packageParams.put("partner_trade_no", params.getTransferId());
+        packageParams.put("openid", params.getPayeeAccount());
         /*NO_CHECK：不校验真实姓名
         FORCE_CHECK：强校验真实姓名（未实名认证的用户会校验失败，无法转账）*/
-        packageParams.put("check_name", params.getCheckName());
-        if (!"NO_CHECK".equals(params.getCheckName())) {
-            packageParams.put("re_user_name", params.getReUserName());
+        String reUserName = params.getReUserName();
+        if (StringUtils.isEmpty(reUserName)) {
+            packageParams.put("check_name", "NO_CHECK");
+        } else {
+            packageParams.put("re_user_name", reUserName);
+            packageParams.put("check_name", "FORCE_CHECK");
         }
+
         packageParams.put("amount", WechatUtils.getFinalMoney(params.getAmount()));
         packageParams.put("spbill_create_ip", config.getSpbillCreateIp());
         packageParams.put("desc", params.getDesc());
@@ -83,12 +92,7 @@ public class TransferMoney {
 
         //发送得到微信服务器
         Map<String, String> responseMap = sendRequest(packageParams, wechatMch, BUSINESS_TRANSFER_URL);
-        PayResponse<Map<String, String>> response = new PayResponse<>();
-        WechatUtils.wechatResponseHandler(responseMap, response);
-        if (response.getResult()) {
-            response.setData(responseMap);
-        }
-        return response;
+        return WechatResponseHandler.getInstance().handler(responseMap);
     }
 
     /**
@@ -97,19 +101,19 @@ public class TransferMoney {
      * @param params {@link TransferToBankCardParams}
      * @return {@link PayResponse}
      */
-    public static PayResponse<Boolean> transferToBankCard(TransferToBankCardParams params) throws PayException {
+    public static PayResponse<Map<String, String>> transferToBankCard(TransferToBankCardParams params) throws PayException {
         int mchNo = params.getMchNo();
         Wechat config = Wechat.getInstance();
 
         Wechat.WechatMch wechatMch = config.getMchMap().get(mchNo);
 
-        PayResponse<Boolean> response = new PayResponse<>();
         String wxPublicKey = wechatMch.getPublicKey();
         try {
             params.setEncBankNo(RSAUtils.encryptByPublicKeyToString(params.getEncBankNo().getBytes(), wxPublicKey, ALGORITHM));
             params.setEncTrueName(RSAUtils.encryptByPublicKeyToString(params.getEncTrueName().getBytes(), wxPublicKey, ALGORITHM));
         } catch (Exception e) {
-            response.setResult(false);
+            PayResponse<Map<String, String>> response = new PayResponse<>();
+            response.setResultCode(PayBaseConstants.RETURN_FAIL);
             response.setResultMessage("RSA error");
             return response;
         }
@@ -125,8 +129,8 @@ public class TransferMoney {
         //发送得到微信服务器
         Map<String, String> responseMap = sendRequest(packageParams, wechatMch, URL_TO_BANK_URL);
 
-        WechatUtils.wechatResponseHandler(responseMap, response);
-        return response;
+
+        return WechatResponseHandler.getInstance().handler(responseMap);
     }
 
     /**
@@ -153,12 +157,7 @@ public class TransferMoney {
         //发送得到微信服务器
         Map<String, String> responseMap = sendRequest(packageParams, wechatMch, QUERY_URL_TO_BANK_URL);
 
-        PayResponse<Map<String, String>> response = new PayResponse<>();
-        WechatUtils.wechatResponseHandler(responseMap, response);
-        if (response.getResult()) {
-            response.setData(responseMap);
-        }
-        return response;
+        return WechatResponseHandler.getInstance().handler(responseMap);
     }
 
     private static Map<String, String> sendRequest(SortedMap<String, String> packageParams, Wechat.WechatMch wechatMch, String url) {

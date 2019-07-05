@@ -1,4 +1,4 @@
-package com.ehu.weixin.entity;
+package com.ehu.bean;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,11 +10,11 @@ import lombok.Setter;
  */
 @Setter
 @Getter
-public class WeChatQueryResult extends Mch {
+public class OrderQuery extends PayBase {
     /**
      * 商户订单号
      */
-    private String outTradeNo;
+    private String orderId;
     /**
      * 如果该值不填写则返回订单状态，如果填写了该值，则会比较订单状态和该值是否相等，相等返回true，否则返回异常
      */

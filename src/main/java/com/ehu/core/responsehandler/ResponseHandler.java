@@ -6,7 +6,7 @@ import com.ehu.bean.PayResponse;
  * @author AlanSun
  * @date 2019/7/5 16:02
  **/
-public interface ResponseHandler<T> {
+public interface ResponseHandler<T, P, R> {
 
-    PayResponse<T> handler(T response);
+    PayResponse<R> handler(T response, P params);
 }

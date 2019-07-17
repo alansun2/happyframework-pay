@@ -42,4 +42,12 @@ public interface Pay {
      * @return {@link PayResponse}
      */
     PayResponse transferMoneyInternal(TransferMoneyInternal params);
+
+    /**
+     * 获取财务报告
+     *
+     * @param financialReport {@link FinancialReport}
+     * @return {@link PayResponse}
+     */
+    PayResponse getFinancial(FinancialReport financialReport);
 }

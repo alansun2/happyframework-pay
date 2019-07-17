@@ -34,7 +34,7 @@ public class PayResultCodeConstants {
 	 * 支付宝扫码错误
 	 */
 	public static final int ALIPAY_SCAN_ERROR_30001 = 30001;
-	
+
 	/**
 	 * 支付宝退款失败
 	 */

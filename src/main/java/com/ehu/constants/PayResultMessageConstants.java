@@ -13,7 +13,7 @@ public class PayResultMessageConstants {
     /**
      * 微信支付：微信服务器异常
      */
-    public static final String STRING_WECHATPAY_10003 = "查询微信服务器异常";
+    public static final String STRING_WECHATPAY_10003 = "微信服务器异常";
     /**
      * 微信支付：微信支付获取prepayid失败
      */

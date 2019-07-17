@@ -1,8 +1,12 @@
-package com.ehu.core.callback;
+package com.ehu.core;
+
+import com.ehu.core.callback.CallBackParam;
 
 /**
  * @author 53479
  * @date 2019/7/1 16:47
+ * <p>
+ * 具体回调业务处理类
  **/
 public interface ConcretePayService {
     /**

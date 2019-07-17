@@ -92,7 +92,7 @@ public class TransferMoney {
 
         //发送得到微信服务器
         Map<String, String> responseMap = sendRequest(packageParams, wechatMch, BUSINESS_TRANSFER_URL);
-        return WechatResponseHandler.getInstance().handler(responseMap);
+        return WechatResponseHandler.getInstance().handler(responseMap, null);
     }
 
     /**
@@ -130,7 +130,7 @@ public class TransferMoney {
         Map<String, String> responseMap = sendRequest(packageParams, wechatMch, URL_TO_BANK_URL);
 
 
-        return WechatResponseHandler.getInstance().handler(responseMap);
+        return WechatResponseHandler.getInstance().handler(responseMap, null);
     }
 
     /**
@@ -157,7 +157,7 @@ public class TransferMoney {
         //发送得到微信服务器
         Map<String, String> responseMap = sendRequest(packageParams, wechatMch, QUERY_URL_TO_BANK_URL);
 
-        return WechatResponseHandler.getInstance().handler(responseMap);
+        return WechatResponseHandler.getInstance().handler(responseMap, null);
     }
 
     private static Map<String, String> sendRequest(SortedMap<String, String> packageParams, Wechat.WechatMch wechatMch, String url) {

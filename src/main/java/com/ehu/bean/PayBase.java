@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public abstract class PayBase {
-    private TradeTypeEnum tradeType;
+    private TradeTypeEnum tradeType = TradeTypeEnum.APP;
 
     private int payType = PAY_TYPE_1;
 

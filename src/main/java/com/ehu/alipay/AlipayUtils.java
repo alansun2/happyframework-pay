@@ -1,7 +1,6 @@
 package com.ehu.alipay;
 
 import com.alan344happyframework.util.StringUtils;
-import com.alibaba.fastjson.JSON;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.AlipayResponse;
@@ -19,15 +18,13 @@ import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.core.Pay;
-import com.ehu.core.responsehandler.AliResponseHandler;
+import com.ehu.core.responsehandler.AliFinancialReportResponseHandler;
+import com.ehu.core.responsehandler.AliQueryOrderResponseHandler;
+import com.ehu.core.responsehandler.AliResponseHandlerBase;
 import com.ehu.exception.PayException;
 import com.github.rholder.retry.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -126,6 +123,33 @@ public class AlipayUtils implements Pay {
     }
 
     /**
+     * 查询支付状态
+     *
+     * @param params params
+     * @return 订单状态
+     * @throws PayException e
+     */
+    @Override
+    public PayResponse queryOrder(OrderQuery params) throws PayException {
+        AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
+        AlipayTradeQueryModel tradeQueryModel = new AlipayTradeQueryModel();
+        tradeQueryModel.setOutTradeNo(params.getOrderId());
+        request.setBizModel(tradeQueryModel);
+
+        Callable<AlipayTradeQueryResponse> callable = () -> alipayClient.execute(request);
+        Retryer<AlipayTradeQueryResponse> retryer = getAliPayRetryer();
+
+        AlipayTradeQueryResponse alipayResponse = null;
+        try {
+            alipayResponse = retryer.call(callable);
+        } catch (Exception e) {
+            log.error("支付宝扫码查询失败", e);
+        }
+
+        return AliQueryOrderResponseHandler.getInstance().handler(alipayResponse, null);
+    }
+
+    /**
      * 支付宝退款
      *
      * @throws PayException e
@@ -156,8 +180,7 @@ public class AlipayUtils implements Pay {
             log.error("支付宝扫码退款失败", e);
         }
 
-        PayResponse handler = AliResponseHandler.getInstance().handler(alipayResponse);
-        return handler;
+        return AliResponseHandlerBase.getInstance().handler(alipayResponse, null);
     }
 
     /**
@@ -168,7 +191,7 @@ public class AlipayUtils implements Pay {
      * @param params {@link TransferSingleParams}
      */
     @Override
-    public PayResponse<AlipayResponse> transferMoneyInternal(TransferMoneyInternal params) {
+    public PayResponse transferMoneyInternal(TransferMoneyInternal params) {
         AlipayFundTransToaccountTransferRequest request = new AlipayFundTransToaccountTransferRequest();
         AlipayFundTransToaccountTransferModel model = params.getFundTransToaccountTransferModel();
 
@@ -196,41 +219,7 @@ public class AlipayUtils implements Pay {
             log.error("alipay transfer error", e);
         }
 
-        return responseHandler(alipayResponse);
-    }
-
-    /**
-     * 查询支付状态
-     *
-     * @param params params
-     * @return 订单状态
-     * @throws PayException e
-     */
-    @Override
-    public PayResponse queryOrder(OrderQuery params) throws PayException {
-        AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
-        AlipayTradeQueryModel tradeQueryModel = new AlipayTradeQueryModel();
-        tradeQueryModel.setOutTradeNo(params.getOrderId());
-        request.setBizModel(tradeQueryModel);
-
-        Callable<AlipayTradeQueryResponse> callable = () -> alipayClient.execute(request);
-        Retryer<AlipayTradeQueryResponse> retryer = getAliPayRetryer();
-
-        AlipayTradeQueryResponse alipayResponse = null;
-        try {
-            alipayResponse = retryer.call(callable);
-        } catch (Exception e) {
-            log.error("支付宝扫码查询失败", e);
-        }
-
-        PayResponse response = responseHandler(alipayResponse);
-
-        if (!PayBaseConstants.RETURN_SUCCESS.equals(response.getResultCode()) && alipayResponse != null) {
-            if ("ACQ.TRADE_NOT_EXIST".equals(alipayResponse.getSubCode())) {
-                throw new PayException(PayResultCodeConstants.TRADE_NOT_EXIST_30005, PayResultMessageConstants.TRADE_NOT_EXIST_30005);
-            }
-        }
-        return response;
+        return AliResponseHandlerBase.getInstance().handler(alipayResponse, null);
     }
 
     /**
@@ -238,67 +227,33 @@ public class AlipayUtils implements Pay {
      * if aliSrcPath is null then just return downloadUrl
      * otherwise return downloadUrl and download the file
      *
-     * @param time       time
-     * @param aliSrcPath downloanUrl
+     * @param params time
      * @throws PayException e
      */
-    public static String getFinancial(String time, String aliSrcPath) throws PayException {
+    @Override
+    public PayResponse getFinancial(FinancialReport params) {
         AlipayDataDataserviceBillDownloadurlQueryRequest request = new AlipayDataDataserviceBillDownloadurlQueryRequest();
-        AlipayDataDataserviceBillDownloadurlQueryModel downloadurlQueryModel = new AlipayDataDataserviceBillDownloadurlQueryModel();
-        downloadurlQueryModel.setBillDate(time);
-        downloadurlQueryModel.setBillType("trade");
+        AlipayDataDataserviceBillDownloadurlQueryModel model = params.getAlipayDataDataserviceBillDownloadurlQueryModel();
+        if (model == null) {
+            model = new AlipayDataDataserviceBillDownloadurlQueryModel();
+            model.setBillType("trade");
+        }
+        String billDate = model.getBillDate();
+        if (StringUtils.isEmpty(billDate)) {
+            model.setBillDate(params.getData());
+        }
+        request.setBizModel(model);
 
-        request.setBizModel(downloadurlQueryModel);
-
-        AlipayDataDataserviceBillDownloadurlQueryResponse response;
+        AlipayDataDataserviceBillDownloadurlQueryResponse response = null;
         try {
             response = alipayClient.execute(request);
-            if (response.isSuccess()) {
-                try {
-                    if (!StringUtils.isEmpty(aliSrcPath)) {
-                        FileUtils.copyURLToFile(new URL(response.getBillDownloadUrl()), new File(aliSrcPath), 10000, 10000);
-                    }
-                } catch (IOException e) {
-                    log.error("获取财务账单url失败", e);
-                    return response.getBillDownloadUrl();
-                }
-                return response.getBillDownloadUrl();
-            } else {
-                log.error("获取财务失败", response.getCode() + response.getMsg());
-                return null;
-            }
         } catch (AlipayApiException e) {
             log.error("获取财务账单url失败", e);
-            throw new PayException(PayResultCodeConstants.GET_FINANCIAL_30013, PayResultMessageConstants.GET_FINANCIAL_30013);
         }
+        return AliFinancialReportResponseHandler.getInstance().handler(response, params);
     }
 
     //------------------------------------------------------------------------------------------------------------------
-
-    /**
-     * 处理支付宝返回结果
-     *
-     * @param call 支付宝返回结果
-     */
-    private static <T extends AlipayResponse> PayResponse<T> responseHandler(T call) {
-        PayResponse<T> response = new PayResponse<>();
-        log.info("支付宝返回信息：{}", JSON.toJSONString(call));
-        if (null == call) {
-            response.setResultCode(PayBaseConstants.RETURN_FAIL);
-            response.setResultMessage("response null error");
-        } else if (call.isSuccess()) {
-            if (!PayBaseConstants.ALIPAY_RETURN_CODE_10000.equals(call.getCode())) {
-                response.setResultCode(call.getSubCode());
-                response.setResultMessage(call.getSubMsg());
-                response.setData(call);
-            }
-        } else {
-            response.setResultCode(call.getSubCode());
-            response.setResultMessage(call.getSubMsg());
-        }
-
-        return response;
-    }
 
     /**
      * 获取支付宝重试

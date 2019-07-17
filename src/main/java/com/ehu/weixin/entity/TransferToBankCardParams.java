@@ -63,7 +63,7 @@ public class TransferToBankCardParams extends Mch {
      * <p>
      * 必填
      */
-    private double amount;
+    private String amount;
     /**
      * 企业付款到银行卡付款说明,即订单备注（UTF8编码，允许100个字符以内）
      * 最长100

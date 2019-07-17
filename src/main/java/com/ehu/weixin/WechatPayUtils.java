@@ -5,7 +5,6 @@ import com.ehu.core.Pay;
 import com.ehu.core.responsehandler.WechatResponseHandler;
 import com.ehu.exception.PayException;
 import com.ehu.weixin.entity.TransferToBankCardParams;
-import com.ehu.weixin.entity.WeChatOrderQuery;
 import com.ehu.weixin.entity.WechatBusinessPay;
 import com.ehu.weixin.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +44,16 @@ public class WechatPayUtils implements Pay {
     }
 
     /**
+     * 微信订单查询
+     *
+     * @throws PayException e
+     */
+    @Override
+    public PayResponse queryOrder(OrderQuery orderQuery) throws PayException {
+        return QueryOrder.getQueryResult(orderQuery);
+    }
+
+    /**
      * 微信退款
      * <p>
      * 注意：
@@ -60,30 +69,10 @@ public class WechatPayUtils implements Pay {
      * 4、每个支付订单的部分退款次数不能超过50次
      *
      * @return boolean
-     * @throws PayException e
      */
     @Override
-    public PayResponse refund(OrderRefund refundOrder) throws PayException {
-        return WechatResponseHandler.getInstance().handler(Refund.weChatRefund(refundOrder));
-    }
-
-    /**
-     * 微信订单查询
-     *
-     * @throws PayException e
-     */
-    public static Object queryWeChatOrder(WeChatOrderQuery params) throws PayException {
-        return QueryOrder.getQueryResult(params);
-    }
-
-    /**
-     * 下载财务账单
-     *
-     * @param param {@link DownloadParam}
-     * @throws PayException e
-     */
-    public static void downloadBill(DownloadParam param) throws PayException {
-        DownloadBill.downloadBill(param);
+    public PayResponse refund(OrderRefund refundOrder) {
+        return WechatResponseHandler.getInstance().handler(Refund.weChatRefund(refundOrder), null);
     }
 
     /**
@@ -104,6 +93,15 @@ public class WechatPayUtils implements Pay {
     }
 
     /**
+     * 下载财务账单
+     *
+     * @param params {@link FinancialReport}
+     */
+    public PayResponse getFinancial(FinancialReport params) {
+        return DownloadBill.downloadBill(params);
+    }
+
+    /**
      * 付款到银行卡
      * 1.企业付款至银行卡只支持新资金流类型账户
      * 2.目前企业付款到银行卡支持17家银行，更多银行逐步开放中
@@ -116,7 +114,7 @@ public class WechatPayUtils implements Pay {
      * @param params {@link TransferToBankCardParams}
      * @return {@link PayResponse}
      */
-    public static PayResponse<Boolean> transferToBankCard(TransferToBankCardParams params) throws PayException {
+    public static PayResponse<Map<String, String>> transferToBankCard(TransferToBankCardParams params) throws PayException {
         return TransferMoney.transferToBankCard(params);
     }
 

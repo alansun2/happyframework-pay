@@ -11,7 +11,7 @@ import java.util.Map;
  * @date 2019/7/5 16:04
  **/
 @Slf4j
-public class WechatResponseHandler implements ResponseHandler<Map<String, String>> {
+public class WechatResponseHandler implements ResponseHandler<Map<String, String>, Object, Map<String, String>> {
     private WechatResponseHandler() {
     }
 
@@ -22,7 +22,7 @@ public class WechatResponseHandler implements ResponseHandler<Map<String, String
     }
 
     @Override
-    public PayResponse<Map<String, String>> handler(Map<String, String> wxResponseMap) {
+    public PayResponse<Map<String, String>> handler(Map<String, String> wxResponseMap, Object params) {
         PayResponse<Map<String, String>> response = new PayResponse<>();
         if (null == wxResponseMap || wxResponseMap.isEmpty()) {
             response.setResultMessage("微信返回有误");
@@ -43,9 +43,12 @@ public class WechatResponseHandler implements ResponseHandler<Map<String, String
                     response.setResultCode(PayBaseConstants.RETURN_FAIL);
                 }
             }
-        } else {
+        } else if (wxResponseMap.containsKey("return_code")) {
             response.setResultMessage(wxResponseMap.get("return_msg"));
             response.setResultCode(wxResponseMap.get("return_code"));
+        } else {
+            response.setResultMessage("微信返回有误");
+            response.setResultCode(PayBaseConstants.RETURN_FAIL);
         }
 
         return response;

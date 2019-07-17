@@ -1,5 +1,7 @@
 package com.ehu.core.callback;
 
+import com.ehu.core.ConcretePayService;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 

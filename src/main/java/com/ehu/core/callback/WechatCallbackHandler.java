@@ -4,6 +4,7 @@ import com.alan344happyframework.util.StringUtils;
 import com.ehu.config.Wechat;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
+import com.ehu.core.ConcretePayService;
 import com.ehu.exception.PayException;
 import com.alan344happyframework.util.XmlUtils;
 import com.ehu.weixin.util.Signature;

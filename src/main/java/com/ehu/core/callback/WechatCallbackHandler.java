@@ -1,12 +1,12 @@
 package com.ehu.core.callback;
 
 import com.alan344happyframework.util.StringUtils;
+import com.alan344happyframework.util.XmlUtils;
 import com.ehu.config.Wechat;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.core.ConcretePayService;
 import com.ehu.exception.PayException;
-import com.alan344happyframework.util.XmlUtils;
 import com.ehu.weixin.util.Signature;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +25,7 @@ import java.util.Map;
  **/
 @Slf4j
 public class WechatCallbackHandler implements CallbackHandler {
-    @Override
-    public CallBackParam getCallBackParam(Map<String, String> params) {
+    private CallBackParam getCallBackParam(Map<String, String> params) {
         log.debug("微信支付回调开始");
         if (params.containsKey("return_code")) {
             String return_code = params.get("return_code");

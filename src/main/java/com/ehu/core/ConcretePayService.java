@@ -14,5 +14,5 @@ public interface ConcretePayService {
      *
      * @param callBackParam 参数
      */
-    void handler(CallBackParam callBackParam);
+    void handler(CallBackParam callBackParam) throws Exception;
 }

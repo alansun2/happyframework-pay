@@ -55,8 +55,7 @@ public class AlipayCallbackHandler implements CallbackHandler {
         }
     }
 
-    @Override
-    public CallBackParam getCallBackParam(Map<String, String> params) {
+    private CallBackParam getCallBackParam(Map<String, String> params) {
         // 商户支付单号
         String out_trade_no = params.get("out_trade_no");
         // 支付宝交易号

@@ -42,12 +42,12 @@ pay:
 
 alipay
 * app-id: 应用appid
-* sign-type: 支付宝推荐使用RSA2
+* sign-type: 支付宝推荐使用RSA2，这里不填默认RSA2
 * private-key: 商户的私钥。表示一个路径，示例：/root/a/private-key
 * open-public-key:开放平台支付宝公钥 表示一个路径，示例：/root/a/private-key
 * notify-url: fff #支付的默认回调地址，包括app，扫码等
 
-你需要填写的主要有：app-id，private-key，open-public-key，gateway-url，notify-url
+你需要填写的主要有：app-id，private-key，open-public-key，notify-url
 
 wechat
 * spbill-create-ip: 调用接口的ip

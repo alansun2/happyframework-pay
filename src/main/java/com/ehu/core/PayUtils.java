@@ -59,7 +59,7 @@ public class PayUtils {
     /**
      * 查询订单状态
      */
-    public static Object queryOrder(OrderQuery orderQuery) {
+    public static PayResponse queryOrder(OrderQuery orderQuery) {
         return PayUtils.getPay(orderQuery.getPayType()).queryOrder(orderQuery);
     }
 

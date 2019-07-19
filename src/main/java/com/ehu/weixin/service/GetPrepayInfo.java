@@ -119,7 +119,11 @@ public class GetPrepayInfo {
         packageParams.put("spbill_create_ip", config.getSpbillCreateIp());
         packageParams.put("notify_url", StringUtils.getDefaultIfNull(order.getNotifyUrl(), config.getNotifyUrl()));
         packageParams.put("trade_type", order.getTradeType().getTradeType());
-        packageParams.put("openid", wechatPayOrder.getOpenid());
+        String openid = wechatPayOrder.getOpenid();
+        if (StringUtils.isEmpty(openid)) {
+            throw new IllegalArgumentException("openId null error");
+        }
+        packageParams.put("openid", openid);
         packageParams.put("sign", Signature.getSign(packageParams, signKey));
         //得到prepayid
         String prepayId = getSpecificKey(sendRequest(packageParams), "prepay_id");

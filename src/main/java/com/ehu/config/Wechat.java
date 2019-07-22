@@ -3,10 +3,12 @@ package com.ehu.config;
 import com.alan344happyframework.util.FileUtils;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Getter
+@Component
 @ConfigurationProperties(prefix = "pay.wechat")
 public class Wechat {
     public static final Integer DEFAULT_MCH = 1;

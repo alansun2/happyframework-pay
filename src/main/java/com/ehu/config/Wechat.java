@@ -110,7 +110,7 @@ public class Wechat {
         }
 
         public void setCa(String ca) {
-            this.ca = FileUtils.readFile(ca);
+            this.ca = ca;
         }
 
         public void setCaCode(String caCode) {

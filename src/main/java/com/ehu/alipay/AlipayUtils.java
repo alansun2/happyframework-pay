@@ -53,7 +53,7 @@ public class AlipayUtils implements Pay {
      * @return 支付宝订单支付信息（无线）
      */
     @Override
-    public PayInfoResponse createPayInfo(OrderPay order) {
+    public PayInfoResponse createPayInfo(OrderPay order) throws PayException {
         //实例化具体API对应的request类,类名称和接口名称对应,当前调用接口名称：alipay.trade.app.pay
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
 
@@ -127,7 +127,6 @@ public class AlipayUtils implements Pay {
      *
      * @param params params
      * @return 订单状态
-     * @throws PayException e
      */
     @Override
     public PayResponse queryOrder(OrderQuery params) throws PayException {
@@ -151,8 +150,6 @@ public class AlipayUtils implements Pay {
 
     /**
      * 支付宝退款
-     *
-     * @throws PayException e
      */
     @Override
     public PayResponse refund(OrderRefund params) throws PayException {
@@ -191,7 +188,7 @@ public class AlipayUtils implements Pay {
      * @param params {@link TransferSingleParams}
      */
     @Override
-    public PayResponse transferMoneyInternal(TransferMoneyInternal params) {
+    public PayResponse transferMoneyInternal(TransferMoneyInternal params) throws PayException {
         AlipayFundTransToaccountTransferRequest request = new AlipayFundTransToaccountTransferRequest();
         AlipayFundTransToaccountTransferModel model = params.getFundTransToaccountTransferModel();
 
@@ -228,10 +225,9 @@ public class AlipayUtils implements Pay {
      * otherwise return downloadUrl and download the file
      *
      * @param params time
-     * @throws PayException e
      */
     @Override
-    public PayResponse getFinancial(FinancialReport params) {
+    public PayResponse getFinancial(FinancialReport params) throws PayException {
         AlipayDataDataserviceBillDownloadurlQueryRequest request = new AlipayDataDataserviceBillDownloadurlQueryRequest();
         AlipayDataDataserviceBillDownloadurlQueryModel model = params.getAlipayDataDataserviceBillDownloadurlQueryModel();
         if (model == null) {

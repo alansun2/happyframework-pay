@@ -16,28 +16,28 @@ import java.util.Map;
 public abstract class WechatExceptionResponseHandlerAbstract<P, R> implements ResponseHandler<Map<String, String>, P, R> {
 
     @Override
-    public PayResponse<R> handler(Map<String, String> responseMap, P params) {
+    public PayResponse<R> handler(Map<String, String> responseMap, P params) throws PayException {
         PayResponse<R> payResponse = new PayResponse<>();
         if (null == responseMap || responseMap.isEmpty()) {
             throw new PayException(PayResultMessageConstants.STRING_WECHATPAY_10003);
         }
 
         if (responseMap.containsKey("return_code") && PayBaseConstants.RETURN_SUCCESS.equals(responseMap.get("return_code"))) {
-            if (responseMap.containsKey("result_code") && PayBaseConstants.RETURN_SUCCESS.equals(responseMap.get("result_code"))) {
-                //业务成功
-                this.customService(payResponse, responseMap, params);
-            } else {
+            if (!responseMap.containsKey("result_code")) {
                 log.error("业务错误, 返回信息：{}", responseMap);
                 throw new PayException(PayResultMessageConstants.STRING_WECHATPAY_10003);
             }
+            //业务
+            this.customService(payResponse, responseMap, params);
         } else if (responseMap.containsKey("return_code")) {
             log.error("业务错误, 返回信息：{}", responseMap);
             throw new PayException(PayResultMessageConstants.STRING_WECHATPAY_10003);
         } else {
+            log.error("业务错误, 返回信息：{}", responseMap);
             throw new PayException(PayResultMessageConstants.STRING_WECHATPAY_10003);
         }
         return payResponse;
     }
 
-    abstract void customService(PayResponse<R> payResponse, Map<String, String> response, P param);
+    abstract void customService(PayResponse<R> payResponse, Map<String, String> response, P param) throws PayException;
 }

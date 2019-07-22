@@ -71,7 +71,7 @@ public class WechatPayUtils implements Pay {
      * @return boolean
      */
     @Override
-    public PayResponse refund(OrderRefund refundOrder) {
+    public PayResponse refund(OrderRefund refundOrder) throws PayException {
         return WechatResponseHandler.getInstance().handler(Refund.weChatRefund(refundOrder), null);
     }
 
@@ -97,7 +97,7 @@ public class WechatPayUtils implements Pay {
      *
      * @param params {@link FinancialReport}
      */
-    public PayResponse getFinancial(FinancialReport params) {
+    public PayResponse getFinancial(FinancialReport params) throws PayException {
         return DownloadBill.downloadBill(params);
     }
 

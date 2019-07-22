@@ -160,7 +160,7 @@ public class TransferMoney {
         return WechatResponseHandler.getInstance().handler(responseMap, null);
     }
 
-    private static Map<String, String> sendRequest(SortedMap<String, String> packageParams, Wechat.WechatMch wechatMch, String url) {
+    private static Map<String, String> sendRequest(SortedMap<String, String> packageParams, Wechat.WechatMch wechatMch, String url) throws PayException {
         HttpParams httpParams = HttpParams.builder().url(url).strEntity(XmlUtils.mapToXml(packageParams)).build();
         try {
             return HttpClientUtils.doPostWithSslAndResponseHandler(wechatMch.getCa(), wechatMch.getCaCode(), httpParams, new MapStringStringResponseHandler());

@@ -58,7 +58,7 @@ public class QueryOrder {
     /**
      * 发送请求
      */
-    private static Map<String, String> sendRequest(SortedMap<String, String> packageParams) {
+    private static Map<String, String> sendRequest(SortedMap<String, String> packageParams) throws PayException {
         HttpParams httpParams = HttpParams.builder().url(REQUEST_URL).strEntity(XmlUtils.mapToXml(packageParams)).build();
         try {
             return HttpClientUtils.doPostWithResponseHandler(httpParams, new MapStringStringResponseHandler());

@@ -10,10 +10,12 @@ public class PayResultMessageConstants {
      * 微信支付：微信返回有误
      */
     public static final String STRING_WECHATPAY_10004 = "微信返回有误";
+    public static final String ALI_NULL_ERROR = "支付宝服务器未响应";
     /**
      * 微信支付：微信服务器异常
      */
     public static final String STRING_WECHATPAY_10003 = "微信服务器异常";
+    public static final String ALI_SERVER_ERROR = "支付宝服务器异常";
     /**
      * 微信支付：微信支付获取prepayid失败
      */
@@ -53,7 +55,7 @@ public class PayResultMessageConstants {
     /**
      * 微信支付trade_state:NOTPAY(未支付)
      */
-    public static final String TRADE_STATE_NOTPAY_30006 = "您还未支付或已取消支付";
+    public static final String TRADE_STATE_NOTPAY_30006 = "您还未支付";
     /**
      * 微信支付trade_state:SUCCESS
      */

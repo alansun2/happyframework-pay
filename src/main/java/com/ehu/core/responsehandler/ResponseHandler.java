@@ -1,6 +1,7 @@
 package com.ehu.core.responsehandler;
 
 import com.ehu.bean.PayResponse;
+import com.ehu.exception.PayException;
 
 /**
  * @author AlanSun
@@ -8,5 +9,5 @@ import com.ehu.bean.PayResponse;
  **/
 public interface ResponseHandler<T, P, R> {
 
-    PayResponse<R> handler(T response, P params);
+    PayResponse<R> handler(T response, P params) throws PayException;
 }

@@ -1,6 +1,7 @@
 package com.ehu.core;
 
 import com.ehu.bean.*;
+import com.ehu.exception.PayException;
 
 /**
  * @author 53479
@@ -13,19 +14,19 @@ public interface Pay {
      * @param order 订单
      * @return 支付信息
      */
-    PayInfoResponse createPayInfo(OrderPay order);
+    PayInfoResponse createPayInfo(OrderPay order) throws PayException;
 
     /**
      * 二维码扫码支付
      *
      * @return 二维码url
      */
-    String getQrCode(OrderScanPay orderScanPay);
+    String getQrCode(OrderScanPay orderScanPay) throws PayException;
 
     /**
      * 订单查询
      */
-    PayResponse queryOrder(OrderQuery orderQuery);
+    PayResponse queryOrder(OrderQuery orderQuery) throws PayException;
 
     /**
      * 退款
@@ -33,7 +34,7 @@ public interface Pay {
      * @param refundOrder {@link OrderRefund}
      * @return {@link PayResponse}
      */
-    PayResponse refund(OrderRefund refundOrder);
+    PayResponse refund(OrderRefund refundOrder) throws PayException;
 
     /**
      * 第三方内部转账
@@ -41,7 +42,7 @@ public interface Pay {
      * @param params {@link TransferMoneyInternal}
      * @return {@link PayResponse}
      */
-    PayResponse transferMoneyInternal(TransferMoneyInternal params);
+    PayResponse transferMoneyInternal(TransferMoneyInternal params) throws PayException;
 
     /**
      * 获取财务报告
@@ -49,5 +50,5 @@ public interface Pay {
      * @param financialReport {@link FinancialReport}
      * @return {@link PayResponse}
      */
-    PayResponse getFinancial(FinancialReport financialReport);
+    PayResponse getFinancial(FinancialReport financialReport) throws PayException;
 }

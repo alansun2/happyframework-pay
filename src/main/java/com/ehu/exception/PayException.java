@@ -9,7 +9,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class PayException extends RuntimeException {
+public class PayException extends Exception {
 
     /**
      *

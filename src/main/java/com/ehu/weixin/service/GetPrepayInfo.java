@@ -189,7 +189,7 @@ public class GetPrepayInfo {
      * @param map map
      * @throws PayException e
      */
-    private static Map<String, String> sendRequest(SortedMap<String, String> map) {
+    private static Map<String, String> sendRequest(SortedMap<String, String> map) throws PayException {
         String params = XmlUtils.mapToXml(map);
         HttpParams httpParams = HttpParams.builder().url(REQUESTURL).strEntity(params).build();
         Map<String, String> responseMap;
@@ -206,7 +206,7 @@ public class GetPrepayInfo {
                 log.error("获取prepayid失败，params:{}，response:{}", params, responseMap.toString());
                 throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008);
             }
-            if (PayBaseConstants.REFUND_FAIL.equalsIgnoreCase(responseMap.get("result_code"))) {
+            if (PayBaseConstants.RETURN_FAIL.equalsIgnoreCase(responseMap.get("result_code"))) {
                 log.error("获取prepayid失败，params:{}，response:{}", params, responseMap.toString());
                 throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008);
             }

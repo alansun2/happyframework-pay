@@ -7,6 +7,8 @@ import org.apache.http.annotation.ThreadingBehavior;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -17,6 +19,6 @@ import java.util.Map;
 public class MapStringStringResponseHandler extends MapResponseHandlerAbstract<String> {
     @Override
     public Map<String, String> handleEntity(HttpEntity entity) throws IOException {
-        return XmlUtils.xmlToMap(EntityUtils.toString(entity));
+        return XmlUtils.xmlToMap(EntityUtils.toString(entity, StandardCharsets.UTF_8));
     }
 }

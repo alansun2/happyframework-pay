@@ -25,7 +25,7 @@ import java.util.Map;
  **/
 @Slf4j
 public class WechatCallbackHandler implements CallbackHandler {
-    private CallBackParam getCallBackParam(Map<String, String> params) {
+    private CallBackParam getCallBackParam(Map<String, String> params) throws PayException {
         log.debug("微信支付回调开始");
         if (params.containsKey("return_code")) {
             String return_code = params.get("return_code");
@@ -102,7 +102,7 @@ public class WechatCallbackHandler implements CallbackHandler {
      * @param map API返回的XML数据字符串
      * @return API签名是否合法
      */
-    public static boolean checkIsSignValidFromResponseString(Map<String, String> map) {
+    private static boolean checkIsSignValidFromResponseString(Map<String, String> map) {
         String signResponse = map.get("sign");
         if (StringUtils.isEmpty(signResponse)) {
             log.error("API返回的数据签名数据不存在，有可能被第三方篡改!!!");

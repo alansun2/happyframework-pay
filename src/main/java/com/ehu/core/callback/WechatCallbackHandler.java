@@ -31,7 +31,7 @@ public class WechatCallbackHandler implements CallbackHandler {
 
     private static WechatCallbackHandler instance = new WechatCallbackHandler();
 
-    private static WechatCallbackHandler getInstance() {
+    public static WechatCallbackHandler getInstance() {
         return instance;
     }
 

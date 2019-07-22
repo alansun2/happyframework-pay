@@ -2,8 +2,6 @@
 > 开发项目必须为spring项目
 
 ### 1. 使用：
-在`application.properties/yml`中添加和`EhPayConfig`对应的属性。具体的属性说明请查看`EhPayConfig`
-
 ###### 1.1 如何集成到开发项目中？
 只要把以下内容，放入`application.properties/yml`并修改为你自己的微信或支付宝信息即可。
 ```

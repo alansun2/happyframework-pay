@@ -1,8 +1,6 @@
 package com.ehu.bean;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * @author alan
@@ -10,10 +8,11 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class PayResponse<T> {
-    private Boolean result;
-    private String resultCode;
+    private String resultCode = "SUCCESS";
     private String resultMessage;
     private T data;
 

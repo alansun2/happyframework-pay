@@ -9,7 +9,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class TransferToBankCardParams {
+public class TransferToBankCardParams extends Mch {
     /**
      * 商户订单号，需保持唯一（只允许数字[0~9]或字母[A~Z]和[a~z]，最短8位，最长32位）
      * 最长32
@@ -63,7 +63,7 @@ public class TransferToBankCardParams {
      * <p>
      * 必填
      */
-    private double amount;
+    private String amount;
     /**
      * 企业付款到银行卡付款说明,即订单备注（UTF8编码，允许100个字符以内）
      * 最长100
@@ -71,30 +71,4 @@ public class TransferToBankCardParams {
      * 可选
      */
     private String desc;
-
-    //------------------------------------------------------------------------------------------------------------------
-    /**
-     * ssl证书地址
-     */
-    private String caPath;
-
-    /**
-     * 密码
-     */
-    private String code;
-
-    /**
-     * 微信公钥
-     */
-    private String wxPublicKey;
-
-    /**
-     * 商户号
-     */
-    private String mchid;
-
-    /**
-     * 签名密匙
-     */
-    private String privateKey;
 }

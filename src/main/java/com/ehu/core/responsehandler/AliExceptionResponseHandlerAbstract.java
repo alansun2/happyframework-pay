@@ -5,7 +5,6 @@ import com.alipay.api.AlipayResponse;
 import com.ehu.bean.PayResponse;
 import com.ehu.constants.ErrorCode;
 import com.ehu.constants.PayBaseConstants;
-import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
 import lombok.extern.slf4j.Slf4j;
 

@@ -26,6 +26,15 @@ import java.util.Map;
 @Slf4j
 public class WechatCallbackHandler implements CallbackHandler {
 
+    private WechatCallbackHandler() {
+    }
+
+    private static WechatCallbackHandler instance = new WechatCallbackHandler();
+
+    private static WechatCallbackHandler getInstance() {
+        return instance;
+    }
+
     @Override
     public void handler(HttpServletRequest request, HttpServletResponse response, boolean isVerify, ConcretePayService concretePayService) {
         PrintWriter out = null;

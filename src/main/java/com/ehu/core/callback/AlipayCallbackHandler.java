@@ -20,6 +20,15 @@ import java.util.Map;
  **/
 @Slf4j
 public class AlipayCallbackHandler implements CallbackHandler {
+    private AlipayCallbackHandler() {
+    }
+
+    private static AlipayCallbackHandler instance = new AlipayCallbackHandler();
+
+    private static AlipayCallbackHandler getInstance() {
+        return instance;
+    }
+
     private static final AliPay aliPay = AliPay.getInstance();
 
     @Override

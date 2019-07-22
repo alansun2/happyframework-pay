@@ -37,18 +37,11 @@ public interface Pay {
     PayResponse refund(OrderRefund refundOrder) throws PayException;
 
     /**
-     * 第三方内部转账
-     *
-     * @param params {@link TransferMoneyInternal}
-     * @return {@link PayResponse}
-     */
-    PayResponse transferMoneyInternal(TransferMoneyInternal params) throws PayException;
-
-    /**
      * 获取财务报告
      *
      * @param financialReport {@link FinancialReport}
      * @return {@link PayResponse}
      */
     PayResponse getFinancial(FinancialReport financialReport) throws PayException;
+
 }

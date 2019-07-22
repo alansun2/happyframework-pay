@@ -16,11 +16,12 @@ import com.ehu.bean.*;
 import com.ehu.config.AliPay;
 import com.ehu.constants.ErrorCode;
 import com.ehu.constants.PayBaseConstants;
-import com.ehu.core.Pay;
+import com.ehu.core.PayIntegrate;
 import com.ehu.core.responsehandler.AliFinancialReportResponseHandler;
 import com.ehu.core.responsehandler.AliQueryOrderResponseHandler;
 import com.ehu.core.responsehandler.AliResponseHandlerBase;
 import com.ehu.exception.PayException;
+import com.ehu.weixin.entity.TransferToBankCardParams;
 import com.github.rholder.retry.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  * @author AlanSun
  */
 @Slf4j
-public class AlipayUtils implements Pay {
+public class AlipayUtils implements PayIntegrate {
 
     public static final AliPay config = AliPay.getInstance();
     private static AlipayClient alipayClient = new DefaultAlipayClient(config.getGatewayUrl(), config.getAppId(), config.getPrivateKey(), "json", config.getInputCharset(), config.getOpenPublicKey());
@@ -246,6 +247,16 @@ public class AlipayUtils implements Pay {
             log.error("获取财务账单url失败", e);
         }
         return AliFinancialReportResponseHandler.getInstance().handler(response, params);
+    }
+
+    @Override
+    public PayResponse transferToBankCard(TransferToBankCardParams params) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public PayResponse getResultOfTransferToBank(String orderId) {
+        throw new UnsupportedOperationException();
     }
 
     //------------------------------------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 package com.ehu.weixin;
 
 import com.ehu.bean.*;
-import com.ehu.core.Pay;
+import com.ehu.core.PayIntegrate;
 import com.ehu.core.responsehandler.WechatResponseHandler;
 import com.ehu.exception.PayException;
 import com.ehu.weixin.entity.TransferToBankCardParams;
@@ -15,7 +15,7 @@ import java.util.Map;
  * @author AlanSun
  */
 @Slf4j
-public class WechatPayUtils implements Pay {
+public class WechatPayUtils implements PayIntegrate {
 
     /**
      * 微信支付(app支付与jsapi共用)
@@ -114,14 +114,15 @@ public class WechatPayUtils implements Pay {
      * @param params {@link TransferToBankCardParams}
      * @return {@link PayResponse}
      */
-    public static PayResponse<Map<String, String>> transferToBankCard(TransferToBankCardParams params) throws PayException {
+    @Override
+    public PayResponse<Map<String, String>> transferToBankCard(TransferToBankCardParams params) throws PayException {
         return TransferMoney.transferToBankCard(params);
     }
 
     /**
      * 查询企业付款到银行卡
      *
-     * @param partnerTradeNo 商户订单号
+     * @param orderId 商户订单号
      * @return 是否必填
      * 商户号            mch_id	           是	string(32)	商户号
      * 商户企业付款单号	partner_trade_no   是	string(32)	商户单号
@@ -139,7 +140,8 @@ public class WechatPayUtils implements Pay {
      * 成功付款时间	   pay_succ_time	   否	String(32)	微信侧付款成功时间（但无法保证银行不会退票）
      * 失败原因	       reason	           否	String(128)	订单失败原因（如：余额不足）
      */
-    public static PayResponse<Map<String, String>> getResultOfTransferToBank(String partnerTradeNo) throws PayException {
-        return TransferMoney.getResultOfTransferToBank(partnerTradeNo);
+    @Override
+    public PayResponse<Map<String, String>> getResultOfTransferToBank(String orderId) throws PayException {
+        return TransferMoney.getResultOfTransferToBank(orderId);
     }
 }

@@ -3,8 +3,8 @@ package com.ehu.core.callback;
 import com.alan344happyframework.util.StringUtils;
 import com.alan344happyframework.util.XmlUtils;
 import com.ehu.config.Wechat;
+import com.ehu.constants.ErrorCode;
 import com.ehu.constants.PayBaseConstants;
-import com.ehu.constants.PayResultCodeConstants;
 import com.ehu.core.ConcretePayService;
 import com.ehu.exception.PayException;
 import com.ehu.weixin.util.Signature;
@@ -25,7 +25,32 @@ import java.util.Map;
  **/
 @Slf4j
 public class WechatCallbackHandler implements CallbackHandler {
-    private CallBackParam getCallBackParam(Map<String, String> params) throws PayException {
+
+    @Override
+    public void handler(HttpServletRequest request, HttpServletResponse response, boolean isVerify, ConcretePayService concretePayService) {
+        PrintWriter out = null;
+        try {
+            out = response.getWriter();
+            Map<String, String> paramsMap = getWechatPayCallBackMap(request);
+
+            //数字验签
+            if (isVerify && !MD5Check(paramsMap)) {
+                throw new PayException(ErrorCode.VERIFY_ERROR);
+            }
+
+            concretePayService.handler(getCallBackParam(paramsMap));
+            out.write(getWXReturn(1));
+        } catch (Exception e) {
+            assert out != null;
+            out.println(getWXReturn(2));
+            log.error("微信回调fail", e);
+        } finally {
+            if (out != null)
+                out.close();
+        }
+    }
+
+    private static CallBackParam getCallBackParam(Map<String, String> params) throws PayException {
         log.debug("微信支付回调开始");
         if (params.containsKey("return_code")) {
             String return_code = params.get("return_code");
@@ -33,24 +58,18 @@ public class WechatCallbackHandler implements CallbackHandler {
             String transaction_id;
             String openId;
             String totalFee;
-            //String result_code = null;
-            //String appid = null;
-            //String mch_id = null;
             if (PayBaseConstants.RETURN_SUCCESS.equals(return_code)) {
                 if (params.containsKey("result_code")) {
                     String result_code = params.get("result_code");
                     if (!PayBaseConstants.RETURN_SUCCESS.equals(result_code)) {
-                        throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10004, "result_code fail");
+                        throw new PayException("result_code fail");
                     }
                     out_trade_no = params.get("out_trade_no");
-                    //result_code = params.get("result_code");
                     transaction_id = params.get("transaction_id");
                     totalFee = params.get("total_fee");
                     openId = params.get("openid");
-                    //appid = params.get("appid");
-                    //mch_id = params.get("mch_id");
                 } else {
-                    throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10004, "result_code为空");
+                    throw new PayException("result_code null");
                 }
 
                 CallBackParam callBackParam = new CallBackParam();
@@ -62,37 +81,10 @@ public class WechatCallbackHandler implements CallbackHandler {
 
                 return callBackParam;
             } else {
-                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10004, "return_code为fail");
+                throw new PayException("return_code fail");
             }
-        }
-        return null;
-    }
-
-    @Override
-    public void handler(HttpServletRequest request, HttpServletResponse response, boolean isVerify, ConcretePayService concretePayService) {
-        PrintWriter out = null;
-        try {
-            out = response.getWriter();
-            Map<String, String> map = getWechatPayCallBackmap(request);
-
-            if (!isVerify || checkIsSignValidFromResponseString(map)) {
-                CallBackParam callBackParam = getCallBackParam(map);
-                if (null != callBackParam) {
-                    concretePayService.handler(callBackParam);
-                    out.write(getWXReturn(1));
-                } else {
-                    out.println(getWXReturn(2));
-                }
-            } else {
-                out.println(getWXReturn(2));
-            }
-        } catch (Exception e) {
-            assert out != null;
-            out.println(getWXReturn(2));
-            log.error("微信回调fail", e);
-        } finally {
-            if (out != null)
-                out.close();
+        } else {
+            throw new PayException("return_code null");
         }
     }
 
@@ -102,7 +94,7 @@ public class WechatCallbackHandler implements CallbackHandler {
      * @param map API返回的XML数据字符串
      * @return API签名是否合法
      */
-    private static boolean checkIsSignValidFromResponseString(Map<String, String> map) {
+    private static boolean MD5Check(Map<String, String> map) {
         String signResponse = map.get("sign");
         if (StringUtils.isEmpty(signResponse)) {
             log.error("API返回的数据签名数据不存在，有可能被第三方篡改!!!");
@@ -133,7 +125,7 @@ public class WechatCallbackHandler implements CallbackHandler {
      * @throws IOException   e
      * @throws JDOMException e
      */
-    private static Map<String, String> getWechatPayCallBackmap(HttpServletRequest httpServletRequest) throws Exception {
+    private static Map<String, String> getWechatPayCallBackMap(HttpServletRequest httpServletRequest) throws Exception {
         BufferedReader reader;
         String line;
         StringBuilder inputString = new StringBuilder();
@@ -144,7 +136,7 @@ public class WechatCallbackHandler implements CallbackHandler {
                 inputString.append(line);
             }
 
-            return com.alan344happyframework.util.XmlUtils.xmlToMap(inputString.toString());
+            return XmlUtils.xmlToMap(inputString.toString());
         } finally {
             if (reader != null) {
                 reader.close();

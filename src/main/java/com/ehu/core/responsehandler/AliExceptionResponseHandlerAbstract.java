@@ -3,6 +3,7 @@ package com.ehu.core.responsehandler;
 import com.alibaba.fastjson.JSON;
 import com.alipay.api.AlipayResponse;
 import com.ehu.bean.PayResponse;
+import com.ehu.constants.ErrorCode;
 import com.ehu.constants.PayBaseConstants;
 import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
@@ -20,7 +21,7 @@ public abstract class AliExceptionResponseHandlerAbstract<T extends AlipayRespon
         PayResponse<R> response = new PayResponse<>();
         log.info("支付宝返回信息：{}", JSON.toJSONString(alipayResponse));
         if (null == alipayResponse) {
-            throw new PayException(PayResultMessageConstants.ALI_NULL_ERROR);
+            throw new PayException(ErrorCode.ALI_SERVER_ERROR);
         } else {
             if (!PayBaseConstants.ALIPAY_RETURN_CODE_10000.equals(alipayResponse.getCode())) {
                 throw new PayException(alipayResponse.getCode(), alipayResponse.getMsg());

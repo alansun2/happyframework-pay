@@ -6,11 +6,12 @@ import com.alan344happyframework.util.XmlUtils;
 import com.alan344happyframework.util.bean.HttpParams;
 import com.ehu.bean.OrderPay;
 import com.ehu.bean.OrderScanPay;
+import com.ehu.bean.PayResponse;
 import com.ehu.config.Wechat;
+import com.ehu.constants.ErrorCode;
 import com.ehu.constants.PayBaseConstants;
-import com.ehu.constants.PayResultCodeConstants;
-import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.core.httpresponsehandler.MapStringStringResponseHandler;
+import com.ehu.core.responsehandler.WechatResponseHandler;
 import com.ehu.exception.PayException;
 import com.ehu.weixin.entity.WeChatResponseVO;
 import com.ehu.weixin.entity.WechatPayOrder;
@@ -179,7 +180,7 @@ public class GetPrepayInfo {
         }
 
         packageParams.put("sign", Signature.getSign(packageParams, wechatMch.getSignKey()));
-        //得到prepayid
+        //得到prepayid，qr_code
         return getSpecificKey(sendRequest(packageParams), "code_url");
     }
 
@@ -197,25 +198,17 @@ public class GetPrepayInfo {
         try {
             responseMap = HttpClientUtils.doPostWithResponseHandler(httpParams, new MapStringStringResponseHandler());
         } catch (IOException | HttpException e) {
-            log.error("获取prepayid失败，params:{}", params);
-            throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008);
+            log.error("预支付失败，params:{}", params);
+            throw new PayException(ErrorCode.PRE_ORDER_FAIL);
         }
 
-        if (responseMap != null && !responseMap.isEmpty()) {
-            if (PayBaseConstants.RETURN_FAIL.equals(responseMap.get("return_code"))) {
-                log.error("获取prepayid失败，params:{}，response:{}", params, responseMap.toString());
-                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008);
-            }
-            if (PayBaseConstants.RETURN_FAIL.equalsIgnoreCase(responseMap.get("result_code"))) {
-                log.error("获取prepayid失败，params:{}，response:{}", params, responseMap.toString());
-                throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008);
-            }
+        PayResponse<Map<String, String>> payResponse = WechatResponseHandler.getInstance().handler(responseMap, null);
 
-            return responseMap;
-        } else {
-            log.error("获取prepayid失败，params:{}", params);
-            throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008);
+        if (!PayBaseConstants.RETURN_SUCCESS.equals(payResponse.getResultCode())) {
+            throw new PayException(ErrorCode.PRE_ORDER_FAIL);
         }
+
+        return responseMap;
     }
 
     /**
@@ -228,7 +221,7 @@ public class GetPrepayInfo {
         if (responseMap.containsKey(key)) {
             return responseMap.get(key);
         } else {
-            throw new PayException(PayResultCodeConstants.ERROR_CODE_WECHATPAY_10008, PayResultMessageConstants.STRING_WECHATPAY_10008);
+            throw new PayException(ErrorCode.PRE_ORDER_FAIL);
         }
     }
 }

@@ -3,9 +3,8 @@ package com.ehu.core.responsehandler;
 import com.alan344happyframework.util.StringUtils;
 import com.ehu.bean.OrderQuery;
 import com.ehu.bean.PayResponse;
+import com.ehu.constants.ErrorCode;
 import com.ehu.constants.PayBaseConstants;
-import com.ehu.constants.PayResultCodeConstants;
-import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.exception.PayException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -75,22 +74,47 @@ public class WechatQueryOrderResponseHandler extends WechatExceptionResponseHand
      */
     private static final String TRADE_STATE_PAYERROR = "PAYERROR";
 
+    /**
+     * 微信支付trade_state:NOTPAY(未支付)
+     */
+    private static final String TRADE_STATE_NOTPAY_30006 = "您还未支付";
+    /**
+     * 微信支付trade_state:REFUND
+     */
+    private static final String TRADE_STATE_REFUND_30008 = "交易退款中";
+    /**
+     * 微信支付trade_state:CLOSED
+     */
+    private static final String TRADE_STATE_CLOSED_30009 = "交易已关闭";
+    /**
+     * 微信支付trade_state:USERPAYING
+     */
+    private static final String TRADE_STATE_USERPAYING_30010 = "支付中";
+    /**
+     * 微信支付trade_state:PAYERROR
+     */
+    private static final String TRADE_STATE_PAYERROR_30011 = "支付失败";
+    /**
+     * 微信支付trade_state:REVOKED
+     */
+    private static final String TRADE_STATE_REVOKED_30012 = "支付已撤销";
+
     private static void checkTradeState(String tradeState) throws PayException {
         switch (tradeState) {
             case TRADE_STATE_NOTPAY:
-                throw new PayException(PayResultCodeConstants.TRADE_STATE_NOTPAY_30006, PayResultMessageConstants.TRADE_STATE_NOTPAY_30006);
+                throw new PayException(TRADE_STATE_NOTPAY_30006, TRADE_STATE_NOTPAY_30006);
             case TRADE_STATE_REFUND:
-                throw new PayException(PayResultCodeConstants.TRADE_STATE_REFUND_30008, PayResultMessageConstants.TRADE_STATE_REFUND_30008);
+                throw new PayException(TRADE_STATE_REFUND_30008, TRADE_STATE_REFUND_30008);
             case TRADE_STATE_CLOSED:
-                throw new PayException(PayResultCodeConstants.TRADE_STATE_CLOSED_30009, PayResultMessageConstants.TRADE_STATE_CLOSED_30009);
+                throw new PayException(TRADE_STATE_CLOSED_30009, TRADE_STATE_CLOSED_30009);
             case TRADE_STATE_USERPAYING:
-                throw new PayException(PayResultCodeConstants.TRADE_STATE_USERPAYING_30010, PayResultMessageConstants.TRADE_STATE_USERPAYING_30010);
+                throw new PayException(TRADE_STATE_USERPAYING_30010, TRADE_STATE_USERPAYING_30010);
             case TRADE_STATE_PAYERROR:
-                throw new PayException(PayResultCodeConstants.TRADE_STATE_PAYERROR_30011, PayResultMessageConstants.TRADE_STATE_PAYERROR_30011);
+                throw new PayException(TRADE_STATE_PAYERROR_30011, TRADE_STATE_PAYERROR_30011);
             case TRADE_STATE_REVOKED:
-                throw new PayException(PayResultCodeConstants.TRADE_STATE_REVOKED_30012, PayResultMessageConstants.TRADE_STATE_REVOKED_30012);
+                throw new PayException(TRADE_STATE_REVOKED_30012, TRADE_STATE_REVOKED_30012);
             default:
-                throw new PayException(PayResultMessageConstants.STRING_WECHATPAY_10003);
+                throw new PayException(ErrorCode.WECHAT_SERVER_ERROR);
         }
     }
 }

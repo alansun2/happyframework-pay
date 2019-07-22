@@ -1,5 +1,6 @@
 package com.ehu.exception;
 
+import com.ehu.constants.ErrorCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,5 +37,11 @@ public class PayException extends Exception {
     public PayException(String msg) {
         super(msg);
         this.errormsg = msg;
+    }
+
+    public PayException(ErrorCode code) {
+        super(code.getMessage());
+        this.errorcode = code.getCode();
+        this.errormsg = code.getMessage();
     }
 }

@@ -4,8 +4,7 @@ import com.alan344happyframework.util.StringUtils;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.ehu.bean.OrderQuery;
 import com.ehu.bean.PayResponse;
-import com.ehu.constants.PayResultCodeConstants;
-import com.ehu.constants.PayResultMessageConstants;
+import com.ehu.constants.ErrorCode;
 import com.ehu.exception.PayException;
 
 /**
@@ -26,9 +25,9 @@ public class AliQueryOrderResponseHandler extends AliExceptionResponseHandlerAbs
     protected void customResponse(PayResponse<Object> payResponse, AlipayTradeQueryResponse alipayResponse, OrderQuery param) throws PayException {
         if (!alipayResponse.isSuccess()) {
             if ("ACQ.TRADE_NOT_EXIST".equals(alipayResponse.getSubCode())) {
-                throw new PayException(PayResultCodeConstants.TRADE_NOT_EXIST_30005, PayResultMessageConstants.TRADE_NOT_EXIST_30005);
+                throw new PayException(ErrorCode.ORDER_NOT_EXIST);
             } else {
-                throw new PayException(PayResultMessageConstants.ALI_SERVER_ERROR);
+                throw new PayException(ErrorCode.ALI_SERVER_ERROR);
             }
         } else {
             if (StringUtils.isEmpty(param.getQueryFlag())) {
@@ -59,7 +58,7 @@ public class AliQueryOrderResponseHandler extends AliExceptionResponseHandlerAbs
             case TRADE_FINISHED:
                 throw new PayException("交易已结束");
             default:
-                throw new PayException(PayResultMessageConstants.ALI_SERVER_ERROR);
+                throw new PayException(ErrorCode.ALI_SERVER_ERROR);
         }
     }
 }

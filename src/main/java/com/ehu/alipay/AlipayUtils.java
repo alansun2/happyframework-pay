@@ -14,9 +14,8 @@ import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.ehu.alipay.entity.TransferSingleParams;
 import com.ehu.bean.*;
 import com.ehu.config.AliPay;
+import com.ehu.constants.ErrorCode;
 import com.ehu.constants.PayBaseConstants;
-import com.ehu.constants.PayResultCodeConstants;
-import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.core.Pay;
 import com.ehu.core.responsehandler.AliFinancialReportResponseHandler;
 import com.ehu.core.responsehandler.AliQueryOrderResponseHandler;
@@ -117,7 +116,7 @@ public class AlipayUtils implements Pay {
             }
         } catch (Exception e) {
             log.error("支付宝扫码错误", e);
-            throw new PayException(PayResultCodeConstants.ALIPAY_SCAN_ERROR_30001, PayResultMessageConstants.ALIPAY_SCAN_ERROR_30001);
+            throw new PayException(ErrorCode.GET_QR_CODE_ERROR);
         }
         return null;
     }

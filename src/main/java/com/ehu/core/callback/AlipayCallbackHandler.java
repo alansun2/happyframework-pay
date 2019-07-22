@@ -2,9 +2,8 @@ package com.ehu.core.callback;
 
 import com.alipay.api.internal.util.AlipaySignature;
 import com.ehu.config.AliPay;
+import com.ehu.constants.ErrorCode;
 import com.ehu.constants.PayBaseConstants;
-import com.ehu.constants.PayResultCodeConstants;
-import com.ehu.constants.PayResultMessageConstants;
 import com.ehu.core.ConcretePayService;
 import com.ehu.exception.PayException;
 import lombok.extern.slf4j.Slf4j;
@@ -28,22 +27,15 @@ public class AlipayCallbackHandler implements CallbackHandler {
         PrintWriter out = null;
         try {
             out = response.getWriter();
-            Map<String, String> params = getAlipayCallBackMap(request);
-            log.info("支付宝回调开始, 参数：{}", params.toString());
+            Map<String, String> paramsMap = getAlipayCallBackMap(request);
+            log.info("支付宝回调开始, 参数：{}", paramsMap.toString());
 
             //调用SDK验证签名
-            if (isVerify && !AlipaySignature.rsaCheckV1(params, aliPay.getOpenPublicKey(), aliPay.getInputCharset(), params.get("sign_type)"))) {
-                log.error(PayResultMessageConstants.STRING_CALLBACK_VER_10007);
-                throw new PayException(PayResultCodeConstants.CALLBACK_VAR_ERROR_10007, PayResultMessageConstants.STRING_CALLBACK_VER_10007);
+            if (isVerify && !AlipaySignature.rsaCheckV1(paramsMap, aliPay.getOpenPublicKey(), aliPay.getInputCharset(), paramsMap.get("sign_type)"))) {
+                throw new PayException(ErrorCode.VERIFY_ERROR);
             }
-            CallBackParam callBackParam = this.getCallBackParam(params);
-            if (null != callBackParam) {
-                concretePayService.handler(callBackParam);
-                //不要修改或删除
-                out.println("success");
-            } else {
-                out.println("fail");
-            }
+            concretePayService.handler(this.getCallBackParam(paramsMap));
+            out.println("success");
         } catch (Exception e) {
             assert out != null;
             out.println("fail");
@@ -55,7 +47,7 @@ public class AlipayCallbackHandler implements CallbackHandler {
         }
     }
 
-    private CallBackParam getCallBackParam(Map<String, String> params) {
+    private CallBackParam getCallBackParam(Map<String, String> params) throws PayException {
         // 商户支付单号
         String out_trade_no = params.get("out_trade_no");
         // 支付宝交易号
@@ -80,8 +72,9 @@ public class AlipayCallbackHandler implements CallbackHandler {
             callBackParam.setThirdOrderId(trade_no);
 
             return callBackParam;
+        } else {
+            throw new PayException("trade_status error");
         }
-        return null;
     }
 
     /**
@@ -93,7 +86,7 @@ public class AlipayCallbackHandler implements CallbackHandler {
     private static Map<String, String> getAlipayCallBackMap(HttpServletRequest request) {
         //获取支付宝POST过来反馈信息
         Map<String, String[]> requestParams = request.getParameterMap();
-        Map<String, String> params = new HashMap<>(requestParams.size());
+        Map<String, String> paramsMap = new HashMap<>(requestParams.size());
         for (String name : requestParams.keySet()) {
             String[] values = requestParams.get(name);
             String valueStr = "";
@@ -102,8 +95,8 @@ public class AlipayCallbackHandler implements CallbackHandler {
                         : valueStr + values[i] + ",";
             }
             //乱码解决，这段代码在出现乱码时使用。如果mysign和sign不相等也可以使用这段代码转化
-            params.put(name, valueStr);
+            paramsMap.put(name, valueStr);
         }
-        return params;
+        return paramsMap;
     }
 }

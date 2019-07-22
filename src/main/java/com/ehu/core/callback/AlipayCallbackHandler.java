@@ -25,7 +25,7 @@ public class AlipayCallbackHandler implements CallbackHandler {
 
     private static AlipayCallbackHandler instance = new AlipayCallbackHandler();
 
-    private static AlipayCallbackHandler getInstance() {
+    public static AlipayCallbackHandler getInstance() {
         return instance;
     }
 

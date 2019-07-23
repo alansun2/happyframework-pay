@@ -1,22 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.ehoo100</groupId>
-    <artifactId>ehu-pay</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <parent>
+        <artifactId>happyframework</artifactId>
+        <groupId>com.alan344</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>happyframework-pay</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <name>pay</name>
     <packaging>jar</packaging>
-    <description>支付</description>
+    <description>该项目主要用来快速接入第三方支付（比如，支付宝和微信）</description>
 
     <properties>
-        <lombok.version>1.16.14</lombok.version>
         <common-io.version>2.6</common-io.version>
-        <slf4j-api.version>1.7.26</slf4j-api.version>
-        <spring-boot.version>2.1.4.RELEASE</spring-boot.version>
         <alipay-sdk-java.version>3.1.0</alipay-sdk-java.version>
         <commons-codec.version>1.12</commons-codec.version>
-
-        <httpclient-utils.version>1.0.0-SNAPSHOT</httpclient-utils.version>
     </properties>
 
     <dependencies>
@@ -32,23 +32,11 @@
             <artifactId>alipay-sdk-java</artifactId>
             <version>${alipay-sdk-java.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${common-io.version}</version>
-        </dependency>
-        <!-- slf4j start -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j-api.version}</version>
         </dependency>
 
         <dependency>
@@ -62,13 +50,11 @@
         <dependency>
             <groupId>com.alan344</groupId>
             <artifactId>happyframework-core</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot</artifactId>
-            <version>${spring-boot.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
             <exclusions>

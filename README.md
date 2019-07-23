@@ -1,9 +1,10 @@
-# 集成支付宝和微信
+# 快速集成支付宝和微信
 > 开发项目必须为spring项目
 
 ### 1. 使用：
-###### 1.1 如何集成到开发项目中？
-只要把以下内容，放入`application.properties/yml`并修改为你自己的微信或支付宝信息即可。
+##### 1.1 如何集成到开发项目中？
+只要把以下内容，放入`application.properties/yml`并修改为你自己的微信或支付宝信息即可(默认可以不填)。
+
 ```
 pay:
   alipay:
@@ -60,5 +61,9 @@ wechat
    *  sign-key: 用户md5签名。表示一个路径，示例：/root/a/private-key
    *  ca: ca证书地址。表示一个路径，示例：/root/a/private-key
    *  ca-code: ca证书的密匙。表示一个路径，示例：/root/a/private-key
+
+##### 1.2 如何使用
+1. `PayUtils`：执行支付、退款、查询订单操作
+2. `TransferAccountsUtils`：转账操作（包括转账到零钱和银行卡（支付宝未开放转账到银行卡接口））
         
 It's all!

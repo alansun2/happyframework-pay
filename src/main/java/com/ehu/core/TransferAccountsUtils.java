@@ -13,7 +13,7 @@ import com.ehu.weixin.entity.TransferToBankCardParams;
 public class TransferAccountsUtils {
 
     /**
-     * 第三方内部转账
+     * 第三方内部转账，如果是支付宝就转账至余额，如果是微信就转账至零钱
      */
     public static PayResponse transferMoneyInternal(TransferMoneyInternal params) throws PayException {
         return PayIntegrate.getPay(params.getPayType()).transferMoneyInternal(params);
@@ -21,6 +21,8 @@ public class TransferAccountsUtils {
 
     /**
      * 转账到银行卡
+     * <p>
+     * 支付宝未开放该接口
      */
     public static PayResponse transferToBankCard(TransferToBankCardParams params) throws PayException {
         return PayIntegrate.getPay(PayBase.PAY_TYPE_2).transferToBankCard(params);
@@ -28,6 +30,8 @@ public class TransferAccountsUtils {
 
     /**
      * 查询转账到银行卡的结果
+     * <p>
+     * 支付宝未开放该接口
      */
     PayResponse getResultOfTransferToBank(String orderId) throws PayException {
         return PayIntegrate.getPay(PayBase.PAY_TYPE_2).getResultOfTransferToBank(orderId);

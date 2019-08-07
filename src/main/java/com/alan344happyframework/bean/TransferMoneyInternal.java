@@ -55,6 +55,6 @@ public class TransferMoneyInternal extends PayBase {
      */
     private String desc;
 
-    private WechatBusinessPay wechatBusinessPay;
+    private WechatBusinessPay wechatBusinessPay = new WechatBusinessPay();
     private AlipayFundTransToaccountTransferModel fundTransToaccountTransferModel;
 }

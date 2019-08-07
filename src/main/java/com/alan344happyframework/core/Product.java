@@ -28,7 +28,8 @@ public interface Product {
             StringBuilder sb = new StringBuilder();
             StringBuilder sbTem = new StringBuilder();
             int size = products.size(), countSum = 0;
-            for (int i = 0; i < size; i++) {
+            int i = 0;
+            for (; i < size; i++) {
                 Product product = products.get(i);
                 String productName = product.getName();
                 sbTem.append(productName);
@@ -51,14 +52,14 @@ public interface Product {
                     }
                 }
             }
-            if (size > 1) {
+            if (i > 0 && size > 1) {
                 sb.deleteCharAt(sb.lastIndexOf(","));
             }
             body = sb.toString();
             body = body.replaceAll(" ", "");
 
             if (size > countSum) {
-                body = addSoOn(body);
+                body = addSoOn(body, i);
             }
         }
         return body;
@@ -67,13 +68,16 @@ public interface Product {
     /**
      * 如果有多个商品
      *
-     * @param body body
+     * @param body  body
+     * @param index 表示body中有多少个商品，如果是1个商品，index = 0，2个商品，index = 1，以此类推
      * @return 处理后的body
      */
-    static String addSoOn(String body) {
+    static String addSoOn(String body, int index) {
         String bodyTem = body + "等";
-        if (bodyTem.getBytes().length > PRODUCT_NAME_LENGTH) {
+        if (index > 0 && bodyTem.getBytes().length > PRODUCT_NAME_LENGTH) {
             return body.substring(0, body.lastIndexOf(SeparatorConstants.COMMA)) + "等";
+        } else if (bodyTem.getBytes().length > PRODUCT_NAME_LENGTH) {
+            return body.substring(0, body.length() - 10) + "等";
         } else {
             return bodyTem;
         }
@@ -88,7 +92,7 @@ public interface Product {
 
     static void main(String[] args) {
         List<Product> products = new ArrayList<>();
-        Product product = () -> "【盒装新鲜毛豆米】300g";
+        Product product = () -> "【盒装新鲜毛豆米】300";
         products.add(product);
         product = () -> "【鲜山羊排】500g±50g";
         products.add(product);

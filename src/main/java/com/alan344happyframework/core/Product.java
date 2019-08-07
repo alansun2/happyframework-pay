@@ -14,7 +14,7 @@ public interface Product {
     /**
      * 支付时给第三方的body长度
      */
-    int PRODUCT_NAME_LENGTH = 127;
+    int PRODUCT_NAME_LENGTH = 124;
 
     /**
      * 获取下单的产品名称，微信不能超过49个字

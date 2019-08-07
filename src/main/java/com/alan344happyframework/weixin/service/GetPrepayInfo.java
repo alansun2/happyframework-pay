@@ -1,9 +1,5 @@
 package com.alan344happyframework.weixin.service;
 
-import com.alan344happyframework.util.HttpClientUtils;
-import com.alan344happyframework.util.StringUtils;
-import com.alan344happyframework.util.XmlUtils;
-import com.alan344happyframework.util.bean.HttpParams;
 import com.alan344happyframework.bean.OrderPay;
 import com.alan344happyframework.bean.OrderScanPay;
 import com.alan344happyframework.bean.PayResponse;
@@ -13,6 +9,10 @@ import com.alan344happyframework.constants.PayBaseConstants;
 import com.alan344happyframework.core.httpresponsehandler.MapStringStringResponseHandler;
 import com.alan344happyframework.core.responsehandler.WechatResponseHandler;
 import com.alan344happyframework.exception.PayException;
+import com.alan344happyframework.util.HttpClientUtils;
+import com.alan344happyframework.util.StringUtils;
+import com.alan344happyframework.util.XmlUtils;
+import com.alan344happyframework.util.bean.HttpParams;
 import com.alan344happyframework.weixin.entity.WeChatResponseVO;
 import com.alan344happyframework.weixin.entity.WechatPayOrder;
 import com.alan344happyframework.weixin.util.Signature;
@@ -199,6 +199,7 @@ public class GetPrepayInfo {
             responseMap = HttpClientUtils.doPostWithResponseHandler(httpParams, new MapStringStringResponseHandler());
         } catch (IOException | HttpException e) {
             log.error("预支付失败，params:{}", params);
+            log.error("预支付失败", e);
             throw new PayException(ErrorCode.PRE_ORDER_FAIL);
         }
 

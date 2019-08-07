@@ -1,5 +1,6 @@
 package com.alan344happyframework.core;
 
+import com.alan344happyframework.constants.SeparatorConstants;
 import com.alan344happyframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public interface Product {
     static String addSoOn(String body) {
         String bodyTem = body + "等";
         if (bodyTem.getBytes().length > PRODUCT_NAME_LENGTH) {
-            return body.substring(0, body.length() - 1) + "等";
+            return body.substring(0, body.lastIndexOf(SeparatorConstants.COMMA)) + "等";
         } else {
             return bodyTem;
         }
@@ -87,9 +88,15 @@ public interface Product {
 
     static void main(String[] args) {
         List<Product> products = new ArrayList<>();
-        Product product = () -> "东山本港白鲳鱼满两斤包邮，不满两斤，必须拍邮费,,,/不然送,东山手工墨鱼汁肠满两斤从的的的士大夫收到";
+        Product product = () -> "【盒装新鲜毛豆米】300g";
         products.add(product);
-        product = () -> "东山本港白鲳鱼满两斤包邮，不满两斤，必须拍邮费,,,/不然送,东山手工墨鱼汁肠满两斤从的的的";
+        product = () -> "【鲜山羊排】500g±50g";
+        products.add(product);
+        product = () -> "【豆饼青菜】100g豆饼+250g青菜";
+        products.add(product);
+        product = () -> "【净甜玉米棒】1000g";
+        products.add(product);
+        product = () -> "【生菜】500g";
         products.add(product);
 
 

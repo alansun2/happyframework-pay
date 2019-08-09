@@ -56,7 +56,7 @@ public interface Product {
                 sb.deleteCharAt(sb.lastIndexOf(","));
             }
             body = sb.toString();
-            body = body.replaceAll(" ", "");
+            body = body.replaceAll("[\\n\\t$%#\\\\？? ]", "");
 
             if (size > countSum) {
                 body = addSoOn(body, i);

@@ -9,7 +9,7 @@ import lombok.Setter;
  **/
 @Getter
 @Setter
-public class Mch {
+class Mch {
     private int mchNo = 1;
     private int mchAppIdNo = 1;
 }

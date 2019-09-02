@@ -7,7 +7,7 @@ import com.alan344happyframework.config.Wechat;
 import com.alan344happyframework.constants.ErrorCode;
 import com.alan344happyframework.constants.PayBaseConstants;
 import com.alan344happyframework.core.httpresponsehandler.MapStringStringResponseHandler;
-import com.alan344happyframework.core.responsehandler.WechatResponseHandler;
+import com.alan344happyframework.core.responsehandler.WechatResponseHandlerBase;
 import com.alan344happyframework.exception.PayException;
 import com.alan344happyframework.util.HttpClientUtils;
 import com.alan344happyframework.util.StringUtils;
@@ -203,7 +203,7 @@ public class GetPrepayInfo {
             throw new PayException(ErrorCode.PRE_ORDER_FAIL);
         }
 
-        PayResponse<Map<String, String>> payResponse = WechatResponseHandler.getInstance().handler(responseMap, null);
+        PayResponse<Map<String, String>> payResponse = WechatResponseHandlerBase.getInstance().handler(responseMap, null);
 
         if (!PayBaseConstants.RETURN_SUCCESS.equals(payResponse.getResultCode())) {
             throw new PayException(ErrorCode.PRE_ORDER_FAIL);

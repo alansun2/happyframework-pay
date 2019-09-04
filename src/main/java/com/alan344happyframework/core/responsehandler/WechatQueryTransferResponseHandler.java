@@ -2,6 +2,7 @@ package com.alan344happyframework.core.responsehandler;
 
 import com.alan344happyframework.bean.PayResponse;
 import com.alan344happyframework.constants.BaseConstants;
+import com.alan344happyframework.constants.PayBaseConstants;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -27,6 +28,8 @@ public class WechatQueryTransferResponseHandler extends WechatResponseHandlerAbs
     void customService(PayResponse<Map<String, String>> payResponse, Map<String, String> response, Object param) {
         if (response.get("status").equals("FAILED")) {
             payResponse.setResultCode(BaseConstants.FAIL);
+        } else if (response.get("status").equals("PROCESSING")) {
+            payResponse.setResultCode(PayBaseConstants.PROCESSING);
         }
     }
 }

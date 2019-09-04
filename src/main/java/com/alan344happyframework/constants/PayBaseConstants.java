@@ -12,6 +12,10 @@ public class PayBaseConstants {
      */
     public static final String RETURN_FAIL = "FAIL";
     /**
+     * 返回：PROCESSING
+     */
+    public static final String PROCESSING = "PROCESSING";
+    /**
      * 返回：请重试
      */
     public static final String TRY_AGAIN = "请稍后重试";

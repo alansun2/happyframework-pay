@@ -23,7 +23,7 @@ public class TransferAccountsUtils {
     /**
      * 查询内部转账的结果
      */
-    public static PayResponse getResultOftransferMoneyInternal(QueryTransferMoneyInternal params) throws PayException {
+    public static PayResponse getResultOfTransferMoneyInternal(QueryTransferMoneyInternal params) throws PayException {
         return PayIntegrate.getPay(params.getPayType()).getResultOfTransferMoneyInternal(params);
     }
 

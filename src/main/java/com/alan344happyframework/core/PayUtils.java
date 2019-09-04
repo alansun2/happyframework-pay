@@ -57,6 +57,10 @@ public class PayUtils {
      * 退款
      * <p>
      * 支持小程序，app退款
+     *
+     * 必须指定 payType
+     *
+     * 如果是微信退款请指定 tradeType
      */
     public static PayResponse refund(OrderRefund refundOrder) throws PayException {
         return PayIntegrate.getPay(refundOrder.getPayType()).refund(refundOrder);

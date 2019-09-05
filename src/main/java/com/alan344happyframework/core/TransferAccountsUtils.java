@@ -15,6 +15,8 @@ public class TransferAccountsUtils {
 
     /**
      * 第三方内部转账，如果是支付宝就转账至余额，如果是微信就转账至零钱
+     *
+     * @return 如果是微信：SUCCESS：转账成功，PROCESSING：处理中，需要后续处理；其他：失败，需要后续处理
      */
     public static PayResponse transferMoneyInternal(TransferMoneyInternal params) throws PayException {
         return PayIntegrate.getPay(params.getPayType()).transferMoneyInternal(params);
@@ -22,6 +24,8 @@ public class TransferAccountsUtils {
 
     /**
      * 查询内部转账的结果
+     *
+     * @return 如果是微信：SUCCESS：转账成功，PROCESSING：处理中，需要后续处理；其他：失败，需要后续处理
      */
     public static PayResponse getResultOfTransferMoneyInternal(QueryTransferMoneyInternal params) throws PayException {
         return PayIntegrate.getPay(params.getPayType()).getResultOfTransferMoneyInternal(params);

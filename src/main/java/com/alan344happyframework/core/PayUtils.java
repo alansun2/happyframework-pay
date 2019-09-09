@@ -50,7 +50,7 @@ public class PayUtils {
      */
     public static void checkOrderIsPaySuccess(OrderQuery orderQuery) throws PayException {
         orderQuery.setQueryFlag(BaseConstants.SUCCESS);
-        PayIntegrate.getPay(orderQuery.getPayType()).queryOrder(orderQuery);
+        PayResponse payResponse = PayIntegrate.getPay(orderQuery.getPayType()).queryOrder(orderQuery);
     }
 
     /**

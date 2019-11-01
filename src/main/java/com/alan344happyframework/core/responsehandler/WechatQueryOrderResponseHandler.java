@@ -43,6 +43,7 @@ public class WechatQueryOrderResponseHandler extends WechatExceptionResponseHand
             default:
                 throw new PayException(responseMap.get("err_code_des"));
         }
+        payResponse.setData(responseMap);
     }
 
     /**

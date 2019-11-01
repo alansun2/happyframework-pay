@@ -1,7 +1,7 @@
 package com.alan344happyframework.core;
 
-import com.alan344happyframework.constants.BaseConstants;
 import com.alan344happyframework.bean.*;
+import com.alan344happyframework.constants.BaseConstants;
 import com.alan344happyframework.exception.PayException;
 
 /**
@@ -48,15 +48,19 @@ public class PayUtils {
      * 支付完成后，前端主动调用接口查询订单是否已支付，如果已支付就修改商户订单状态，
      * 因为第三方的支付的回调可能会比较慢，所以支付完成后让前端调接口
      */
-    public static void checkOrderIsPaySuccess(OrderQuery orderQuery) throws PayException {
+    public static PayResponse checkOrderIsPaySuccess(OrderQuery orderQuery) throws PayException {
         orderQuery.setQueryFlag(BaseConstants.SUCCESS);
-        PayIntegrate.getPay(orderQuery.getPayType()).queryOrder(orderQuery);
+        return PayIntegrate.getPay(orderQuery.getPayType()).queryOrder(orderQuery);
     }
 
     /**
      * 退款
      * <p>
      * 支持小程序，app退款
+     * <p>
+     * 必须指定 payType
+     * <p>
+     * 如果是微信退款请指定 tradeType
      */
     public static PayResponse refund(OrderRefund refundOrder) throws PayException {
         return PayIntegrate.getPay(refundOrder.getPayType()).refund(refundOrder);

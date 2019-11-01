@@ -3,7 +3,8 @@
 
 ### 1. 使用：
 ##### 1.1 如何集成到开发项目中？
-只要把以下内容，放入`application.properties/yml`并修改为你自己的微信或支付宝信息即可(默认可以不填)。
+1. 只要把以下内容，放入`application.properties/yml`并修改为你自己的微信或支付宝信息即可(默认可以不填)。
+2. @SpringBootApplication(scanBasePackages = {"你自己的包路径", "com.alan344happyframework"})
 
 ```
 pay:

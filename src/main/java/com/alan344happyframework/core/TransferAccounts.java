@@ -1,6 +1,7 @@
 package com.alan344happyframework.core;
 
 import com.alan344happyframework.bean.PayResponse;
+import com.alan344happyframework.bean.QueryTransferMoneyInternal;
 import com.alan344happyframework.bean.TransferMoneyInternal;
 import com.alan344happyframework.exception.PayException;
 import com.alan344happyframework.weixin.entity.TransferToBankCardParams;
@@ -17,6 +18,14 @@ public interface TransferAccounts {
      * @return {@link PayResponse}
      */
     PayResponse transferMoneyInternal(TransferMoneyInternal params) throws PayException;
+
+    /**
+     * 查询内部转账的结果
+     *
+     * @param queryTransferMoneyInternal 订单id
+     * @return {@link PayResponse}
+     */
+    PayResponse getResultOfTransferMoneyInternal(QueryTransferMoneyInternal queryTransferMoneyInternal) throws PayException;
 
     /**
      * 转账到银行卡

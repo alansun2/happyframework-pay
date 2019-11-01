@@ -1,15 +1,19 @@
 package com.alan344happyframework.weixin;
 
 import com.alan344happyframework.bean.*;
+import com.alan344happyframework.constants.BaseConstants;
 import com.alan344happyframework.core.PayIntegrate;
-import com.alan344happyframework.core.responsehandler.WechatResponseHandler;
+import com.alan344happyframework.core.responsehandler.WechatResponseHandlerBase;
 import com.alan344happyframework.exception.PayException;
 import com.alan344happyframework.weixin.entity.TransferToBankCardParams;
 import com.alan344happyframework.weixin.entity.WechatBusinessPay;
 import com.alan344happyframework.weixin.service.*;
+import com.github.rholder.retry.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author AlanSun
@@ -72,11 +76,14 @@ public class WechatPayUtils implements PayIntegrate {
      */
     @Override
     public PayResponse refund(OrderRefund refundOrder) throws PayException {
-        return WechatResponseHandler.getInstance().handler(Refund.weChatRefund(refundOrder), null);
+        return WechatResponseHandlerBase.getInstance().handler(Refund.weChatRefund(refundOrder), null);
     }
 
     /**
      * 微信企业转账
+     * <p>
+     * 重试三次
+     * <p>
      * ◆ 不支持给非实名用户打款
      * ◆ 给同一个实名用户付款，单笔单日限额2W/2W
      * ◆ 一个商户同一日付款总额限额100W
@@ -89,7 +96,41 @@ public class WechatPayUtils implements PayIntegrate {
      */
     @Override
     public PayResponse<Map<String, String>> transferMoneyInternal(TransferMoneyInternal params) throws PayException {
-        return TransferMoney.weChatPayBusinessPayForUser(params);
+        Retryer<PayResponse<Map<String, String>>> retryer = RetryerBuilder.<PayResponse<Map<String, String>>>newBuilder()
+                .retryIfException()
+                .retryIfResult(input -> input == null || (!input.getResultCode().equals(BaseConstants.SUCCESS) && input.getData().containsKey("err_code") && input.getData().get("err_code").equals("SYSTEMERROR")))
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(3))
+                .build();
+
+        PayResponse<Map<String, String>> payResponse;
+        try {
+            payResponse = retryer.call(() -> {
+                PayResponse<Map<String, String>> mapPayResponse = TransferMoney.weChatPayBusinessPayForUser(params);
+                if (!BaseConstants.SUCCESS.equals(mapPayResponse.getResultCode()) && mapPayResponse.getData().containsKey("err_code") && mapPayResponse.getData().get("err_code").equals("SYSTEMERROR")) {
+                    PayResponse<Map<String, String>> resultOfBusinessPayForUser = TransferMoney.getResultOfBusinessPayForUser(params);
+                    if (BaseConstants.SUCCESS.equals(mapPayResponse.getResultCode())) {
+                        return resultOfBusinessPayForUser;
+                    }
+                }
+                return mapPayResponse;
+            });
+        } catch (ExecutionException | RetryException e) {
+            log.error("3次重试失败", e);
+            payResponse = TransferMoney.getResultOfBusinessPayForUser(params);
+        }
+        return payResponse;
+    }
+
+    /**
+     * 查询微信企业转账
+     *
+     * @param queryTransferMoneyInternal queryTransferMoneyInternal
+     * @return PayResponse
+     * @throws PayException e
+     */
+    public PayResponse<Map<String, String>> getResultOfTransferMoneyInternal(QueryTransferMoneyInternal queryTransferMoneyInternal) throws PayException {
+        return TransferMoney.getResultOfBusinessPayForUser(queryTransferMoneyInternal);
     }
 
     /**
@@ -97,6 +138,7 @@ public class WechatPayUtils implements PayIntegrate {
      *
      * @param params {@link FinancialReport}
      */
+    @Override
     public PayResponse getFinancial(FinancialReport params) throws PayException {
         return DownloadBill.downloadBill(params);
     }

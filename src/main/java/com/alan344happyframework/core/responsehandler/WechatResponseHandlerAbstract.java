@@ -11,18 +11,10 @@ import java.util.Map;
  * @date 2019/7/5 16:04
  **/
 @Slf4j
-public class WechatResponseHandler implements ResponseHandler<Map<String, String>, Object, Map<String, String>> {
-    private WechatResponseHandler() {
-    }
-
-    private static WechatResponseHandler wechatResponseHandler = new WechatResponseHandler();
-
-    public static WechatResponseHandler getInstance() {
-        return wechatResponseHandler;
-    }
+public abstract class WechatResponseHandlerAbstract<P> implements ResponseHandler<Map<String, String>, P, Map<String, String>> {
 
     @Override
-    public PayResponse<Map<String, String>> handler(Map<String, String> wxResponseMap, Object params) {
+    public PayResponse<Map<String, String>> handler(Map<String, String> wxResponseMap, P param) {
         PayResponse<Map<String, String>> response = new PayResponse<>();
         if (null == wxResponseMap || wxResponseMap.isEmpty()) {
             response.setResultMessage("微信返回有误");
@@ -38,6 +30,7 @@ public class WechatResponseHandler implements ResponseHandler<Map<String, String
                 if (PayBaseConstants.RETURN_FAIL.equals(wxResponseMap.get("result_code"))) {
                     response.setResultMessage(wxResponseMap.get("err_code_des"));
                     response.setResultCode(wxResponseMap.get("err_code"));
+                    this.customService(response, wxResponseMap, param);
                 } else {
                     response.setResultMessage("微信返回有误");
                     response.setResultCode(PayBaseConstants.RETURN_FAIL);
@@ -53,4 +46,6 @@ public class WechatResponseHandler implements ResponseHandler<Map<String, String
 
         return response;
     }
+
+    abstract void customService(PayResponse<Map<String, String>> payResponse, Map<String, String> response, P param);
 }

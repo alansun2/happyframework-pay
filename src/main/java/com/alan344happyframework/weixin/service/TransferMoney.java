@@ -1,24 +1,26 @@
 package com.alan344happyframework.weixin.service;
 
-import com.alan344happyframework.util.HttpClientUtils;
-import com.alan344happyframework.util.RSAUtils;
-import com.alan344happyframework.util.StringUtils;
-import com.alan344happyframework.util.XmlUtils;
-import com.alan344happyframework.util.bean.HttpParams;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.alan344happyframework.bean.PayResponse;
+import com.alan344happyframework.bean.QueryTransferMoneyInternal;
 import com.alan344happyframework.bean.TransferMoneyInternal;
 import com.alan344happyframework.config.Wechat;
 import com.alan344happyframework.constants.PayBaseConstants;
 import com.alan344happyframework.core.LowerUnderscoreFilter;
 import com.alan344happyframework.core.httpresponsehandler.MapStringStringResponseHandler;
-import com.alan344happyframework.core.responsehandler.WechatResponseHandler;
+import com.alan344happyframework.core.responsehandler.WechatQueryTransferResponseHandler;
+import com.alan344happyframework.core.responsehandler.WechatResponseHandlerBase;
 import com.alan344happyframework.exception.PayException;
+import com.alan344happyframework.util.HttpClientUtils;
+import com.alan344happyframework.util.RSAUtils;
+import com.alan344happyframework.util.StringUtils;
+import com.alan344happyframework.util.XmlUtils;
+import com.alan344happyframework.util.bean.HttpParams;
 import com.alan344happyframework.weixin.entity.TransferToBankCardParams;
 import com.alan344happyframework.weixin.entity.WechatBusinessPay;
 import com.alan344happyframework.weixin.util.Signature;
 import com.alan344happyframework.weixin.util.WechatUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpException;
 
@@ -37,6 +39,11 @@ import java.util.TreeMap;
 public class TransferMoney {
 
     private static final String BUSINESS_TRANSFER_URL = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
+
+    /**
+     * 查询企业付款到零钱
+     */
+    private static final String QUERY_BUSINESS_TRANSFER_URL = "https://api.mch.weixin.qq.com/mmpaymkttransfers/gettransferinfo";
 
     /**
      * 转账到银行卡
@@ -92,7 +99,34 @@ public class TransferMoney {
 
         //发送得到微信服务器
         Map<String, String> responseMap = sendRequest(packageParams, wechatMch, BUSINESS_TRANSFER_URL);
-        return WechatResponseHandler.getInstance().handler(responseMap, null);
+        return WechatResponseHandlerBase.getInstance().handler(responseMap, null);
+    }
+
+    /**
+     * 查询企业付款到银行卡
+     *
+     * @param queryTransferMoneyInternal queryTransferMoneyInternal
+     */
+    public static PayResponse<Map<String, String>> getResultOfBusinessPayForUser(QueryTransferMoneyInternal queryTransferMoneyInternal) throws PayException {
+        String transferId = queryTransferMoneyInternal.getTransferId();
+        if (StringUtils.isEmpty(transferId)) {
+            throw new PayException("transferId null error");
+        }
+        int mchNo = queryTransferMoneyInternal.getWechatBusinessPay().getMchNo();
+        int mchAppIdNo = queryTransferMoneyInternal.getWechatBusinessPay().getMchAppIdNo();
+        Wechat config = Wechat.getInstance();
+        Wechat.WechatMch wechatMch = config.getMchMap().get(mchNo);
+
+        SortedMap<String, String> packageParams = new TreeMap<>();
+        packageParams.put("mch_id", wechatMch.getMchId());
+        packageParams.put("partner_trade_no", transferId);
+        packageParams.put("nonce_str", WechatUtils.getNonceStr());
+        packageParams.put("appid", config.getMchAppIdMap().get(mchAppIdNo));
+        packageParams.put("sign", Signature.getSign(packageParams, wechatMch.getSignKey()));
+        //发送得到微信服务器
+        Map<String, String> responseMap = sendRequest(packageParams, wechatMch, QUERY_BUSINESS_TRANSFER_URL);
+
+        return WechatQueryTransferResponseHandler.getInstance().handler(responseMap, null);
     }
 
     /**
@@ -130,7 +164,7 @@ public class TransferMoney {
         Map<String, String> responseMap = sendRequest(packageParams, wechatMch, URL_TO_BANK_URL);
 
 
-        return WechatResponseHandler.getInstance().handler(responseMap, null);
+        return WechatResponseHandlerBase.getInstance().handler(responseMap, null);
     }
 
     /**
@@ -157,7 +191,7 @@ public class TransferMoney {
         //发送得到微信服务器
         Map<String, String> responseMap = sendRequest(packageParams, wechatMch, QUERY_URL_TO_BANK_URL);
 
-        return WechatResponseHandler.getInstance().handler(responseMap, null);
+        return WechatResponseHandlerBase.getInstance().handler(responseMap, null);
     }
 
     private static Map<String, String> sendRequest(SortedMap<String, String> packageParams, Wechat.WechatMch wechatMch, String url) throws PayException {

@@ -1,16 +1,5 @@
 package com.alan344happyframework.alipay;
 
-import com.alan344happyframework.util.StringUtils;
-import com.alipay.api.AlipayApiException;
-import com.alipay.api.AlipayClient;
-import com.alipay.api.AlipayResponse;
-import com.alipay.api.DefaultAlipayClient;
-import com.alipay.api.domain.*;
-import com.alipay.api.request.*;
-import com.alipay.api.response.AlipayDataDataserviceBillDownloadurlQueryResponse;
-import com.alipay.api.response.AlipayTradeAppPayResponse;
-import com.alipay.api.response.AlipayTradePrecreateResponse;
-import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alan344happyframework.alipay.entity.TransferSingleParams;
 import com.alan344happyframework.bean.*;
 import com.alan344happyframework.config.AliPay;
@@ -21,7 +10,18 @@ import com.alan344happyframework.core.responsehandler.AliFinancialReportResponse
 import com.alan344happyframework.core.responsehandler.AliQueryOrderResponseHandler;
 import com.alan344happyframework.core.responsehandler.AliResponseHandlerBase;
 import com.alan344happyframework.exception.PayException;
+import com.alan344happyframework.util.StringUtils;
 import com.alan344happyframework.weixin.entity.TransferToBankCardParams;
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
+import com.alipay.api.AlipayResponse;
+import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.domain.*;
+import com.alipay.api.request.*;
+import com.alipay.api.response.AlipayDataDataserviceBillDownloadurlQueryResponse;
+import com.alipay.api.response.AlipayTradeAppPayResponse;
+import com.alipay.api.response.AlipayTradePrecreateResponse;
+import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.github.rholder.retry.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -217,6 +217,11 @@ public class AlipayUtils implements PayIntegrate {
         }
 
         return AliResponseHandlerBase.getInstance().handler(alipayResponse, null);
+    }
+
+    @Override
+    public PayResponse getResultOfTransferMoneyInternal(QueryTransferMoneyInternal queryTransferMoneyInternal) throws PayException {
+        throw new UnsupportedOperationException();
     }
 
     /**

@@ -10,6 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 class Mch {
-    private int mchNo = 1;
-    private int mchAppIdNo = 1;
+    private transient int mchNo = 1;
+    private transient int mchAppIdNo = 1;
 }

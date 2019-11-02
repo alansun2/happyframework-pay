@@ -1,7 +1,6 @@
 package com.alan344happyframework.core.responsehandler;
 
 import com.alan344happyframework.bean.PayResponse;
-import com.alan344happyframework.constants.BaseConstants;
 import com.alan344happyframework.constants.PayBaseConstants;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,10 +25,19 @@ public class WechatQueryTransferResponseHandler extends WechatResponseHandlerAbs
 
     @Override
     void customService(PayResponse<Map<String, String>> payResponse, Map<String, String> response, Object param) {
-        if (response.get("status").equals("FAILED")) {
-            payResponse.setResultCode(BaseConstants.FAIL);
-        } else if (response.get("status").equals("PROCESSING")) {
-            payResponse.setResultCode(PayBaseConstants.PROCESSING);
+        String status = response.get("status");
+        payResponse.setResultCode(status);
+    }
+
+    @Override
+    void errorCustomService(PayResponse<Map<String, String>> payResponse, Map<String, String> response, Object param) {
+        String err_code = response.get("err_code");
+        if ("ORDERNOTEXIST".equals(err_code)) {
+            payResponse.setResultCode(PayBaseConstants.ORDER_NOT_EXIST);
+        } else if ("NOT_FOUND".equals(err_code)) {
+            payResponse.setResultCode(PayBaseConstants.MANUAL);
+        } else if ("SYSTEMERROR".equals(err_code) || "INVALID_REQUEST".equals(err_code)) {
+            payResponse.setResultCode(PayBaseConstants.RETRY);
         }
     }
 }

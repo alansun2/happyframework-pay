@@ -29,16 +29,18 @@ public abstract class WechatResponseHandlerAbstract<P> implements ResponseHandle
             if (!PayBaseConstants.RETURN_SUCCESS.equals(wxResponseMap.get("result_code"))) {
                 if (PayBaseConstants.RETURN_FAIL.equals(wxResponseMap.get("result_code"))) {
                     response.setResultMessage(wxResponseMap.get("err_code_des"));
-                    response.setResultCode(wxResponseMap.get("err_code"));
-                    this.customService(response, wxResponseMap, param);
+                    response.setResultCode(PayBaseConstants.RETURN_FAIL);
+                    errorCustomService(response, wxResponseMap, param);
                 } else {
                     response.setResultMessage("微信返回有误");
                     response.setResultCode(PayBaseConstants.RETURN_FAIL);
                 }
+            } else {
+                this.customService(response, wxResponseMap, param);
             }
         } else if (wxResponseMap.containsKey("return_code")) {
             response.setResultMessage(wxResponseMap.get("return_msg"));
-            response.setResultCode(wxResponseMap.get("return_code"));
+            response.setResultCode(PayBaseConstants.RETURN_FAIL);
         } else {
             response.setResultMessage("微信返回有误");
             response.setResultCode(PayBaseConstants.RETURN_FAIL);
@@ -47,5 +49,14 @@ public abstract class WechatResponseHandlerAbstract<P> implements ResponseHandle
         return response;
     }
 
-    abstract void customService(PayResponse<Map<String, String>> payResponse, Map<String, String> response, P param);
+    void customService(PayResponse<Map<String, String>> payResponse, Map<String, String> response, P param) {
+
+    }
+
+    /**
+     * result_code == FAIL时的处理
+     */
+    void errorCustomService(PayResponse<Map<String, String>> payResponse, Map<String, String> response, P param) {
+
+    }
 }

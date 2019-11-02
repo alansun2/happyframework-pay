@@ -2,6 +2,7 @@ package com.alan344happyframework.weixin;
 
 import com.alan344happyframework.bean.*;
 import com.alan344happyframework.constants.BaseConstants;
+import com.alan344happyframework.constants.PayBaseConstants;
 import com.alan344happyframework.core.PayIntegrate;
 import com.alan344happyframework.core.responsehandler.WechatResponseHandlerBase;
 import com.alan344happyframework.exception.PayException;
@@ -130,7 +131,21 @@ public class WechatPayUtils implements PayIntegrate {
      * @throws PayException e
      */
     public PayResponse<Map<String, String>> getResultOfTransferMoneyInternal(QueryTransferMoneyInternal queryTransferMoneyInternal) throws PayException {
-        return TransferMoney.getResultOfBusinessPayForUser(queryTransferMoneyInternal);
+        Retryer<PayResponse<Map<String, String>>> retryer = RetryerBuilder.<PayResponse<Map<String, String>>>newBuilder()
+                .retryIfException()
+                .retryIfResult(input -> input == null || (!input.getResultCode().equals(BaseConstants.SUCCESS) && input.getData().containsKey("err_code") && input.getData().get("err_code").equals("SYSTEMERROR")))
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(3))
+                .build();
+
+        PayResponse<Map<String, String>> payResponse;
+        try {
+            payResponse = retryer.call(() -> TransferMoney.getResultOfBusinessPayForUser(queryTransferMoneyInternal));
+        } catch (ExecutionException | RetryException e) {
+            log.error("3次重试失败", e);
+            payResponse = TransferMoney.getResultOfBusinessPayForUser(queryTransferMoneyInternal);
+        }
+        return payResponse;
     }
 
     /**
@@ -153,19 +168,62 @@ public class WechatPayUtils implements PayIntegrate {
      * 5.每个商户号每天可以出款100万，单商户给同一银行卡付款每天限额5万
      * 6.发票：在账户中心-发票信息页面申请开票的商户会按月收到发票（已申请的无需重复申请）。
      *
+     * 这里把微信查询也封装了。
+     * 当转账接口返回 SUCCESS 时，返回 PROCESSING，因为一般银行卡转账需要一段时间处理。
+     * 当转账接口返回 FAIL 时会根据 微信返回的 err_code 来做相应的处理:
+     * if err_code IN (SYSTEMERROR, ORDERPAID, FATAL_ERROR then)
+     *      使用查询接口查询，if 查询接口返回 SUCCESS (请求成功)，then 直接根据返回的 status 来返回，
+     *      if 查询接口返回 FAIL，then 根据查询接口的 err_code 做处理：
+     *      if err_code = NOT_FOUND，then 返回 MANUAL，说明需要手动处理
+     *      else 表示请求失败，返回 PROCESSING
+     * else 表示请求失败，返回 FAIL
+     *
+     * 需要注意的是 FAIL 可以使用原订单号重新发起请求
+     *
      * @param params {@link TransferToBankCardParams}
-     * @return {@link PayResponse}
+     * @return resultCode:
+     * SUCCESS：付款成功
+     * PROCESSING：处理中。对应转账受理成功和查询接口的 status = PROCESSING
+     * FAILED：付款失败
+     * BANK_FAIL：银行退票
+     * MANUAL：需要人工处理
+     * FAIL：请求失败，需要重新发起请求
      */
     @Override
     public PayResponse<Map<String, String>> transferToBankCard(TransferToBankCardParams params) throws PayException {
-        return TransferMoney.transferToBankCard(params);
+        Retryer<PayResponse<Map<String, String>>> retryer = RetryerBuilder.<PayResponse<Map<String, String>>>newBuilder()
+                .retryIfException()
+                .retryIfResult(input -> input == null || input.getResultCode().equals(PayBaseConstants.RETRY))
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(3))
+                .build();
+
+        PayResponse<Map<String, String>> payResponse;
+        try {
+            payResponse = retryer.call(() -> TransferMoney.transferToBankCard(params));
+        } catch (ExecutionException | RetryException e) {
+            log.error("3次重试失败", e);
+            payResponse = TransferMoney.getResultOfTransferToBank(params.getPartnerTradeNo());
+        }
+
+        if (PayBaseConstants.RETRY.equals(payResponse.getResultCode())) {
+            payResponse.setResultCode(PayBaseConstants.RETURN_FAIL);
+        }
+        return payResponse;
     }
 
     /**
      * 查询企业付款到银行卡
      *
-     * @param orderId 商户订单号
-     * @return 是否必填
+     *  if 查询接口返回 SUCCESS (请求成功)，then 直接根据返回的 status 来返回。
+     *  if 查询接口返回 FAIL，then 根据查询接口的 err_code 做处理：
+     *  if err_code = ORDERNOTEXIST(订单不存在)，then 返回 ORDER_NOT_EXIST
+     *  if err_code = NOT_FOUND，then 返回 MANUAL，说明需要手动处理
+     *  else 表示请求失败，返回 FAIL
+     *
+     *  请注意：
+     * <p>
+     * 返回参数：
      * 商户号            mch_id	           是	string(32)	商户号
      * 商户企业付款单号	partner_trade_no   是	string(32)	商户单号
      * 微信企业付款单号	payment_no	       是	string(64)	即为微信内部业务单号
@@ -181,9 +239,37 @@ public class WechatPayUtils implements PayIntegrate {
      * 商户下单时间	   create_time	       是	String(32)	微信侧订单创建时间
      * 成功付款时间	   pay_succ_time	   否	String(32)	微信侧付款成功时间（但无法保证银行不会退票）
      * 失败原因	       reason	           否	String(128)	订单失败原因（如：余额不足）
+     *
+     * @param orderId 商户订单号
+     * @return resultCode:
+     * SUCCESS：付款成功
+     * PROCESSING：处理中
+     * FAILED：付款失败
+     * BANK_FAIL：银行退票
+     * ORDER_NOT_EXIST: 订单不存在
+     * MANUAL：需要人工处理
+     * FAIL：请求失败，需要重新发起请求
      */
     @Override
     public PayResponse<Map<String, String>> getResultOfTransferToBank(String orderId) throws PayException {
-        return TransferMoney.getResultOfTransferToBank(orderId);
+        Retryer<PayResponse<Map<String, String>>> retryer = RetryerBuilder.<PayResponse<Map<String, String>>>newBuilder()
+                .retryIfException()
+                .retryIfResult(input -> input == null || input.getResultCode().equals(PayBaseConstants.RETRY))
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(2))
+                .build();
+
+        PayResponse<Map<String, String>> payResponse;
+        try {
+            payResponse = retryer.call(() -> TransferMoney.getResultOfTransferToBank(orderId));
+        } catch (ExecutionException | RetryException e) {
+            log.error("3次重试失败", e);
+            payResponse = TransferMoney.getResultOfTransferToBank(orderId);
+        }
+
+        if (PayBaseConstants.RETRY.equals(payResponse.getResultCode())) {
+            payResponse.setResultCode(PayBaseConstants.RETURN_FAIL);
+        }
+        return payResponse;
     }
 }

@@ -9,6 +9,7 @@ import com.alan344happyframework.core.LowerUnderscoreFilter;
 import com.alan344happyframework.core.httpresponsehandler.MapStringStringResponseHandler;
 import com.alan344happyframework.core.responsehandler.WechatQueryTransferResponseHandler;
 import com.alan344happyframework.core.responsehandler.WechatResponseHandlerBase;
+import com.alan344happyframework.core.responsehandler.WechatTransferBankResponseHandler;
 import com.alan344happyframework.exception.PayException;
 import com.alan344happyframework.util.HttpClientUtils;
 import com.alan344happyframework.util.RSAUtils;
@@ -103,7 +104,7 @@ public class TransferMoney {
     }
 
     /**
-     * 查询企业付款到银行卡
+     * 查询企业付款到账户
      *
      * @param queryTransferMoneyInternal queryTransferMoneyInternal
      */
@@ -163,8 +164,7 @@ public class TransferMoney {
         //发送得到微信服务器
         Map<String, String> responseMap = sendRequest(packageParams, wechatMch, URL_TO_BANK_URL);
 
-
-        return WechatResponseHandlerBase.getInstance().handler(responseMap, null);
+        return WechatTransferBankResponseHandler.getInstance().handler(responseMap, params);
     }
 
     /**
@@ -191,7 +191,7 @@ public class TransferMoney {
         //发送得到微信服务器
         Map<String, String> responseMap = sendRequest(packageParams, wechatMch, QUERY_URL_TO_BANK_URL);
 
-        return WechatResponseHandlerBase.getInstance().handler(responseMap, null);
+        return WechatQueryTransferResponseHandler.getInstance().handler(responseMap, null);
     }
 
     private static Map<String, String> sendRequest(SortedMap<String, String> packageParams, Wechat.WechatMch wechatMch, String url) throws PayException {

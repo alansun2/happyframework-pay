@@ -1,7 +1,6 @@
 package com.alan344happyframework.core.responsehandler;
 
 import com.alipay.api.AlipayResponse;
-import com.alan344happyframework.bean.PayResponse;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -17,14 +16,5 @@ public class AliResponseHandlerBase extends AliResponseHandlerAbstract<AlipayRes
 
     public static AliResponseHandlerBase getInstance() {
         return aliResponseHandlerBase;
-    }
-
-    @Override
-    protected void customResponse(PayResponse<AlipayResponse> payResponse, AlipayResponse alipayResponse, Object param) {
-        if (!alipayResponse.isSuccess()) {
-            payResponse.setResultCode(alipayResponse.getSubCode());
-            payResponse.setResultMessage(alipayResponse.getSubMsg());
-            payResponse.setData(alipayResponse);
-        }
     }
 }

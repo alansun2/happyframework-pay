@@ -34,6 +34,6 @@ public abstract class AliResponseHandlerAbstract<T extends AlipayResponse, P, R>
         return response;
     }
 
-    protected void customResponse(PayResponse<R> payResponse, T alipayResponse, P param) throws PayException {
+    protected void customResponse(PayResponse<R> payResponse, T alipayResponse, P param) {
     }
 }

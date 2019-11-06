@@ -11,9 +11,7 @@ import com.alan344happyframework.weixin.entity.WechatBusinessPay;
 import com.alan344happyframework.weixin.service.*;
 import com.github.rholder.retry.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;

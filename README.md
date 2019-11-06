@@ -19,10 +19,9 @@ pay:
     sign-type: bbb #选填，默认：RSA2
     time-out: 默认：30m 
   wechat:
-    applets-app-id: ccc #小程序appid
     spbill-create-ip: bbb #调用接口的ip
     notify-url: ddd #微信支付回调地址
-    mch-app-id-map: #与商户号绑定的appid或小程序appid，主要用于转账到微信零钱，默认使用第一个支付
+    mch-app-id-map: #与商户号绑定的appid或小程序appid，默认使用第一个支付
       1: ddd
       2: eee
     mch-map: #商户号信息，默认第一个为primary
@@ -52,7 +51,6 @@ alipay
 
 wechat
 * spbill-create-ip: 调用接口的ip
-* applets-app-id: 小程序appid
 * notify-url: ddd #微信支付回调地址
 * mch-app-id-map: 与商户号绑定的appid或小程序appid，主要用于转账到微信零钱，默认使用第一个appid进行支付，退款，查询订单
   > 该属性为一个map，key为`Integer`，value为`String`

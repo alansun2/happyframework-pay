@@ -5,6 +5,8 @@ import com.alan344happyframework.weixin.entity.WechatFinancialReport;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * @author AlanSun
  * @date 2019/7/16 9:52
@@ -21,10 +23,12 @@ public class FinancialReport extends PayBase {
      * <p>
      * 支付宝支持月账单：格式为yyyy-MM
      */
+    @NotBlank
     private String data;
     /**
      * 下载文件存放绝对路径 （包含文件名）
      */
+    @NotBlank
     private String desPath;
 
     private WechatFinancialReport wechatFinancialReport = new WechatFinancialReport();

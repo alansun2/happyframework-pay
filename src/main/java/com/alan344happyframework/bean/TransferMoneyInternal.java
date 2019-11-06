@@ -5,6 +5,9 @@ import com.alipay.api.domain.AlipayFundTransToaccountTransferModel;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+
 /**
  * @author AlanSun
  * @date 2019/7/5 9:48
@@ -26,6 +29,7 @@ public class TransferMoneyInternal extends QueryTransferMoneyInternal {
      * 收款方账户。与payee_type配合使用。付款方和收款方不能是同一个账户。
      * 最大长度100
      */
+    @NotBlank
     private String payeeAccount;
     /**
      * 实名
@@ -41,6 +45,8 @@ public class TransferMoneyInternal extends QueryTransferMoneyInternal {
      * <p>
      * 必填
      */
+    @NotBlank
+    @Digits(integer = 30, fraction = 2)
     private String amount;
     /**
      * 付款描述 ,必填

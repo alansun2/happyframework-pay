@@ -1,12 +1,15 @@
 package com.alan344happyframework.bean;
 
-import com.alan344happyframework.util.StringUtils;
-import com.alipay.api.domain.AlipayTradeAppPayModel;
 import com.alan344happyframework.core.Product;
+import com.alan344happyframework.util.StringUtils;
 import com.alan344happyframework.weixin.entity.WechatPayOrder;
+import com.alipay.api.domain.AlipayTradeAppPayModel;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Getter
@@ -15,10 +18,14 @@ public class OrderPay extends PayBase {
     /**
      * 订单id，必填
      */
+    @NotBlank
+    @Length(max = 32, min = 1)
     private String orderId;
     /**
      * 订单金额，必填
      */
+    @NotBlank
+    @Digits(integer = 30, fraction = 2)
     private String price;
     /**
      * 对一笔交易的具体描述信息。如果是多种商品，请将商品描述字符串累加传给body。
@@ -27,6 +34,7 @@ public class OrderPay extends PayBase {
      * <p>
      * 必填
      */
+    @NotBlank
     private String body;
     /**
      * body 和 products 二者选其一，如果两个都填，使用body
@@ -37,10 +45,12 @@ public class OrderPay extends PayBase {
      * <p>
      * 必填
      */
+    @NotBlank
     private String subject;
     /**
-     * 回调地址
+     * 回调地址，如果填写的话第三方会在回调你应用的接口
      */
+    @NotBlank
     private String notifyUrl;
     /**
      * 阿里其他参数

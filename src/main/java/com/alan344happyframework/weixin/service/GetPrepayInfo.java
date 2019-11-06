@@ -11,6 +11,7 @@ import com.alan344happyframework.core.responsehandler.WechatResponseHandlerBase;
 import com.alan344happyframework.exception.PayException;
 import com.alan344happyframework.util.HttpClientUtils;
 import com.alan344happyframework.util.StringUtils;
+import com.alan344happyframework.util.ValidationUtil;
 import com.alan344happyframework.util.XmlUtils;
 import com.alan344happyframework.util.bean.HttpParams;
 import com.alan344happyframework.weixin.entity.WeChatResponseVO;
@@ -100,6 +101,11 @@ public class GetPrepayInfo {
      */
     public static WeChatResponseVO generatorPrepayXcx(OrderPay order) throws PayException {
         WechatPayOrder wechatPayOrder = order.getWechatPayOrder();
+        ValidationUtil.ValidResult validResult = ValidationUtil.validateBean(wechatPayOrder);
+        if (validResult.hasErrors()) {
+            throw new IllegalArgumentException(validResult.getErrors());
+        }
+
         int mchNo = wechatPayOrder.getMchNo();
         Wechat config = Wechat.getInstance();
 
@@ -120,11 +126,7 @@ public class GetPrepayInfo {
         packageParams.put("spbill_create_ip", config.getSpbillCreateIp());
         packageParams.put("notify_url", StringUtils.getDefaultIfNull(order.getNotifyUrl(), config.getNotifyUrl()));
         packageParams.put("trade_type", order.getTradeType().getTradeType());
-        String openid = wechatPayOrder.getOpenid();
-        if (StringUtils.isEmpty(openid)) {
-            throw new IllegalArgumentException("openId null error");
-        }
-        packageParams.put("openid", openid);
+        packageParams.put("openid", wechatPayOrder.getOpenid());
         packageParams.put("sign", Signature.getSign(packageParams, signKey));
         //得到prepayid
         String prepayId = getSpecificKey(sendRequest(packageParams), "prepay_id");

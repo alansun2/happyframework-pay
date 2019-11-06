@@ -2,8 +2,11 @@ package com.alan344happyframework.core;
 
 import com.alan344happyframework.alipay.AlipayUtils;
 import com.alan344happyframework.bean.PayBase;
+import com.alan344happyframework.core.proxy.ValidationInvocationHandler;
 import com.alan344happyframework.weixin.WechatPayUtils;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,16 +22,18 @@ public interface PayIntegrate extends Pay, TransferAccounts {
         if (payTypePayMap.containsKey(payType)) {
             pay = payTypePayMap.get(payType);
         } else {
+            InvocationHandler handler;
             switch (payType) {
                 case PayBase.PAY_TYPE_1:
-                    pay = new AlipayUtils();
+                    handler = new ValidationInvocationHandler(new AlipayUtils());
                     break;
                 case PayBase.PAY_TYPE_2:
-                    pay = new WechatPayUtils();
+                    handler = new ValidationInvocationHandler(new WechatPayUtils());
                     break;
                 default:
                     throw new IllegalArgumentException("payType error");
             }
+            pay = (PayIntegrate) Proxy.newProxyInstance(handler.getClass().getClassLoader(), new Class[]{PayIntegrate.class}, handler);
             payTypePayMap.put(payType, pay);
         }
 

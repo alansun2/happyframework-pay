@@ -41,9 +41,7 @@ public class OrderPay extends PayBase {
      */
     private List<? extends Product> bodyProducts;
     /**
-     * 商品的标题/交易标题/订单标题/订单关键字等。
-     * <p>
-     * 必填
+     * 商品的标题/交易标题/订单标题/订单关键字等。例如：火车票
      */
     @NotBlank
     private String subject;

@@ -3,6 +3,9 @@ package com.alan344happyframework.weixin.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+
 /**
  * @author alan
  * @createtime 18-8-28 下午2:05 * 付款到银行卡参数
@@ -16,6 +19,7 @@ public class TransferToBankCardParams extends Mch {
      * <p>
      * 必填
      */
+    @NotBlank
     private String partnerTradeNo;
 
     /**
@@ -24,6 +28,7 @@ public class TransferToBankCardParams extends Mch {
      * <p>
      * 必填
      */
+    @NotBlank
     private String encBankNo;
 
     /**
@@ -32,6 +37,7 @@ public class TransferToBankCardParams extends Mch {
      * <p>
      * 必填
      */
+    @NotBlank
     private String encTrueName;
 
     /**
@@ -55,6 +61,7 @@ public class TransferToBankCardParams extends Mch {
      * 北京银行       1032
      * 宁波银行       1056
      */
+    @NotBlank
     private String bankCode;
 
     /**
@@ -63,6 +70,8 @@ public class TransferToBankCardParams extends Mch {
      * <p>
      * 必填
      */
+    @NotBlank
+    @Digits(integer = 30, fraction = 2)
     private String amount;
     /**
      * 企业付款到银行卡付款说明,即订单备注（UTF8编码，允许100个字符以内）

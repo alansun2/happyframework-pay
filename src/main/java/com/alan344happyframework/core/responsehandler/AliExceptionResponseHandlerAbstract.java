@@ -1,11 +1,10 @@
 package com.alan344happyframework.core.responsehandler;
 
-import com.alibaba.fastjson.JSON;
-import com.alipay.api.AlipayResponse;
 import com.alan344happyframework.bean.PayResponse;
 import com.alan344happyframework.constants.ErrorCode;
-import com.alan344happyframework.constants.PayBaseConstants;
 import com.alan344happyframework.exception.PayException;
+import com.alibaba.fastjson.JSON;
+import com.alipay.api.AlipayResponse;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -22,8 +21,8 @@ public abstract class AliExceptionResponseHandlerAbstract<T extends AlipayRespon
         if (null == alipayResponse) {
             throw new PayException(ErrorCode.ALI_SERVER_ERROR);
         } else {
-            if (!PayBaseConstants.ALIPAY_RETURN_CODE_10000.equals(alipayResponse.getCode())) {
-                throw new PayException(alipayResponse.getCode(), alipayResponse.getMsg());
+            if (!alipayResponse.isSuccess()) {
+                throw new PayException(alipayResponse.getSubCode(), alipayResponse.getSubMsg());
             } else {
                 this.customResponse(response, alipayResponse, params);
             }

@@ -24,14 +24,6 @@ public class Wechat {
     }
 
     /**
-     * 小程序appid
-     * <p>
-     * 应用：
-     * 1.小程序支付
-     * 2.小程序退款
-     */
-    private String appletsAppId;
-    /**
      * 调用ip
      */
     private String spbillCreateIp;
@@ -50,10 +42,6 @@ public class Wechat {
      * 支付回调地址
      */
     private String notifyUrl;
-
-    public void setAppletsAppId(String appletsAppId) {
-        WECHAT_INSTANCE.appletsAppId = appletsAppId;
-    }
 
     public void setSpbillCreateIp(String spbillCreateIp) {
         WECHAT_INSTANCE.spbillCreateIp = spbillCreateIp;

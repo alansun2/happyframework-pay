@@ -21,7 +21,8 @@ public class OrderQuery extends PayBase {
     @NotBlank
     private String orderId;
     /**
-     * 如果该值不填写则返回订单状态，如果填写了该值，则会比较订单状态和该值是否相等，相等返回true，否则返回异常
+     * 如果该值为 null 则直接返回订单状态；
+     * 如果 != null，则会比较订单状态和该值是否相等，相等返回true，否则返回异常
      */
     private String queryFlag;
 

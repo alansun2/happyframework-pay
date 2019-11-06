@@ -1,6 +1,7 @@
 package com.alan344happyframework.weixin.service;
 
 import com.alan344happyframework.util.HttpClientUtils;
+import com.alan344happyframework.util.StringUtils;
 import com.alan344happyframework.util.XmlUtils;
 import com.alan344happyframework.util.bean.HttpParams;
 import com.alan344happyframework.bean.OrderRefund;
@@ -67,6 +68,9 @@ public class Refund {
         packageParams.put("out_refund_no", params.getRefundId());
         packageParams.put("total_fee", orderMoney);
         packageParams.put("refund_fee", refundMoney);
+        if (StringUtils.isNotEmpty(params.getRefundCurrency())) {
+            packageParams.put("refund_fee_type", params.getRefundCurrency());
+        }
         packageParams.put("op_user_id", wechatMch.getMchId());
         packageParams.put("sign", Signature.getSign(packageParams, wechatMch.getSignKey()));
         return sendRequest(packageParams, wechatMch);

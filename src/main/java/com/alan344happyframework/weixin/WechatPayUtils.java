@@ -11,7 +11,9 @@ import com.alan344happyframework.weixin.entity.WechatBusinessPay;
 import com.alan344happyframework.weixin.service.*;
 import com.github.rholder.retry.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -167,17 +169,17 @@ public class WechatPayUtils implements PayIntegrate {
      * 如果商户开通了运营账户，手续费和付款的金额都从运营账户出。如果没有开通，则都从基本户出。
      * 5.每个商户号每天可以出款100万，单商户给同一银行卡付款每天限额5万
      * 6.发票：在账户中心-发票信息页面申请开票的商户会按月收到发票（已申请的无需重复申请）。
-     *
+     * <p>
      * 这里把微信查询也封装了。
      * 当转账接口返回 SUCCESS 时，返回 PROCESSING，因为一般银行卡转账需要一段时间处理。
      * 当转账接口返回 FAIL 时会根据 微信返回的 err_code 来做相应的处理:
      * if err_code IN (SYSTEMERROR, ORDERPAID, FATAL_ERROR then)
-     *      使用查询接口查询，if 查询接口返回 SUCCESS (请求成功)，then 直接根据返回的 status 来返回，
-     *      if 查询接口返回 FAIL，then 根据查询接口的 err_code 做处理：
-     *      if err_code = NOT_FOUND，then 返回 MANUAL，说明需要手动处理
-     *      else 表示请求失败，返回 PROCESSING
+     * 使用查询接口查询，if 查询接口返回 SUCCESS (请求成功)，then 直接根据返回的 status 来返回，
+     * if 查询接口返回 FAIL，then 根据查询接口的 err_code 做处理：
+     * if err_code = NOT_FOUND，then 返回 MANUAL，说明需要手动处理
+     * else 表示请求失败，返回 PROCESSING
      * else 表示请求失败，返回 FAIL
-     *
+     * <p>
      * 需要注意的是 FAIL 可以使用原订单号重新发起请求
      *
      * @param params {@link TransferToBankCardParams}
@@ -214,14 +216,14 @@ public class WechatPayUtils implements PayIntegrate {
 
     /**
      * 查询企业付款到银行卡
-     *
-     *  if 查询接口返回 SUCCESS (请求成功)，then 直接根据返回的 status 来返回。
-     *  if 查询接口返回 FAIL，then 根据查询接口的 err_code 做处理：
-     *  if err_code = ORDERNOTEXIST(订单不存在)，then 返回 ORDER_NOT_EXIST
-     *  if err_code = NOT_FOUND，then 返回 MANUAL，说明需要手动处理
-     *  else 表示请求失败，返回 FAIL
-     *
-     *  请注意：
+     * <p>
+     * if 查询接口返回 SUCCESS (请求成功)，then 直接根据返回的 status 来返回。
+     * if 查询接口返回 FAIL，then 根据查询接口的 err_code 做处理：
+     * if err_code = ORDERNOTEXIST(订单不存在)，then 返回 ORDER_NOT_EXIST
+     * if err_code = NOT_FOUND，then 返回 MANUAL，说明需要手动处理
+     * else 表示请求失败，返回 FAIL
+     * <p>
+     * 请注意：
      * <p>
      * 返回参数：
      * 商户号            mch_id	           是	string(32)	商户号

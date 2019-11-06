@@ -11,4 +11,8 @@ import lombok.Setter;
 @Setter
 @Getter
 public class WeChatRefundInfo extends Mch {
+    /**
+     * 微信退款成功后的回调
+     */
+    private String notifyUrl;
 }

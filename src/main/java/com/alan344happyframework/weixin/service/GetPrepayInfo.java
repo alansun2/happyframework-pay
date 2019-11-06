@@ -109,15 +109,16 @@ public class GetPrepayInfo {
         int mchNo = wechatPayOrder.getMchNo();
         Wechat config = Wechat.getInstance();
 
-        String appletsAppId = config.getAppletsAppId();
         Wechat.WechatMch wechatMch = config.getMchMap().get(mchNo);
         String mchId = wechatMch.getMchId();
         String signKey = wechatMch.getSignKey();
 
+        String appid = config.getMchAppIdMap().get(wechatPayOrder.getMchAppIdNo());
+
         //封装获取prepayid
         String nonceStr = WechatUtils.getNonceStr();
         SortedMap<String, String> packageParams = new TreeMap<>();
-        packageParams.put("appid", appletsAppId);
+        packageParams.put("appid", appid);
         packageParams.put("mch_id", mchId);
         packageParams.put("nonce_str", nonceStr);
         packageParams.put("body", order.getBody());
@@ -133,14 +134,14 @@ public class GetPrepayInfo {
 
         String timeStamp = WechatUtils.getTimeStamp();
         SortedMap<String, String> finalPackage = new TreeMap<>();
-        finalPackage.put("appId", appletsAppId);
+        finalPackage.put("appId", appid);
         finalPackage.put("nonceStr", nonceStr);
         finalPackage.put("package", "prepay_id=" + prepayId);
         finalPackage.put("signType", "MD5");
         finalPackage.put("timeStamp", timeStamp);
 
         WeChatResponseVO weChatResponseVO = new WeChatResponseVO();
-        weChatResponseVO.setAppId(appletsAppId);
+        weChatResponseVO.setAppId(appid);
         weChatResponseVO.setTimeStamp(timeStamp);
         weChatResponseVO.setPackageValue("prepay_id=" + prepayId);
         weChatResponseVO.setNonceStr(nonceStr);

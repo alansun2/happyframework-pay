@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class AliResponseHandlerAbstract<T extends AlipayResponse, P, R> implements ResponseHandler<T, P, R> {
 
     @Override
-    public PayResponse<R> handler(T alipayResponse, P params) throws PayException {
+    public PayResponse<R> handler(T alipayResponse, P params) {
         PayResponse<R> response = new PayResponse<>();
         log.info("支付宝返回信息：{}", JSON.toJSONString(alipayResponse));
         if (null == alipayResponse) {

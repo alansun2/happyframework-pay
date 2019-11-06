@@ -56,11 +56,7 @@ public class Refund {
         Wechat.WechatMch wechatMch = config.getMchMap().get(weChatRefundInfo.getMchNo());
 
         SortedMap<String, String> packageParams = new TreeMap<>();
-        if (TradeTypeEnum.APPLET.equals(params.getTradeType())) {
-            packageParams.put("appid", config.getAppletsAppId());
-        } else if (TradeTypeEnum.APP.equals(params.getTradeType())) {
-            packageParams.put("appid", config.getMchAppIdMap().get(weChatRefundInfo.getMchAppIdNo()));
-        }
+        packageParams.put("appid", config.getMchAppIdMap().get(weChatRefundInfo.getMchAppIdNo()));
         packageParams.put("mch_id", wechatMch.getMchId());
         packageParams.put("nonce_str", WechatUtils.getNonceStr());
         packageParams.put("out_trade_no", params.getOrderId());

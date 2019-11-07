@@ -1,4 +1,7 @@
-import com.alan344happyframework.bean.*;
+import com.alan344happyframework.bean.OrderPay;
+import com.alan344happyframework.bean.OrderRefund;
+import com.alan344happyframework.bean.PayBase;
+import com.alan344happyframework.bean.TransferMoneyInternal;
 import com.alan344happyframework.core.PayUtils;
 import com.alan344happyframework.core.TransferAccountsUtils;
 import com.alan344happyframework.exception.PayException;

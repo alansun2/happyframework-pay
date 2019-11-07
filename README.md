@@ -103,7 +103,7 @@ order.setBodyProducts(bodyProducts);
 ...
 PayUtils.createPayInfo(order);
 ```
-使用 bodyProducts 的前提是 bodyProducts 必须实现 Product 接口。
+使用 bodyProducts 的前提是 bodyProducts 必须实现 Product 接口。notify_url 只要在上面的配置文件中配置了，这里就不需要设置了。
 
 另外对于支付宝/微信的回调，这里我也做了简单的封装，你需要做的就是实现 ConcretePayService 写你的业务逻辑就可以了。具体的做法：
 ```java

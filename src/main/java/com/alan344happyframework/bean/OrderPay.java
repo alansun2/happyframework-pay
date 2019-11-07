@@ -48,7 +48,6 @@ public class OrderPay extends PayBase {
     /**
      * 回调地址，如果填写的话第三方会在回调你应用的接口
      */
-    @NotBlank
     private String notifyUrl;
     /**
      * 阿里其他参数

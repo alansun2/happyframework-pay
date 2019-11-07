@@ -76,7 +76,6 @@ order.setBody("肥仔快乐水");
 order.setPrice("3.25");
 order.setSubject("盒马生鲜");
 order.setOrderId("sadfasdfas234234");
-order.setNotifyUrl("http://www.baidu.com");
 PayUtils.createPayInfo(order);
 ```
 
@@ -86,7 +85,6 @@ OrderPay order = new OrderPay();
 order.setBody("肥仔快乐水");
 order.setPrice("3.25");
 order.setOrderId("sadfasdfas234234");
-order.setNotifyUrl("http://www.baidu.com");
 order.setPayType(PayBase.PAY_TYPE_2);
 // tradeType 默认是 APP，如果要使用小程序支付，需要修改
 orderPay.setTradeType(BaseConstants.OS_WX == os ? TradeTypeEnum.APPLET : TradeTypeEnum.APP);

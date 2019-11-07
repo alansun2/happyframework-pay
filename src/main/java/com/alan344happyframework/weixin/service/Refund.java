@@ -1,14 +1,13 @@
 package com.alan344happyframework.weixin.service;
 
+import com.alan344happyframework.bean.OrderRefund;
+import com.alan344happyframework.config.Wechat;
+import com.alan344happyframework.core.httpresponsehandler.MapStringStringResponseHandler;
+import com.alan344happyframework.exception.PayException;
 import com.alan344happyframework.util.HttpClientUtils;
 import com.alan344happyframework.util.StringUtils;
 import com.alan344happyframework.util.XmlUtils;
 import com.alan344happyframework.util.bean.HttpParams;
-import com.alan344happyframework.bean.OrderRefund;
-import com.alan344happyframework.bean.TradeTypeEnum;
-import com.alan344happyframework.config.Wechat;
-import com.alan344happyframework.core.httpresponsehandler.MapStringStringResponseHandler;
-import com.alan344happyframework.exception.PayException;
 import com.alan344happyframework.weixin.entity.WeChatRefundInfo;
 import com.alan344happyframework.weixin.util.Signature;
 import com.alan344happyframework.weixin.util.WechatUtils;
@@ -66,6 +65,9 @@ public class Refund {
         packageParams.put("refund_fee", refundMoney);
         if (StringUtils.isNotEmpty(params.getRefundCurrency())) {
             packageParams.put("refund_fee_type", params.getRefundCurrency());
+        }
+        if (StringUtils.isNotEmpty(weChatRefundInfo.getNotifyUrl())) {
+            packageParams.put("notify_url", weChatRefundInfo.getNotifyUrl());
         }
         packageParams.put("op_user_id", wechatMch.getMchId());
         packageParams.put("sign", Signature.getSign(packageParams, wechatMch.getSignKey()));

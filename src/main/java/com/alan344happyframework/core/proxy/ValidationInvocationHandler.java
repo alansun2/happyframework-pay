@@ -1,9 +1,11 @@
 package com.alan344happyframework.core.proxy;
 
 
+import com.alan344happyframework.exception.PayException;
 import com.alan344happyframework.util.ValidationUtil;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -23,6 +25,12 @@ public class ValidationInvocationHandler implements InvocationHandler {
         if (validResult.hasErrors()) {
             throw new IllegalArgumentException(validResult.getErrors());
         }
-        return method.invoke(target, args);
+        Object invoke;
+        try {
+            invoke = method.invoke(target, args);
+        } catch (InvocationTargetException e) {
+            throw e.getTargetException();
+        }
+        return invoke;
     }
 }

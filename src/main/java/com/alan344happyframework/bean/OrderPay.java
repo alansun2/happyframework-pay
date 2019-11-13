@@ -1,5 +1,6 @@
 package com.alan344happyframework.bean;
 
+import com.alan344happyframework.constants.SeparatorConstants;
 import com.alan344happyframework.core.Product;
 import com.alan344happyframework.util.StringUtils;
 import com.alan344happyframework.weixin.entity.WechatPayOrder;
@@ -61,6 +62,20 @@ public class OrderPay extends PayBase {
     public void setBodyProducts(List<? extends Product> products) {
         if (StringUtils.isEmpty(this.body)) {
             this.body = Product.getNames(products);
+        }
+    }
+
+    /**
+     * 过滤 body 中的特殊字符
+     *
+     * @param replaceStr 需要去除的文字，使用逗号隔开
+     */
+    public void filterBody(String replaceStr) {
+        if (!org.springframework.util.StringUtils.isEmpty(replaceStr) && StringUtils.isNotEmpty(this.body)) {
+            String[] split = replaceStr.split(SeparatorConstants.COMMA);
+            for (String s : split) {
+                this.body = body.replaceAll(body, s);
+            }
         }
     }
 }

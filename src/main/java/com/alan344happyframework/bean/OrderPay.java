@@ -74,7 +74,7 @@ public class OrderPay extends PayBase {
         if (!org.springframework.util.StringUtils.isEmpty(replaceStr) && StringUtils.isNotEmpty(this.body)) {
             String[] split = replaceStr.split(SeparatorConstants.COMMA);
             for (String s : split) {
-                this.body = body.replaceAll(body, s);
+                this.body = body.replaceAll(s, SeparatorConstants.EMPTY);
             }
         }
     }

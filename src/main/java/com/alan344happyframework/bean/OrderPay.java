@@ -71,10 +71,10 @@ public class OrderPay extends PayBase {
      * @param replaceStr 需要去除的文字，使用逗号隔开
      */
     public void filterBody(String replaceStr) {
-        if (!org.springframework.util.StringUtils.isEmpty(replaceStr) && StringUtils.isNotEmpty(this.body)) {
+        if (StringUtils.isNotEmpty(replaceStr) && StringUtils.isNotEmpty(this.body)) {
             String[] split = replaceStr.split(SeparatorConstants.COMMA);
             for (String s : split) {
-                this.body = body.replaceAll(s, SeparatorConstants.EMPTY);
+                this.body = this.body.replaceAll(s, SeparatorConstants.EMPTY);
             }
         }
     }

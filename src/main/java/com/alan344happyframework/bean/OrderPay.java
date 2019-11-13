@@ -74,7 +74,9 @@ public class OrderPay extends PayBase {
         if (StringUtils.isNotEmpty(replaceStr) && StringUtils.isNotEmpty(this.body)) {
             String[] split = replaceStr.split(SeparatorConstants.COMMA);
             for (String s : split) {
-                this.body = this.body.replaceAll(s, SeparatorConstants.EMPTY);
+                if (this.body.indexOf(s) != -1) {
+                    this.body = this.body.replaceAll(s, SeparatorConstants.EMPTY);
+                }
             }
         }
     }

@@ -68,16 +68,11 @@ public class OrderPay extends PayBase {
     /**
      * 过滤 body 中的特殊字符
      *
-     * @param replaceStr 需要去除的文字，使用逗号隔开
+     * @param regex 正则表达式
      */
-    public void filterBody(String replaceStr) {
-        if (StringUtils.isNotEmpty(replaceStr) && StringUtils.isNotEmpty(this.body)) {
-            String[] split = replaceStr.split(SeparatorConstants.COMMA);
-            for (String s : split) {
-                if (this.body.indexOf(s) != -1) {
-                    this.body = this.body.replaceAll(s, SeparatorConstants.EMPTY);
-                }
-            }
+    public void filterBody(Object regex) {
+        if (regex instanceof String && StringUtils.isNotEmpty(this.body)) {
+            this.body = this.body.replaceAll(regex.toString(), SeparatorConstants.EMPTY);
         }
     }
 }

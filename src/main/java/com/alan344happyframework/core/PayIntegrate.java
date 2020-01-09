@@ -6,7 +6,6 @@ import com.alan344happyframework.core.proxy.ValidationInvocationHandler;
 import com.alan344happyframework.weixin.WechatPayUtils;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +32,7 @@ public interface PayIntegrate extends Pay, TransferAccounts {
                 default:
                     throw new IllegalArgumentException("payType error");
             }
-            pay = (PayIntegrate) Proxy.newProxyInstance(handler.getClass().getClassLoader(), new Class[]{PayIntegrate.class}, handler);
+            pay = ValidationInvocationHandler.getInstance(handler);
             payTypePayMap.put(payType, pay);
         }
 

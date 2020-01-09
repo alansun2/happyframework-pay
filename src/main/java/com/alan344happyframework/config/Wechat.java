@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-@Getter
 @Component
 @ConfigurationProperties(prefix = "pay.wechat")
 public class Wechat {
@@ -59,10 +58,25 @@ public class Wechat {
         WECHAT_INSTANCE.notifyUrl = notifyUrl;
     }
 
+    public String getSpbillCreateIp() {
+        return spbillCreateIp;
+    }
+
+    public Map<Integer, WechatMch> getMchMap() {
+        return mchMap;
+    }
+
+    public Map<Integer, String> getMchAppIdMap() {
+        return mchAppIdMap;
+    }
+
+    public String getNotifyUrl() {
+        return notifyUrl;
+    }
+
     /**
      * 微信商户信息
      */
-    @Getter
     public static class WechatMch {
         /**
          * 商户号
@@ -109,6 +123,26 @@ public class Wechat {
 
         public void setPublicKey(String publicKey) {
             this.publicKey = FileUtils.readFile(publicKey);
+        }
+
+        public String getMchId() {
+            return mchId;
+        }
+
+        public String getSignKey() {
+            return signKey;
+        }
+
+        public String getCa() {
+            return ca;
+        }
+
+        public String getCaCode() {
+            return caCode;
+        }
+
+        public String getPublicKey() {
+            return publicKey;
         }
     }
 }

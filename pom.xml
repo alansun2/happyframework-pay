@@ -98,5 +98,13 @@
             <version>1.2.3</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- spring -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
+
 </project>

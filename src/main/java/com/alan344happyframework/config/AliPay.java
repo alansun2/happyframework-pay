@@ -1,11 +1,9 @@
 package com.alan344happyframework.config;
 
 import com.alan344happyframework.util.FileUtils;
-import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@Getter
 @Component
 @ConfigurationProperties(prefix = "pay.alipay")
 public class AliPay {
@@ -84,5 +82,37 @@ public class AliPay {
 
     public void setNotifyUrl(String notifyUrl) {
         ALIPAY_INSTANCE.notifyUrl = notifyUrl;
+    }
+
+    public String getInputCharset() {
+        return inputCharset;
+    }
+
+    public String getSignType() {
+        return signType;
+    }
+
+    public String getTimeOut() {
+        return timeOut;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
+    public String getOpenPublicKey() {
+        return openPublicKey;
+    }
+
+    public String getGatewayUrl() {
+        return gatewayUrl;
+    }
+
+    public String getNotifyUrl() {
+        return notifyUrl;
     }
 }

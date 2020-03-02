@@ -37,12 +37,12 @@ public class TransferAccountsUtils {
      * 支付宝未开放该接口
      *
      * @return 如果是微信：
-     * SUCCESS：转账成功；
+     * SUCCESS：微信受理成功，转账是否成功还要看银行方面的具体情况；
      * PROCESSING：处理中，需要后续处理；
      * BANK_FAIL：银行退票；
      * FAILED：付款失败,需要替换付款单号重新发起付款；
      * MANUAL：需要人工处理
-     * FAIL：受理失败，需要重试；
+     * FAIL：微信受理失败，需要重试；
      */
     public static PayResponse transferToBankCard(TransferToBankCardParams params) throws PayException {
         return PayIntegrate.getPay(PayBase.PAY_TYPE_2).transferToBankCard(params);

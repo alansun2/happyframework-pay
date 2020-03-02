@@ -130,6 +130,7 @@ public class WechatPayUtils implements PayIntegrate {
      * @return PayResponse
      * @throws PayException e
      */
+    @Override
     public PayResponse<Map<String, String>> getResultOfTransferMoneyInternal(QueryTransferMoneyInternal queryTransferMoneyInternal) throws PayException {
         Retryer<PayResponse<Map<String, String>>> retryer = RetryerBuilder.<PayResponse<Map<String, String>>>newBuilder()
                 .retryIfException()

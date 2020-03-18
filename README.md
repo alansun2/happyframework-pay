@@ -12,9 +12,10 @@
     <dependency>
         <groupId>com.alan344</groupId>
         <artifactId>happyframework-pay</artifactId>
-        <version>1.5.0-SNAPSHOT</version>
+        <version>1.5.2-SNAPSHOT</version>
     </dependency>
     ```
+> 注意：请拉取 master 分支的代码
 2. 把 `@EnablePay` 注解放到有 @SpringBootApplication/@Configuration 的地方；
 
 2. 把以下内容，放入`application.properties/yml`并修改为你自己的微信或支付宝信息即可(有默认值的可以不填)；

@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>happyframework-pay</artifactId>
-    <version>1.5.1-SNAPSHOT</version>
+    <version>1.5.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <description>该项目主要用来快速接入第三方支付（比如，支付宝和微信）</description>
 
@@ -16,7 +16,7 @@
 
     <properties>
         <common-io.version>2.6</common-io.version>
-        <alipay-sdk-java.version>3.1.0</alipay-sdk-java.version>
+        <alipay-sdk-java.version>4.9.71.ALL</alipay-sdk-java.version>
         <commons-codec.version>1.12</commons-codec.version>
     </properties>
 

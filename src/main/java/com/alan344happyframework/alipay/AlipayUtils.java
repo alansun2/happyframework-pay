@@ -201,7 +201,7 @@ public class AlipayUtils implements PayIntegrate {
         model.setOutBizNo(params.getTransferId());
         model.setRemark(params.getDesc());
         model.setPayeeAccount(params.getPayeeAccount());
-        model.setPayerRealName(params.getReUserName());
+        model.setPayeeRealName(params.getReUserName());
 
 //        String paramStr = JSON.toJSONString(params, new LowerUnderscoreFilter());
         request.setBizModel(model);

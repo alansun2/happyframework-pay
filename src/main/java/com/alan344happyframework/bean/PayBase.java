@@ -10,8 +10,14 @@ import lombok.Setter;
 @Getter
 @Setter
 public abstract class PayBase {
+    /**
+     * 交易类型：默认：app 支付
+     */
     private TradeTypeEnum tradeType = TradeTypeEnum.APP;
 
+    /**
+     * 支付方式 1：支付宝；2：微信；默认：支付宝
+     */
     private int payType = PAY_TYPE_1;
 
     /**

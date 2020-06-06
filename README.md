@@ -3,7 +3,7 @@
 
 ### 1. 使用
 #### 1.1. 如何集成到项目中？
-1. git clone https://github.com/alansun2/happyframework.git,因为项目中会以来此项目
+1. git clone https://github.com/alansun2/happyframework.git，因为项目中会依赖此项目
 ```
     mvn clean install
 ```

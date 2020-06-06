@@ -3,7 +3,11 @@
 
 ### 1. 使用
 #### 1.1. 如何集成到项目中？
-1. git clone 此项目，进入目录，使用以下 maven 命令打成 jar 包：
+1. git clone https://github.com/alansun2/happyframework.git,因为项目中会以来此项目
+```
+    mvn clean install
+```
+2. git clone 此项目，进入目录，使用以下 maven 命令打成 jar 包：
     ```
     mvn clean install
     ```

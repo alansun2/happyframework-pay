@@ -8,7 +8,7 @@ import com.alan344happyframework.constants.PayBaseConstants;
 import com.alan344happyframework.core.PayIntegrate;
 import com.alan344happyframework.core.responsehandler.AliFinancialReportResponseHandler;
 import com.alan344happyframework.core.responsehandler.AliQueryOrderResponseHandler;
-import com.alan344happyframework.core.responsehandler.AliResponseHandlerBase;
+import com.alan344happyframework.core.responsehandler.AliResponseHandlerCommon;
 import com.alan344happyframework.exception.PayException;
 import com.alan344happyframework.util.StringUtils;
 import com.alan344happyframework.weixin.entity.TransferToBankCardParams;
@@ -177,7 +177,7 @@ public class AlipayUtils implements PayIntegrate {
             log.error("支付宝扫码退款失败", e);
         }
 
-        return AliResponseHandlerBase.getInstance().handler(alipayResponse, null);
+        return AliResponseHandlerCommon.getInstance().handler(alipayResponse, null);
     }
 
     /**
@@ -216,7 +216,7 @@ public class AlipayUtils implements PayIntegrate {
             log.error("alipay transfer error", e);
         }
 
-        return AliResponseHandlerBase.getInstance().handler(alipayResponse, null);
+        return AliResponseHandlerCommon.getInstance().handler(alipayResponse, null);
     }
 
     @Override

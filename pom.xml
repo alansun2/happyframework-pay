@@ -23,7 +23,7 @@
     </licenses>
 
     <scm>
-        <url>https://github.com/alansun2</url>
+        <url>git@github.com:alansun2/happyframework-pay.git</url>
         <connection>scm:git:https://github.com/alansun2/happyframework-pay</connection>
         <developerConnection>scm:git:https://github.com/alansun2/happyframework-pay.git</developerConnection>
       <tag>v1.5.3</tag>

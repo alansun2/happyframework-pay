@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>happyframework-pay</artifactId>
-    <version>1.5.3</version>
+    <version>1.5.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>happyframework-pay</name>

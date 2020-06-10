@@ -3,23 +3,14 @@
 
 ### 1. 使用
 #### 1.1. 如何集成到项目中？
-1. git clone https://github.com/alansun2/happyframework.git，因为项目中会依赖此项目
+1. 把下面的依赖加到你的 pom.xml 即可：
 ```
-    mvn clean install
-```
-2. git clone 此项目，进入目录，使用以下 maven 命令打成 jar 包：
-    ```
-    mvn clean install
-    ```
-    相应的在 pom.xml 中加入如下依赖：
-    ```
     <dependency>
         <groupId>com.alan344</groupId>
         <artifactId>happyframework-pay</artifactId>
         <version>1.5.2-SNAPSHOT</version>
     </dependency>
-    ```
-> 注意：请拉取 master 分支的代码
+```
 2. 把 `@EnablePay` 注解放到有 @SpringBootApplication/@Configuration 的地方；
 
 2. 把以下内容，放入`application.properties/yml`并修改为你自己的微信或支付宝信息即可(有默认值的可以不填)；

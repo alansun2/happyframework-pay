@@ -38,7 +38,7 @@
     </developers>
 
     <properties>
-        <common-io.version>2.6</common-io.version>
+        <common-io.version>2.7</common-io.version>
         <alipay-sdk-java.version>4.9.71.ALL</alipay-sdk-java.version>
         <commons-codec.version>1.12</commons-codec.version>
     </properties>
